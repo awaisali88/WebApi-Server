@@ -6,7 +6,7 @@ namespace Common
 {
     public static class HttpRequestHeaders
     {
-        public const string ApiKeyValue = "J15jZUAyrKnFadeTQrR4rQWLTRDAeGBFSWGhyfRPzDuK3qtZAa";
+        public const string ApiKeyValue = "pnqxdcABJPkKu0IvtjNvtWqD6iNUxqBaxivBrJwzUfNv4Nbq1S";
 
         public const string RequestUrl = "callback-url";
         public const string ApiKey = "access-token";

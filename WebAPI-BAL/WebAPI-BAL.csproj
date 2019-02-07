@@ -22,9 +22,9 @@
     <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\Dapper.Identity\Dapper.Identity.csproj" />
     <ProjectReference Include="..\Encryptor\Encryptor.csproj" />
-    <ProjectReference Include="..\WebGCS-DataAccess\WebAPI-DataAccess.csproj" />
-    <ProjectReference Include="..\WebGCS-Model\WebAPI-Model.csproj" />
-    <ProjectReference Include="..\WebGCS-ViewModel\WebAPI-ViewModel.csproj" />
+    <ProjectReference Include="..\WebAPI-DataAccess\WebAPI-DataAccess.csproj" />
+    <ProjectReference Include="..\WebAPI-Model\WebAPI-Model.csproj" />
+    <ProjectReference Include="..\WebAPI-ViewModel\WebAPI-ViewModel.csproj" />
   </ItemGroup>
 
   <ItemGroup>

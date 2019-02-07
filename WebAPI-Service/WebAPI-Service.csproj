@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
-    <ProjectReference Include="..\WebGCS-ViewModel\WebAPI-ViewModel.csproj" />
+    <ProjectReference Include="..\WebAPI-ViewModel\WebAPI-ViewModel.csproj" />
   </ItemGroup>
 
 </Project>

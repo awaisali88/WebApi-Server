@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WebGCS-Server\WebAPI-Server.csproj" />
+    <ProjectReference Include="..\WebAPI-Server\WebAPI-Server.csproj" />
   </ItemGroup>
 
 </Project>

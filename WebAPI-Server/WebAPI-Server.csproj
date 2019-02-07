@@ -107,10 +107,10 @@
     <ProjectReference Include="..\ElmahCore.Mvc\ElmahCore.Mvc.csproj" />
     <ProjectReference Include="..\ElmahCore\ElmahCore.csproj" />
     <ProjectReference Include="..\Encryptor\Encryptor.csproj" />
-    <ProjectReference Include="..\WebGCS-BAL\WebAPI-BAL.csproj" />
-    <ProjectReference Include="..\WebGCS-Model\WebAPI-Model.csproj" />
-    <ProjectReference Include="..\WebGCS-Service\WebAPI-Service.csproj" />
-    <ProjectReference Include="..\WebGCS-ViewModel\WebAPI-ViewModel.csproj" />
+    <ProjectReference Include="..\WebAPI-BAL\WebAPI-BAL.csproj" />
+    <ProjectReference Include="..\WebAPI-Model\WebAPI-Model.csproj" />
+    <ProjectReference Include="..\WebAPI-Service\WebAPI-Service.csproj" />
+    <ProjectReference Include="..\WebAPI-ViewModel\WebAPI-ViewModel.csproj" />
   </ItemGroup>
 
   <ItemGroup>
