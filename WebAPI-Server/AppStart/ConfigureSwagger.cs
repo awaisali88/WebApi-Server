@@ -23,7 +23,7 @@ namespace WebAPI_Server.AppStart
                 {
                     Version = "v1",
                     Title = "Web GCS API",
-                    Description = "Access token: J15jZUAyrKnFadeTQrR4rQWLTRDAeGBFSWGhyfRPzDuK3qtZAa",
+                    Description = $"Access token: {HttpRequestHeaders.ApiKeyValue}",
                     //TermsOfService = "None",
                     //Contact = new Contact
                     //{
