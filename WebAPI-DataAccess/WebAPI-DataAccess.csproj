@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <RootNamespace>WebAPI_DataAccess</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="IdentityStore\**" />
+    <Compile Remove="Migrations\**" />
+    <EmbeddedResource Remove="IdentityStore\**" />
+    <EmbeddedResource Remove="Migrations\**" />
+    <None Remove="IdentityStore\**" />
+    <None Remove="Migrations\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Context\ApplicationDbContext_ModelCreating.cs" />
+    <Compile Remove="Context\IDbOptions.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="1.50.5" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj" />
+    <ProjectReference Include="..\Dapper.Repositories\Dapper.Repositories.csproj" />
+    <ProjectReference Include="..\WebGCS-Model\WebAPI-Model.csproj" />
+  </ItemGroup>
+
+</Project>
