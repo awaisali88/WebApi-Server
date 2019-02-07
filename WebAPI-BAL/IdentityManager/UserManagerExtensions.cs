@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
 
-namespace WebGCS_BAL.IdentityManager
+namespace WebAPI_BAL.IdentityManager
 {
     public static class UserManagerExtensions
     {

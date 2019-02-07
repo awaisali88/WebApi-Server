@@ -5,7 +5,7 @@ using AspNetCore.Identity.Dapper;
 using Encryptor;
 using Microsoft.AspNetCore.Identity;
 
-namespace WebGCS_BAL.IdentityManager
+namespace WebAPI_BAL.IdentityManager
 {
     public class PasswordHasherAes : IPasswordHasher<ApplicationUser>
     {
