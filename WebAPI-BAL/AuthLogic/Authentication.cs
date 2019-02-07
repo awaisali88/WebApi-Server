@@ -80,7 +80,7 @@ namespace WebAPI_BAL.AuthLogic
             ApplicationUser user = _mapper.Map<ApplicationUser>(data);
             bool userAlreadyExist = _userManager.Users.Any(x => x.UserName == user.UserName); 
             if (userAlreadyExist)
-                throw new GcsApplicationException(StatusCodes.Status409Conflict, ErrorMessages.ErrorCreatingLocalUser,
+                throw new WebApiApplicationException(StatusCodes.Status409Conflict, ErrorMessages.ErrorCreatingLocalUser,
                     new object[]
                     {
                         new
@@ -92,7 +92,7 @@ namespace WebAPI_BAL.AuthLogic
 
             var result = await _userManager.CreateAsync(user, data.Password);
             if (!result.Succeeded)
-                throw new GcsApplicationException(StatusCodes.Status409Conflict, ErrorMessages.ErrorCreatingLocalUser, result.Errors.ToList());
+                throw new WebApiApplicationException(StatusCodes.Status409Conflict, ErrorMessages.ErrorCreatingLocalUser, result.Errors.ToList());
 
             await SendConfirmationEmail(user);
 
@@ -106,7 +106,7 @@ namespace WebAPI_BAL.AuthLogic
             ApplicationUser user = _mapper.Map<ApplicationUser>(data);
             bool userAlreadyExit = _userManager.Users.Any(x => x.UserName == user.UserName);
             if (userAlreadyExit)
-                throw new GcsApplicationException(StatusCodes.Status409Conflict, ErrorMessages.ErrorCreatingLocalUser,
+                throw new WebApiApplicationException(StatusCodes.Status409Conflict, ErrorMessages.ErrorCreatingLocalUser,
                     new object[]
                     {
                         new
@@ -118,7 +118,7 @@ namespace WebAPI_BAL.AuthLogic
 
             var result = await _userManager.CreateAsync(user);
             if (!result.Succeeded)
-                throw new GcsApplicationException(StatusCodes.Status409Conflict, ErrorMessages.ErrorCreatingLocalUser, result.Errors.ToList());
+                throw new WebApiApplicationException(StatusCodes.Status409Conflict, ErrorMessages.ErrorCreatingLocalUser, result.Errors.ToList());
 
             await SendConfirmationEmail(user);
 
@@ -129,17 +129,17 @@ namespace WebAPI_BAL.AuthLogic
         {
             ApplicationUser data = await _userManager.FindByIdAsync(userId);
             if (data == null)
-                throw new GcsApplicationException(StatusCodes.Status404NotFound, ErrorMessages.ErrorUserNotFound);
+                throw new WebApiApplicationException(StatusCodes.Status404NotFound, ErrorMessages.ErrorUserNotFound);
 
             //CheckRecord(data);
 
             var result = await _userManager.RemovePasswordAsync(data);
             if (!result.Succeeded)
-                throw new GcsApplicationException(StatusCodes.Status409Conflict, ErrorMessages.ErrorCreatingLocalUser, result.Errors.ToList());
+                throw new WebApiApplicationException(StatusCodes.Status409Conflict, ErrorMessages.ErrorCreatingLocalUser, result.Errors.ToList());
 
             var deleteResult = await _userManager.DeleteAsync(data);
             if (!deleteResult.Succeeded)
-                throw new GcsApplicationException(StatusCodes.Status409Conflict, ErrorMessages.ErrorCreatingLocalUser, result.Errors.ToList());
+                throw new WebApiApplicationException(StatusCodes.Status409Conflict, ErrorMessages.ErrorCreatingLocalUser, result.Errors.ToList());
 
             return true;
         }
@@ -148,7 +148,7 @@ namespace WebAPI_BAL.AuthLogic
         {
             var signInResult = await _signInManager.PasswordSignInAsync(data.Email, data.Password, false, false);
             if (!signInResult.Succeeded)
-                throw new GcsApplicationException(StatusCodes.Status403Forbidden, ErrorMessages.InvalidUser,
+                throw new WebApiApplicationException(StatusCodes.Status403Forbidden, ErrorMessages.InvalidUser,
                     new
                     {
                         signInResult.IsNotAllowed,
@@ -160,7 +160,7 @@ namespace WebAPI_BAL.AuthLogic
 
             var identity = await GetClaimsIdentity(data.Email, data.Password);
             if (identity == null)
-                throw new GcsApplicationException(StatusCodes.Status403Forbidden, ErrorMessages.InvalidUser);
+                throw new WebApiApplicationException(StatusCodes.Status403Forbidden, ErrorMessages.InvalidUser);
 
             //var jsonSerlizeSettings = new JsonSerializerSettings {Formatting = Formatting.Indented};
             JwtToken jwt = await Tokens.GenerateJwt(identity, _jwtFactory, data.Email, _jwtOptions,
@@ -191,7 +191,7 @@ namespace WebAPI_BAL.AuthLogic
                 var result = await _userManager.CreateAsync(appUser, Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Substring(0, 8));
 
                 if (!result.Succeeded)
-                    throw new GcsApplicationException(StatusCodes.Status400BadRequest, ErrorMessages.ErrorCreatingFbUser, result.Errors.ToList());
+                    throw new WebApiApplicationException(StatusCodes.Status400BadRequest, ErrorMessages.ErrorCreatingFbUser, result.Errors.ToList());
                 //if (!result.Succeeded) return new BadRequestObjectResult(Errors.AddErrorsToModelState(result, ModelState));
             }
 
@@ -200,7 +200,7 @@ namespace WebAPI_BAL.AuthLogic
 
             if (localUser == null)
             {
-                throw new GcsApplicationException(StatusCodes.Status400BadRequest, ErrorMessages.ErrorCreatingLocalUser);
+                throw new WebApiApplicationException(StatusCodes.Status400BadRequest, ErrorMessages.ErrorCreatingLocalUser);
                 //return BadRequest(Errors.AddErrorToModelState("login_failure", "Failed to create local user account.", ModelState));
             }
 
@@ -224,11 +224,11 @@ namespace WebAPI_BAL.AuthLogic
 
             IdentityResult removePasswordResult = await _userManager.RemovePasswordAsync(user);
             if (!removePasswordResult.Succeeded)
-                throw new GcsApplicationException(StatusCodes.Status400BadRequest, ErrorMessages.ErrorSetPassword, removePasswordResult.Errors.ToList());
+                throw new WebApiApplicationException(StatusCodes.Status400BadRequest, ErrorMessages.ErrorSetPassword, removePasswordResult.Errors.ToList());
 
             IdentityResult result = await _userManager.AddPasswordAsync(user, data.NewPassword);
             if (!result.Succeeded)
-                throw new GcsApplicationException(StatusCodes.Status400BadRequest, ErrorMessages.ErrorSetPassword, result.Errors.ToList());
+                throw new WebApiApplicationException(StatusCodes.Status400BadRequest, ErrorMessages.ErrorSetPassword, result.Errors.ToList());
 
             return true;
         }
@@ -241,7 +241,7 @@ namespace WebAPI_BAL.AuthLogic
             ExtBusinessLogic.CheckRecord(user);
 
             if (user != null && !user.EmailConfirmed)
-                throw new GcsApplicationException(StatusCodes.Status403Forbidden, ErrorMessages.EmailNotVerified);
+                throw new WebApiApplicationException(StatusCodes.Status403Forbidden, ErrorMessages.EmailNotVerified);
 
             string passwordResetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
 
@@ -275,7 +275,7 @@ namespace WebAPI_BAL.AuthLogic
                     x => x.Id == ExtBusinessLogic.UserValue(claim, nameof(ApplicationUser.Id)) && x.Status && !x.Trashed);
             IdentityResult result = await _userManager.ChangePasswordAsync(user, data.OldPassword, data.NewPassword);
             if (!result.Succeeded)
-                throw new GcsApplicationException(StatusCodes.Status400BadRequest, ErrorMessages.ErrorSetPassword, result.Errors.ToList());
+                throw new WebApiApplicationException(StatusCodes.Status400BadRequest, ErrorMessages.ErrorSetPassword, result.Errors.ToList());
 
             return true;
         }
@@ -288,7 +288,7 @@ namespace WebAPI_BAL.AuthLogic
 
             IdentityResult result = await _userManager.ResetPasswordAsync(user, data.Token, data.ConfirmPassword);
             if (!result.Succeeded)
-                throw new GcsApplicationException(StatusCodes.Status400BadRequest, ErrorMessages.ErrorSetPassword, result.Errors.ToList());
+                throw new WebApiApplicationException(StatusCodes.Status400BadRequest, ErrorMessages.ErrorSetPassword, result.Errors.ToList());
 
             return true;
         }
@@ -301,11 +301,11 @@ namespace WebAPI_BAL.AuthLogic
 
             ApplicationUser user = _userManager.Users.FirstOrDefault(x => x.Id == userId);
             if (user == null)
-                throw new GcsApplicationException(StatusCodes.Status404NotFound, ErrorMessages.ErrorUserNotFound);
+                throw new WebApiApplicationException(StatusCodes.Status404NotFound, ErrorMessages.ErrorUserNotFound);
 
             var result = await _userManager.ConfirmEmailAsync(user, token);
             if (!result.Succeeded)
-                throw new GcsApplicationException(StatusCodes.Status409Conflict, ErrorMessages.InvalidUser, result.Errors.ToList());
+                throw new WebApiApplicationException(StatusCodes.Status409Conflict, ErrorMessages.InvalidUser, result.Errors.ToList());
 
             if (!user.Status || user.Trashed)
             {
@@ -313,7 +313,7 @@ namespace WebAPI_BAL.AuthLogic
                 user.Trashed = false;
                 var updateResult = await _userManager.UpdateAsync(user);
                 if (!updateResult.Succeeded)
-                    throw new GcsApplicationException(StatusCodes.Status409Conflict, ErrorMessages.InvalidUser, result.Errors.ToList());
+                    throw new WebApiApplicationException(StatusCodes.Status409Conflict, ErrorMessages.InvalidUser, result.Errors.ToList());
             }
             if (!await _userManager.HasPasswordAsync(user))
             {
@@ -328,7 +328,7 @@ namespace WebAPI_BAL.AuthLogic
             ApplicationUser user =
                 _userManager.Users.FirstOrDefault(x => x.Id == userId && x.Status && !x.Trashed);
             if (!(user != null && user.TokenNumber == tokenNumber))
-                throw new GcsApplicationException(StatusCodes.Status404NotFound, ErrorMessages.ErrorUserNotFound);
+                throw new WebApiApplicationException(StatusCodes.Status404NotFound, ErrorMessages.ErrorUserNotFound);
 
             var identity = await GetClaimsIdentity(user.Email);
             //var jsonSerlizeSettings = new JsonSerializerSettings { Formatting = Formatting.Indented };
@@ -346,7 +346,7 @@ namespace WebAPI_BAL.AuthLogic
             ApplicationUser user = _userManager.Users.FirstOrDefault(x =>
                 x.Id == ExtBusinessLogic.UserValue(claim, nameof(ApplicationUser.Id)));
             if (user == null)
-                throw new GcsApplicationException(StatusCodes.Status404NotFound, ErrorMessages.ErrorUserNotFound);
+                throw new WebApiApplicationException(StatusCodes.Status404NotFound, ErrorMessages.ErrorUserNotFound);
 
             //CheckRecord(user);
 
@@ -368,7 +368,7 @@ namespace WebAPI_BAL.AuthLogic
 
             ApplicationUser user = _userManager.Users.FirstOrDefault(x => x.Id == userId);
             if (user == null)
-                throw new GcsApplicationException(StatusCodes.Status404NotFound, ErrorMessages.ErrorUserNotFound);
+                throw new WebApiApplicationException(StatusCodes.Status404NotFound, ErrorMessages.ErrorUserNotFound);
 
             return await _userManager.ConfirmEmailAsync(user, token);
         }
@@ -414,11 +414,11 @@ namespace WebAPI_BAL.AuthLogic
 
             bool passwordConfirmed = await _userManager.CheckPasswordAsync(userToVerify, password);
             if (!passwordConfirmed)
-                throw new GcsApplicationException(StatusCodes.Status401Unauthorized, ErrorMessages.InvalidUser);
+                throw new WebApiApplicationException(StatusCodes.Status401Unauthorized, ErrorMessages.InvalidUser);
 
             bool emailConfirmed = await _userManager.IsEmailConfirmedAsync(userToVerify);
             if (!emailConfirmed)
-                throw new GcsApplicationException(StatusCodes.Status403Forbidden, ErrorMessages.EmailNotVerified);
+                throw new WebApiApplicationException(StatusCodes.Status403Forbidden, ErrorMessages.EmailNotVerified);
 
             return await Task.FromResult(_jwtFactory.GenerateClaimsIdentity(userName, userToVerify.Id, Convert.ToString(_httpContextAccessor.HttpContext.Connection.RemoteIpAddress)));
         }
@@ -432,7 +432,7 @@ namespace WebAPI_BAL.AuthLogic
 
             bool emailConfirmed = await _userManager.IsEmailConfirmedAsync(userToVerify);
             if (!emailConfirmed)
-                throw new GcsApplicationException(StatusCodes.Status403Forbidden, ErrorMessages.EmailNotVerified);
+                throw new WebApiApplicationException(StatusCodes.Status403Forbidden, ErrorMessages.EmailNotVerified);
 
             return await Task.FromResult(_jwtFactory.GenerateClaimsIdentity(userName, userToVerify.Id, Convert.ToString(_httpContextAccessor.HttpContext.Connection.RemoteIpAddress)));
         }

@@ -20,11 +20,11 @@ namespace WebAPI_BAL
         internal static void CheckRecord<TDefaultColumns>(TDefaultColumns data) where TDefaultColumns : IDefaultColumns
         {
             if (data == null)
-                throw new GcsApplicationException(StatusCodes.Status404NotFound, ErrorMessages.RecordNotFound);
+                throw new WebApiApplicationException(StatusCodes.Status404NotFound, ErrorMessages.RecordNotFound);
             if (!data.Status)
-                throw new GcsApplicationException(StatusCodes.Status403Forbidden, ErrorMessages.InActiveRecord);
+                throw new WebApiApplicationException(StatusCodes.Status403Forbidden, ErrorMessages.InActiveRecord);
             if (data.Trashed)
-                throw new GcsApplicationException(StatusCodes.Status405MethodNotAllowed, ErrorMessages.TrashedRecord);
+                throw new WebApiApplicationException(StatusCodes.Status405MethodNotAllowed, ErrorMessages.TrashedRecord);
         }
 
         internal static TEntity GetInsertEntity<TEntity>(TEntity data, string userId) where TEntity : class, IDefaultColumns

@@ -48,12 +48,12 @@ namespace WebAPI_BAL.AuthLogic
             ApplicationRole roleData = _mapper.Map<ApplicationRole>(data);
             bool roleExist = await _roleManager.RoleExistsAsync(roleData.Name);
             if (roleExist)
-                throw new GcsApplicationException(StatusCodes.Status409Conflict, ErrorMessages.RoleAlreadyExist);
+                throw new WebApiApplicationException(StatusCodes.Status409Conflict, ErrorMessages.RoleAlreadyExist);
 
             roleData.GenerateNewId();
             var result = await _roleManager.CreateAsync(roleData);
             if (!result.Succeeded)
-                throw new GcsApplicationException(StatusCodes.Status400BadRequest, ErrorMessages.CommonErrorMessage, result.Errors.ToList());
+                throw new WebApiApplicationException(StatusCodes.Status400BadRequest, ErrorMessages.CommonErrorMessage, result.Errors.ToList());
 
             return true;
         }
@@ -65,7 +65,7 @@ namespace WebAPI_BAL.AuthLogic
 
             var result = await _roleManager.UpdateAsync(roleData);
             if (!result.Succeeded)
-                throw new GcsApplicationException(StatusCodes.Status400BadRequest, ErrorMessages.CommonErrorMessage, result.Errors.ToList());
+                throw new WebApiApplicationException(StatusCodes.Status400BadRequest, ErrorMessages.CommonErrorMessage, result.Errors.ToList());
 
             return true;
         }
@@ -79,7 +79,7 @@ namespace WebAPI_BAL.AuthLogic
             roleData.ModifiedBy = ExtBusinessLogic.UserValue(claim);
             var result = await _roleManager.DeleteAsync(roleData);
             if (!result.Succeeded)
-                throw new GcsApplicationException(StatusCodes.Status400BadRequest, ErrorMessages.CommonErrorMessage, result.Errors.ToList());
+                throw new WebApiApplicationException(StatusCodes.Status400BadRequest, ErrorMessages.CommonErrorMessage, result.Errors.ToList());
 
             return true;
         }
@@ -87,11 +87,11 @@ namespace WebAPI_BAL.AuthLogic
         public async Task<bool> AssignRole(ClaimsPrincipal claim, string userId, List<string> selectedRoles)
         {
             if (!selectedRoles.Any())
-                throw new GcsApplicationException(StatusCodes.Status400BadRequest, ErrorMessages.EmptyData);
+                throw new WebApiApplicationException(StatusCodes.Status400BadRequest, ErrorMessages.EmptyData);
 
             List<string> roleNames = _roleManager.Roles.Where(x => selectedRoles.Contains(x.Id) && x.Status).Select(x => x.Name).ToList();
             if (!roleNames.Any())
-                throw new GcsApplicationException(StatusCodes.Status404NotFound, ErrorMessages.RecordNotFound);
+                throw new WebApiApplicationException(StatusCodes.Status404NotFound, ErrorMessages.RecordNotFound);
 
             ApplicationUser user =
                 await Task.Run(() => _userManager.Users.FirstOrDefault(x => x.Id == userId));
@@ -99,7 +99,7 @@ namespace WebAPI_BAL.AuthLogic
             user.ModifiedBy = ExtBusinessLogic.UserValue(claim);
             var result = await _userManager.AddToRolesAsync(user, roleNames);
             if (!result.Succeeded)
-                throw new GcsApplicationException(StatusCodes.Status400BadRequest, ErrorMessages.CommonErrorMessage,
+                throw new WebApiApplicationException(StatusCodes.Status400BadRequest, ErrorMessages.CommonErrorMessage,
                     result.Errors.ToList());
 
             return true;
@@ -130,11 +130,11 @@ namespace WebAPI_BAL.AuthLogic
         public async Task<bool> RemoveFromRole(ClaimsPrincipal claim, string userId, List<string> selectedRoles)
         {
             if (!selectedRoles.Any())
-                throw new GcsApplicationException(StatusCodes.Status400BadRequest, ErrorMessages.EmptyData);
+                throw new WebApiApplicationException(StatusCodes.Status400BadRequest, ErrorMessages.EmptyData);
 
             List<string> roleNames = _roleManager.Roles.Where(x => selectedRoles.Contains(x.Id) && x.Status).Select(x => x.Name).ToList();
             if (!roleNames.Any())
-                throw new GcsApplicationException(StatusCodes.Status404NotFound, ErrorMessages.RecordNotFound);
+                throw new WebApiApplicationException(StatusCodes.Status404NotFound, ErrorMessages.RecordNotFound);
 
             ApplicationUser user =
                 await Task.Run(() => _userManager.Users.FirstOrDefault(x => x.Id == userId));
@@ -143,7 +143,7 @@ namespace WebAPI_BAL.AuthLogic
 
             var result = await _userManager.RemoveFromRolesAsync(user, roleNames);
             if (!result.Succeeded)
-                throw new GcsApplicationException(StatusCodes.Status400BadRequest, ErrorMessages.CommonErrorMessage, result.Errors.ToList());
+                throw new WebApiApplicationException(StatusCodes.Status400BadRequest, ErrorMessages.CommonErrorMessage, result.Errors.ToList());
 
             return true;
         }

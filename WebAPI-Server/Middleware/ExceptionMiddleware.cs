@@ -33,7 +33,7 @@ namespace WebAPI_Server.Middleware
         /// </summary>
         /// <param name="httpContext"></param>
         /// <returns></returns>
-        /// <exception cref="GcsApplicationException"></exception>
+        /// <exception cref="WebApiApplicationException"></exception>
         public async Task InvokeAsync(HttpContext httpContext)
         {
             try
@@ -43,7 +43,7 @@ namespace WebAPI_Server.Middleware
                     AuthenticateResult result = await httpContext.AuthenticateAsync("Identity.Application");
                     if (!result.Succeeded)
                     {
-                        throw new GcsApplicationException(StatusCodes.Status412PreconditionFailed,
+                        throw new WebApiApplicationException(StatusCodes.Status412PreconditionFailed,
                             ErrorMessages.InvalidApiKey);
                     }
                 }
@@ -56,7 +56,7 @@ namespace WebAPI_Server.Middleware
                     if (!(httpContext.Request.Headers.TryGetValue(HttpRequestHeaders.ApiKey,
                               out StringValues apiKeyValues) &&
                           (apiKeyValues.FirstOrDefault()?.Equals(HttpRequestHeaders.ApiKeyValue) ?? false)))
-                        throw new GcsApplicationException(StatusCodes.Status412PreconditionFailed, ErrorMessages.InvalidApiKey);
+                        throw new WebApiApplicationException(StatusCodes.Status412PreconditionFailed, ErrorMessages.InvalidApiKey);
                 }
 
                 await _next(httpContext);
@@ -80,9 +80,9 @@ namespace WebAPI_Server.Middleware
             {
                 await HandleModelValidationExceptionAsync(httpContext, ex);
             }
-            catch (GcsApplicationException ex)
+            catch (WebApiApplicationException ex)
             {
-                await HandleGcsAppExceptionAsync(httpContext, ex);
+                await HandleApiAppExceptionAsync(httpContext, ex);
             }
             catch (Exception ex)
             {
@@ -110,7 +110,7 @@ namespace WebAPI_Server.Middleware
                 resultException.ErrorMessage, resultException.ErrorData)));
         }
 
-        private static Task HandleGcsAppExceptionAsync(HttpContext context, GcsApplicationException resultException)
+        private static Task HandleApiAppExceptionAsync(HttpContext context, WebApiApplicationException resultException)
         {
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = resultException.StatusCode;

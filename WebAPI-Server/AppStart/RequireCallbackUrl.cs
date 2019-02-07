@@ -13,7 +13,7 @@ namespace WebAPI_Server.AppStart
             if (!context.HttpContext.Request.Headers.ContainsKey(HttpRequestHeaders.RequestUrl) ||
                 (context.HttpContext.Request.Headers.ContainsKey(HttpRequestHeaders.RequestUrl) &&
                  string.IsNullOrEmpty(context.HttpContext.Request.Headers[HttpRequestHeaders.RequestUrl])))
-                throw new GcsApplicationException(StatusCodes.Status412PreconditionFailed,
+                throw new WebApiApplicationException(StatusCodes.Status412PreconditionFailed,
                     ErrorMessages.InvalidRequestUrl);
         }
     }

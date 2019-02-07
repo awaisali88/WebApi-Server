@@ -205,15 +205,9 @@ namespace WebAPI_Server
             // specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Web GCS API (V1)");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Web API (V1)");
                 c.RoutePrefix = "api-doc";
-                c.DocumentTitle = "Web GCS API Doc";
-                c.OAuthConfigObject = new OAuthConfigObject()
-                {
-                    ClientId = "awais",
-                    ClientSecret = "awais",
-                    UseBasicAuthenticationWithAccessCodeGrant = true
-                };
+                c.DocumentTitle = "Web API Doc";
             });
 
             app.UseDefaultFiles();

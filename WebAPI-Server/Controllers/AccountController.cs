@@ -131,7 +131,7 @@ namespace WebAPI_Server.Controllers
 
             if (!userAccessTokenValidation.Data.IsValid)
             {
-                throw new GcsApplicationException(StatusCodes.Status409Conflict, ErrorMessages.InvalidFbToken, MethodBase.GetCurrentMethod().GetParameters());
+                throw new WebApiApplicationException(StatusCodes.Status409Conflict, ErrorMessages.InvalidFbToken, MethodBase.GetCurrentMethod().GetParameters());
             }
 
             // 3. we've got a valid token so we can request user data from fb
@@ -149,7 +149,7 @@ namespace WebAPI_Server.Controllers
 
             JwtToken result = await _auth.ExternalAuthenticationAsync(registerUser);
             if (result == null)
-                throw new GcsApplicationException(StatusCodes.Status401Unauthorized, ErrorMessages.InvalidUser);
+                throw new WebApiApplicationException(StatusCodes.Status401Unauthorized, ErrorMessages.InvalidUser);
 
             return Ok(result, InfoMessages.UserSignin);
         }
@@ -171,7 +171,7 @@ namespace WebAPI_Server.Controllers
 
             JwtToken result = await _auth.AuthenticateUserAsync(data);
             if (result == null)
-                    throw new GcsApplicationException(StatusCodes.Status401Unauthorized, ErrorMessages.InvalidUser, MethodBase.GetCurrentMethod().GetParameters());
+                    throw new WebApiApplicationException(StatusCodes.Status401Unauthorized, ErrorMessages.InvalidUser, MethodBase.GetCurrentMethod().GetParameters());
             //return StatusCode(StatusCodes.Status401Unauthorized, "Invalid username or password", null);
 
             return Ok(result, InfoMessages.UserSignin);
@@ -302,7 +302,7 @@ namespace WebAPI_Server.Controllers
             var result = await _auth.RefreshTokenAsync(data.Token, data.UserId, data.TokenNumber);
 
             if (result == null)
-                throw new GcsApplicationException(StatusCodes.Status401Unauthorized, ErrorMessages.InvalidUser, MethodBase.GetCurrentMethod().GetParameters());
+                throw new WebApiApplicationException(StatusCodes.Status401Unauthorized, ErrorMessages.InvalidUser, MethodBase.GetCurrentMethod().GetParameters());
 
             return Ok(result, InfoMessages.UserSignin);
         }

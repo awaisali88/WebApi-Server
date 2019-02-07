@@ -22,13 +22,13 @@ namespace WebAPI_Server.AppStart
                 c.SwaggerDoc("v1", new Info
                 {
                     Version = "v1",
-                    Title = "Web GCS API",
+                    Title = "Web API",
                     Description = $"Access token: {HttpRequestHeaders.ApiKeyValue}",
                     //TermsOfService = "None",
                     //Contact = new Contact
                     //{
                     //    Name = "Awais Ali",
-                    //    Email = "awais.ali@liveadmins.com",
+                    //    Email = "",
                     //},
                     //License = new License
                     //{
