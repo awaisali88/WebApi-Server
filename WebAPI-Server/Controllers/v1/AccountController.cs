@@ -1,6 +1,7 @@
 ﻿using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
+using Common;
 using Common.Exception;
 using Common.Messages;
 using Microsoft.AspNetCore.Authorization;
@@ -21,8 +22,9 @@ using WebAPI_ViewModel.Response;
 namespace WebAPI_Server.Controllers.v1
 {
     /// <inheritdoc />
-    [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/auth")]
+    //[Route("api/v{version:apiVersion}/auth")]
+    [ApiVersion(ApiVersionNumber.V1)]
+    [Route("api/auth")]
     [ApiController]
     public class AccountController : BaseController
     {

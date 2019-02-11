@@ -46,4 +46,11 @@ namespace Common
     {
         public const string RemoteIp = "rip";
     }
+
+    public class ApiVersionNumber
+    {
+        public const string V1 = "1.0";
+        public const string V2 = "2.0";
+
+    }
 }

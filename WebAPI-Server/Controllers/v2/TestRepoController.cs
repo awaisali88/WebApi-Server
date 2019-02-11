@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using System.Net.Http;
+using Common;
 using Common.Messages;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -15,7 +16,7 @@ using WebAPI_ViewModel.DTO;
 namespace WebAPI_Server.Controllers.v2
 {
     /// <inheritdoc />
-    [ApiVersion("2.0")]
+    [ApiVersion(ApiVersionNumber.V2)]
     [Route("api/test")]
     [ApiController]
     public class TestRepoController : BaseController
