@@ -124,7 +124,7 @@ namespace Dapper.Repositories.SqlGenerator
         public object LogicalDeleteValue { get; protected set; }
 
         /// <inheritdoc />
-        public virtual SqlQuery GetCount(Expression<Func<TEntity, bool>> predicate)
+        public virtual SqlQuery GetCount(Expression<Func<TEntity, bool>> predicate, bool includeLogicalDeleted)
         {
             var sqlQuery = new SqlQuery();
 
@@ -133,14 +133,14 @@ namespace Dapper.Repositories.SqlGenerator
                 .Append(TableName)
                 .Append(" ");
 
-            AppendWherePredicateQuery(sqlQuery, predicate, QueryType.Select);
+            AppendWherePredicateQuery(sqlQuery, predicate, QueryType.Select, includeLogicalDeleted);
 
             LogSqlQuery(sqlQuery);
             return sqlQuery;
         }
 
         /// <inheritdoc />
-        public virtual SqlQuery GetCount(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, object>> distinctField)
+        public virtual SqlQuery GetCount(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, object>> distinctField, bool includeLogicalDeleted)
         {
             var propertyName = ExpressionHelper.GetPropertyName(distinctField);
             var property = SqlProperties.First(x => x.PropertyName == propertyName);
@@ -151,26 +151,26 @@ namespace Dapper.Repositories.SqlGenerator
                 .Append(TableName)
                 .Append(" ");
 
-            AppendWherePredicateQuery(sqlQuery, predicate, QueryType.Select);
+            AppendWherePredicateQuery(sqlQuery, predicate, QueryType.Select, includeLogicalDeleted);
 
             LogSqlQuery(sqlQuery);
             return sqlQuery;
         }
 
         /// <inheritdoc />
-        public virtual SqlQuery GetSelectFirst(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes)
+        public virtual SqlQuery GetSelectFirst(Expression<Func<TEntity, bool>> predicate, bool includeLogicalDeleted, params Expression<Func<TEntity, object>>[] includes)
         {
-            return GetSelect(predicate, true, includes);
+            return GetSelect(predicate, true, includeLogicalDeleted, includes);
         }
 
         /// <inheritdoc />
-        public virtual SqlQuery GetSelectAll(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes)
+        public virtual SqlQuery GetSelectAll(Expression<Func<TEntity, bool>> predicate, bool includeLogicalDeleted, params Expression<Func<TEntity, object>>[] includes)
         {
-            return GetSelect(predicate, false, includes);
+            return GetSelect(predicate, false, includeLogicalDeleted, includes);
         }
 
         /// <inheritdoc />
-        public SqlQuery GetSelectById(object id, params Expression<Func<TEntity, object>>[] includes)
+        public SqlQuery GetSelectById(object id, bool includeLogicalDeleted, params Expression<Func<TEntity, object>>[] includes)
         {
             if (KeySqlProperties.Length != 1)
                 throw new NotSupportedException("GetSelectById support only 1 key");
@@ -211,7 +211,7 @@ namespace Dapper.Repositories.SqlGenerator
                 .Append(keyProperty.PropertyName)
                 .Append(" ");
 
-            if (LogicalDelete)
+            if (LogicalDelete && !includeLogicalDeleted)
                 sqlQuery.SqlBuilder
                     .Append("AND ")
                     .Append(TableName)
@@ -232,11 +232,11 @@ namespace Dapper.Repositories.SqlGenerator
 
         /// <inheritdoc />
         public virtual SqlQuery GetSelectBetween(object from, object to, Expression<Func<TEntity, object>> btwField,
-            Expression<Func<TEntity, bool>> expression = null)
+            bool includeLogicalDeleted, Expression<Func<TEntity, bool>> expression = null)
         {
             var fieldName = ExpressionHelper.GetPropertyName(btwField);
             var columnName = SqlProperties.First(x => x.PropertyName == fieldName).ColumnName;
-            var query = GetSelectAll(expression);
+            var query = GetSelectAll(expression, includeLogicalDeleted);
 
             query.SqlBuilder
                 .Append(expression == null && !LogicalDelete ? "WHERE" : "AND")
@@ -545,7 +545,7 @@ namespace Dapper.Repositories.SqlGenerator
             return query;
         }
 
-        private void AppendWherePredicateQuery(SqlQuery sqlQuery, Expression<Func<TEntity, bool>> predicate, QueryType queryType)
+        private void AppendWherePredicateQuery(SqlQuery sqlQuery, Expression<Func<TEntity, bool>> predicate, QueryType queryType, bool includeLogicalDeleted = false)
         {
             IDictionary<string, object> dictionaryParams = new Dictionary<string, object>();
 
@@ -585,12 +585,12 @@ namespace Dapper.Repositories.SqlGenerator
                     dictionaryParams[item.PropertyName] = item.PropertyValue;
                 }
 
-                if (LogicalDelete && queryType == QueryType.Select)
+                if (LogicalDelete && queryType == QueryType.Select && !includeLogicalDeleted)
                     sqlQuery.SqlBuilder.Append("AND " + TableName + "." + StatusPropertyName + " != " + LogicalDeleteValue + " ");
             }
             else
             {
-                if (LogicalDelete && queryType == QueryType.Select)
+                if (LogicalDelete && queryType == QueryType.Select && !includeLogicalDeleted)
                     sqlQuery.SqlBuilder.Append("WHERE " + TableName + "." + StatusPropertyName + " != " + LogicalDeleteValue + " ");
             }
 
@@ -769,7 +769,7 @@ namespace Dapper.Repositories.SqlGenerator
             return string.Join(", ", properties.Select(ProjectionFunction));
         }
 
-        private SqlQuery GetSelect(Expression<Func<TEntity, bool>> predicate, bool firstOnly, params Expression<Func<TEntity, object>>[] includes)
+        private SqlQuery GetSelect(Expression<Func<TEntity, bool>> predicate, bool firstOnly, bool includeLogicalDeleted, params Expression<Func<TEntity, object>>[] includes)
         {
             var sqlQuery = InitBuilderSelect(firstOnly);
 
@@ -784,7 +784,7 @@ namespace Dapper.Repositories.SqlGenerator
                 sqlQuery.SqlBuilder.Append(" FROM " + TableName + " ");
             }
 
-            AppendWherePredicateQuery(sqlQuery, predicate, QueryType.Select);
+            AppendWherePredicateQuery(sqlQuery, predicate, QueryType.Select, includeLogicalDeleted);
 
             if (firstOnly && (Config.SqlProvider == SqlProvider.MySQL || Config.SqlProvider == SqlProvider.PostgreSQL))
                 sqlQuery.SqlBuilder.Append("LIMIT 1");

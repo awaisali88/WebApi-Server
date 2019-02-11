@@ -25,109 +25,109 @@ namespace Dapper.Repositories
         /// <summary>
         ///     Get number of rows
         /// </summary>
-        int Count();
+        int Count(bool includeLogicalDeleted);
         
         /// <summary>
         ///     Get number of rows
         /// </summary>
-        int Count(IDbTransaction transaction);
+        int Count(bool includeLogicalDeleted, IDbTransaction transaction);
 
         /// <summary>
         ///     Get number of rows with WHERE clause
         /// </summary>
-        int Count(Expression<Func<TEntity, bool>> predicate);
+        int Count(Expression<Func<TEntity, bool>> predicate, bool includeLogicalDeleted);
         
         /// <summary>
         ///     Get number of rows with WHERE clause
         /// </summary>
-        int Count(Expression<Func<TEntity, bool>> predicate, IDbTransaction transaction);
+        int Count(Expression<Func<TEntity, bool>> predicate, bool includeLogicalDeleted, IDbTransaction transaction);
 
         /// <summary>
         ///     Get number of rows with DISTINCT clause
         /// </summary>
-        int Count(Expression<Func<TEntity, object>> distinctField);
+        int Count(Expression<Func<TEntity, object>> distinctField, bool includeLogicalDeleted);
         
         /// <summary>
         ///     Get number of rows with DISTINCT clause
         /// </summary>
-        int Count(Expression<Func<TEntity, object>> distinctField, IDbTransaction transaction);
+        int Count(Expression<Func<TEntity, object>> distinctField, bool includeLogicalDeleted, IDbTransaction transaction);
 
         /// <summary>
         ///     Get number of rows with DISTINCT and WHERE clause
         /// </summary>
-        int Count(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, object>> distinctField);
+        int Count(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, object>> distinctField, bool includeLogicalDeleted);
         
         /// <summary>
         ///     Get number of rows with DISTINCT and WHERE clause
         /// </summary>
-        int Count(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, object>> distinctField, IDbTransaction transaction);
+        int Count(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, object>> distinctField, bool includeLogicalDeleted, IDbTransaction transaction);
 
         /// <summary>
         ///     Get number of rows
         /// </summary>
-        Task<int> CountAsync();
+        Task<int> CountAsync(bool includeLogicalDeleted);
         
         /// <summary>
         ///     Get number of rows
         /// </summary>
-        Task<int> CountAsync(IDbTransaction transaction);
+        Task<int> CountAsync(bool includeLogicalDeleted, IDbTransaction transaction);
 
         /// <summary>
         ///     Get number of rows with WHERE clause
         /// </summary>
-        Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate);
+        Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate, bool includeLogicalDeleted);
         
         /// <summary>
         ///     Get number of rows with WHERE clause
         /// </summary>
-        Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate, IDbTransaction transaction);
+        Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate, bool includeLogicalDeleted, IDbTransaction transaction);
 
         /// <summary>
         ///     Get number of rows with DISTINCT clause
         /// </summary>
-        Task<int> CountAsync(Expression<Func<TEntity, object>> distinctField);
+        Task<int> CountAsync(Expression<Func<TEntity, object>> distinctField, bool includeLogicalDeleted);
         
         /// <summary>
         ///     Get number of rows with DISTINCT clause
         /// </summary>
-        Task<int> CountAsync(Expression<Func<TEntity, object>> distinctField, IDbTransaction transaction);
+        Task<int> CountAsync(Expression<Func<TEntity, object>> distinctField, bool includeLogicalDeleted, IDbTransaction transaction);
 
         /// <summary>
         ///     Get number of rows with DISTINCT and WHERE clause
         /// </summary>
-        Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, object>> distinctField);
+        Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, object>> distinctField, bool includeLogicalDeleted);
         
         /// <summary>
         ///     Get number of rows with DISTINCT and WHERE clause
         /// </summary>
-        Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, object>> distinctField, IDbTransaction transaction);
+        Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, object>> distinctField, bool includeLogicalDeleted, IDbTransaction transaction);
 
         /// <summary>
         ///     Get first object
         /// </summary>
-        TEntity Find();
+        TEntity Find(bool includeLogicalDeleted);
 
         /// <summary>
         ///     Get first object
         /// </summary>
-        TEntity Find(Expression<Func<TEntity, bool>> predicate);
+        TEntity Find(Expression<Func<TEntity, bool>> predicate, bool includeLogicalDeleted);
 
         /// <summary>
         ///     Get first object
         /// </summary>
-        TEntity Find(IDbTransaction transaction);
+        TEntity Find(bool includeLogicalDeleted, IDbTransaction transaction);
 
         /// <summary>
         ///     Get first object
         /// </summary>
-        TEntity Find(Expression<Func<TEntity, bool>> predicate, IDbTransaction transaction);
+        TEntity Find(Expression<Func<TEntity, bool>> predicate, bool includeLogicalDeleted, IDbTransaction transaction);
 
         /// <summary>
         ///     Get first object with join objects
         /// </summary>
         TEntity Find<TChild1>(Expression<Func<TEntity, bool>> predicate,
             Expression<Func<TEntity, object>> tChild1,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get first object with join objects
@@ -135,7 +135,7 @@ namespace Dapper.Repositories
         TEntity Find<TChild1, TChild2>(Expression<Func<TEntity, bool>> predicate,
             Expression<Func<TEntity, object>> tChild1,
             Expression<Func<TEntity, object>> tChild2,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get first object with join objects
@@ -144,7 +144,7 @@ namespace Dapper.Repositories
             Expression<Func<TEntity, object>> tChild1,
             Expression<Func<TEntity, object>> tChild2,
             Expression<Func<TEntity, object>> tChild3,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get first object with join objects
@@ -154,7 +154,7 @@ namespace Dapper.Repositories
             Expression<Func<TEntity, object>> tChild2,
             Expression<Func<TEntity, object>> tChild3,
             Expression<Func<TEntity, object>> tChild4,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get first object with join objects
@@ -165,7 +165,7 @@ namespace Dapper.Repositories
             Expression<Func<TEntity, object>> tChild3,
             Expression<Func<TEntity, object>> tChild4,
             Expression<Func<TEntity, object>> tChild5,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get first object with join objects
@@ -177,24 +177,24 @@ namespace Dapper.Repositories
             Expression<Func<TEntity, object>> tChild4,
             Expression<Func<TEntity, object>> tChild5,
             Expression<Func<TEntity, object>> tChild6,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get object by Id
         /// </summary>
-        TEntity FindById(object id);
+        TEntity FindById(object id, bool includeLogicalDeleted);
 
         /// <summary>
         ///     Get object by Id
         /// </summary>
-        TEntity FindById(object id, IDbTransaction transaction);
+        TEntity FindById(object id, bool includeLogicalDeleted, IDbTransaction transaction);
 
         /// <summary>
         ///     Get object by Id with join objects
         /// </summary>
         TEntity FindById<TChild1>(object id,
             Expression<Func<TEntity, object>> tChild1,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get object by Id with join objects
@@ -202,7 +202,7 @@ namespace Dapper.Repositories
         TEntity FindById<TChild1, TChild2>(object id,
             Expression<Func<TEntity, object>> tChild1,
             Expression<Func<TEntity, object>> tChild2,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get object by Id with join objects
@@ -211,7 +211,7 @@ namespace Dapper.Repositories
             Expression<Func<TEntity, object>> tChild1,
             Expression<Func<TEntity, object>> tChild2,
             Expression<Func<TEntity, object>> tChild3,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get object by Id with join objects
@@ -221,7 +221,7 @@ namespace Dapper.Repositories
             Expression<Func<TEntity, object>> tChild2,
             Expression<Func<TEntity, object>> tChild3,
             Expression<Func<TEntity, object>> tChild4,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get object by Id with join objects
@@ -232,7 +232,7 @@ namespace Dapper.Repositories
             Expression<Func<TEntity, object>> tChild3,
             Expression<Func<TEntity, object>> tChild4,
             Expression<Func<TEntity, object>> tChild5,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get object by Id with join objects
@@ -244,24 +244,24 @@ namespace Dapper.Repositories
             Expression<Func<TEntity, object>> tChild4,
             Expression<Func<TEntity, object>> tChild5,
             Expression<Func<TEntity, object>> tChild6,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get object by Id
         /// </summary>
-        Task<TEntity> FindByIdAsync(object id);
+        Task<TEntity> FindByIdAsync(object id, bool includeLogicalDeleted);
 
         /// <summary>
         ///     Get object by Id
         /// </summary>
-        Task<TEntity> FindByIdAsync(object id, IDbTransaction transaction);
+        Task<TEntity> FindByIdAsync(object id, bool includeLogicalDeleted, IDbTransaction transaction);
 
         /// <summary>
         ///     Get object by Id with join objects
         /// </summary>
         Task<TEntity> FindByIdAsync<TChild1>(object id,
             Expression<Func<TEntity, object>> tChild1,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get object by Id with join objects
@@ -269,7 +269,7 @@ namespace Dapper.Repositories
         Task<TEntity> FindByIdAsync<TChild1, TChild2>(object id,
             Expression<Func<TEntity, object>> tChild1,
             Expression<Func<TEntity, object>> tChild2,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get object by Id with join objects
@@ -278,7 +278,7 @@ namespace Dapper.Repositories
             Expression<Func<TEntity, object>> tChild1,
             Expression<Func<TEntity, object>> tChild2,
             Expression<Func<TEntity, object>> tChild3,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get object by Id with join objects
@@ -288,7 +288,7 @@ namespace Dapper.Repositories
             Expression<Func<TEntity, object>> tChild2,
             Expression<Func<TEntity, object>> tChild3,
             Expression<Func<TEntity, object>> tChild4,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get object by Id with join objects
@@ -299,7 +299,7 @@ namespace Dapper.Repositories
             Expression<Func<TEntity, object>> tChild3,
             Expression<Func<TEntity, object>> tChild4,
             Expression<Func<TEntity, object>> tChild5,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get object by Id with join objects
@@ -311,35 +311,35 @@ namespace Dapper.Repositories
             Expression<Func<TEntity, object>> tChild4,
             Expression<Func<TEntity, object>> tChild5,
             Expression<Func<TEntity, object>> tChild6,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
 
         /// <summary>
         ///     Get first object
         /// </summary>
-        Task<TEntity> FindAsync();
+        Task<TEntity> FindAsync(bool includeLogicalDeleted);
 
         /// <summary>
         ///     Get first object
         /// </summary>
-        Task<TEntity> FindAsync(IDbTransaction transaction);
+        Task<TEntity> FindAsync(bool includeLogicalDeleted, IDbTransaction transaction);
 
         /// <summary>
         ///     Get first object
         /// </summary>
-        Task<TEntity> FindAsync(Expression<Func<TEntity, bool>> predicate);
+        Task<TEntity> FindAsync(Expression<Func<TEntity, bool>> predicate, bool includeLogicalDeleted);
 
         /// <summary>
         ///     Get first object
         /// </summary>
-        Task<TEntity> FindAsync(Expression<Func<TEntity, bool>> predicate, IDbTransaction transaction);
+        Task<TEntity> FindAsync(Expression<Func<TEntity, bool>> predicate, bool includeLogicalDeleted, IDbTransaction transaction);
 
         /// <summary>
         ///     Get first object with join objects
         /// </summary>
         Task<TEntity> FindAsync<TChild1>(Expression<Func<TEntity, bool>> predicate,
             Expression<Func<TEntity, object>> tChild1,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get first object with join objects
@@ -347,7 +347,7 @@ namespace Dapper.Repositories
         Task<TEntity> FindAsync<TChild1, TChild2>(Expression<Func<TEntity, bool>> predicate,
             Expression<Func<TEntity, object>> tChild1,
             Expression<Func<TEntity, object>> tChild2,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get first object with join objects
@@ -356,7 +356,7 @@ namespace Dapper.Repositories
             Expression<Func<TEntity, object>> tChild1,
             Expression<Func<TEntity, object>> tChild2,
             Expression<Func<TEntity, object>> tChild3,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get first object with join objects
@@ -366,7 +366,7 @@ namespace Dapper.Repositories
             Expression<Func<TEntity, object>> tChild2,
             Expression<Func<TEntity, object>> tChild3,
             Expression<Func<TEntity, object>> tChild4,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get first object with join objects
@@ -377,7 +377,7 @@ namespace Dapper.Repositories
             Expression<Func<TEntity, object>> tChild3,
             Expression<Func<TEntity, object>> tChild4,
             Expression<Func<TEntity, object>> tChild5,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get first object with join objects
@@ -389,23 +389,23 @@ namespace Dapper.Repositories
             Expression<Func<TEntity, object>> tChild4,
             Expression<Func<TEntity, object>> tChild5,
             Expression<Func<TEntity, object>> tChild6,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get all objects
         /// </summary>
-        IEnumerable<TEntity> FindAll(IDbTransaction transaction = null);
+        IEnumerable<TEntity> FindAll(bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get all objects
         /// </summary>
-        IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> predicate, IDbTransaction transaction = null);
+        IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> predicate, bool includeLogicalDeleted, IDbTransaction transaction = null);
 
 
         /// <summary>
         ///     Get all objects with join objects
         /// </summary>
-        IEnumerable<TEntity> FindAll<TChild1>(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, object>> tChild1, IDbTransaction transaction = null);
+        IEnumerable<TEntity> FindAll<TChild1>(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, object>> tChild1, bool includeLogicalDeleted, IDbTransaction transaction = null);
 
 
         /// <summary>
@@ -415,7 +415,7 @@ namespace Dapper.Repositories
             Expression<Func<TEntity, bool>> predicate,
             Expression<Func<TEntity, object>> tChild1,
             Expression<Func<TEntity, object>> tChild2,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get all objects with join objects
@@ -425,7 +425,7 @@ namespace Dapper.Repositories
             Expression<Func<TEntity, object>> tChild1,
             Expression<Func<TEntity, object>> tChild2,
             Expression<Func<TEntity, object>> tChild3,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get all objects with join objects
@@ -436,7 +436,7 @@ namespace Dapper.Repositories
             Expression<Func<TEntity, object>> tChild2,
             Expression<Func<TEntity, object>> tChild3,
             Expression<Func<TEntity, object>> tChild4,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get all objects with join objects
@@ -448,7 +448,7 @@ namespace Dapper.Repositories
             Expression<Func<TEntity, object>> tChild3,
             Expression<Func<TEntity, object>> tChild4,
             Expression<Func<TEntity, object>> tChild5,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get all objects with join objects
@@ -461,17 +461,17 @@ namespace Dapper.Repositories
             Expression<Func<TEntity, object>> tChild4,
             Expression<Func<TEntity, object>> tChild5,
             Expression<Func<TEntity, object>> tChild6,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get all objects
         /// </summary>
-        Task<IEnumerable<TEntity>> FindAllAsync(IDbTransaction transaction = null);
+        Task<IEnumerable<TEntity>> FindAllAsync(bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get all objects
         /// </summary>
-        Task<IEnumerable<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> predicate, IDbTransaction transaction = null);
+        Task<IEnumerable<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> predicate, bool includeLogicalDeleted, IDbTransaction transaction = null);
 
 
         /// <summary>
@@ -479,7 +479,7 @@ namespace Dapper.Repositories
         /// </summary>
         Task<IEnumerable<TEntity>> FindAllAsync<TChild1>(Expression<Func<TEntity, bool>> predicate,
             Expression<Func<TEntity, object>> tChild1,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get all objects with join objects
@@ -488,7 +488,7 @@ namespace Dapper.Repositories
             Expression<Func<TEntity, bool>> predicate,
             Expression<Func<TEntity, object>> tChild1,
             Expression<Func<TEntity, object>> tChild2,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
 
         /// <summary>
@@ -499,7 +499,7 @@ namespace Dapper.Repositories
             Expression<Func<TEntity, object>> tChild1,
             Expression<Func<TEntity, object>> tChild2,
             Expression<Func<TEntity, object>> tChild3,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get all objects with join objects
@@ -510,7 +510,7 @@ namespace Dapper.Repositories
             Expression<Func<TEntity, object>> tChild2,
             Expression<Func<TEntity, object>> tChild3,
             Expression<Func<TEntity, object>> tChild4,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get all objects with join objects
@@ -522,7 +522,7 @@ namespace Dapper.Repositories
             Expression<Func<TEntity, object>> tChild3,
             Expression<Func<TEntity, object>> tChild4,
             Expression<Func<TEntity, object>> tChild5,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get all objects with join objects
@@ -535,7 +535,7 @@ namespace Dapper.Repositories
             Expression<Func<TEntity, object>> tChild4,
             Expression<Func<TEntity, object>> tChild5,
             Expression<Func<TEntity, object>> tChild6,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Insert object to DB
@@ -655,45 +655,45 @@ namespace Dapper.Repositories
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
-        IEnumerable<TEntity> FindAllBetween(object from, object to, Expression<Func<TEntity, object>> btwField, IDbTransaction transaction = null);
+        IEnumerable<TEntity> FindAllBetween(object from, object to, Expression<Func<TEntity, object>> btwField, bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
         IEnumerable<TEntity> FindAllBetween(object from, object to, Expression<Func<TEntity, object>> btwField, Expression<Func<TEntity, bool>> predicate = null,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted = false, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
-        IEnumerable<TEntity> FindAllBetween(DateTime from, DateTime to, Expression<Func<TEntity, object>> btwField, IDbTransaction transaction = null);
+        IEnumerable<TEntity> FindAllBetween(DateTime from, DateTime to, Expression<Func<TEntity, object>> btwField, bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
         IEnumerable<TEntity> FindAllBetween(DateTime from, DateTime to, Expression<Func<TEntity, object>> btwField, Expression<Func<TEntity, bool>> predicate,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
-        Task<IEnumerable<TEntity>> FindAllBetweenAsync(object from, object to, Expression<Func<TEntity, object>> btwField, IDbTransaction transaction = null);
+        Task<IEnumerable<TEntity>> FindAllBetweenAsync(object from, object to, Expression<Func<TEntity, object>> btwField, bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
         Task<IEnumerable<TEntity>> FindAllBetweenAsync(object from, object to, Expression<Func<TEntity, object>> btwField, Expression<Func<TEntity, bool>> predicate,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
-        Task<IEnumerable<TEntity>> FindAllBetweenAsync(DateTime from, DateTime to, Expression<Func<TEntity, object>> btwField, IDbTransaction transaction = null);
+        Task<IEnumerable<TEntity>> FindAllBetweenAsync(DateTime from, DateTime to, Expression<Func<TEntity, object>> btwField, bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
         Task<IEnumerable<TEntity>> FindAllBetweenAsync(DateTime from, DateTime to, Expression<Func<TEntity, object>> btwField, Expression<Func<TEntity, bool>> predicate,
-            IDbTransaction transaction = null);
+            bool includeLogicalDeleted, IDbTransaction transaction = null);
     }
 }

@@ -81,7 +81,7 @@ namespace WebAPI_Server.Controllers.v2
 
             bool result = _cBal.HandleTransaction((IDbTransaction trans) =>
             {
-                TestRepoViewModel trData = _cBal.FindById(data.Id, trans);
+                TestRepoViewModel trData = _cBal.FindById(data.Id, transaction: trans);
                 return _cBal.Delete(User, trData, transaction: trans);
             });
 
@@ -100,7 +100,7 @@ namespace WebAPI_Server.Controllers.v2
         [AllowAnonymous]
         public IActionResult CountData()
         {
-            int result = _cBal.Count();
+            int result = _cBal.Count(true);
             return Ok(result, InfoMessages.CommonInfoMessage);
         }
 
@@ -112,7 +112,7 @@ namespace WebAPI_Server.Controllers.v2
         [AllowAnonymous]
         public IActionResult SelectAll()
         {
-            var result = _cBal.FindAll();
+            var result = _cBal.FindAll(true);
             return Ok(result, InfoMessages.CommonInfoMessage);
         }
 

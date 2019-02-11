@@ -93,12 +93,12 @@ namespace Dapper.Repositories.SqlGenerator
         /// <summary>
         ///     Get SQL for COUNT Query
         /// </summary>
-        SqlQuery GetCount(Expression<Func<TEntity, bool>> predicate);
+        SqlQuery GetCount(Expression<Func<TEntity, bool>> predicate, bool includeLogicalDeleted);
 
         /// <summary>
         ///     Get SQL for COUNT with DISTINCT Query
         /// </summary>
-        SqlQuery GetCount(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, object>> distinctField);
+        SqlQuery GetCount(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, object>> distinctField, bool includeLogicalDeleted);
 
         /// <summary>
         ///     Get SQL for INSERT Query
@@ -130,22 +130,22 @@ namespace Dapper.Repositories.SqlGenerator
         /// <summary>
         ///     Get SQL for SELECT Query by Id
         /// </summary>
-        SqlQuery  GetSelectById(object id, params Expression<Func<TEntity, object>>[] includes);
+        SqlQuery  GetSelectById(object id, bool includeLogicalDeleted, params Expression<Func<TEntity, object>>[] includes);
 
         /// <summary>
         ///     Get SQL for SELECT Query
         /// </summary>
-        SqlQuery GetSelectFirst(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes);
+        SqlQuery GetSelectFirst(Expression<Func<TEntity, bool>> predicate, bool includeLogicalDeleted, params Expression<Func<TEntity, object>>[] includes);
 
         /// <summary>
         ///     Get SQL for SELECT Query
         /// </summary>
-        SqlQuery GetSelectAll(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes);
+        SqlQuery GetSelectAll(Expression<Func<TEntity, bool>> predicate, bool includeLogicalDeleted, params Expression<Func<TEntity, object>>[] includes);
 
         /// <summary>
         ///     Get SQL for SELECT Query with BETWEEN
         /// </summary>
-        SqlQuery GetSelectBetween(object from, object to, Expression<Func<TEntity, object>> btwField, Expression<Func<TEntity, bool>> expression = null);
+        SqlQuery GetSelectBetween(object from, object to, Expression<Func<TEntity, object>> btwField, bool includeLogicalDeleted, Expression<Func<TEntity, bool>> expression = null);
 
         /// <summary>
         ///     Get SQL for DELETE Query

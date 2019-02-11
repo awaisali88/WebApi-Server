@@ -141,6 +141,19 @@ namespace WebAPI_BAL
                 : func(data1, data2, data3, data4, data5, data6, data7, transaction);
         }
 
+        private TReturn ManageOrHandleTransaction<TReturn, TData1, TData2, TData3, TData4, TData5, TData6, TData7, TData8>(
+            Func<TData1, TData2, TData3, TData4, TData5, TData6, TData7, TData8, IDbTransaction, TReturn> func, TData1 data1,
+            TData2 data2,
+            TData3 data3, TData4 data4, TData5 data5, TData6 data6, TData7 data7, TData8 data8, IDbTransaction transaction,
+            bool manageTransaction)
+        {
+            if (!manageTransaction)
+                return func(data1, data2, data3, data4, data5, data6, data7, data8, null);
+
+            return transaction == null
+                ? HandleTransaction(func, data1, data2, data3, data4, data5, data6, data7, data8)
+                : func(data1, data2, data3, data4, data5, data6, data7, data8, transaction);
+        }
         #endregion
 
         #region Handle Transaction
@@ -302,6 +315,28 @@ namespace WebAPI_BAL
                 try
                 {
                     result = repoFunc(data1, data2, data3, data4, data5, data6, data7, transaction);
+                    transaction.Commit();
+                }
+                catch (Exception)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+            }
+
+            return result;
+        }
+
+        public TReturn HandleTransaction<TReturn, TData1, TData2, TData3, TData4, TData5, TData6, TData7, TData8>(
+            Func<TData1, TData2, TData3, TData4, TData5, TData6, TData7, TData8, IDbTransaction, TReturn> repoFunc, TData1 data1, TData2 data2,
+            TData3 data3, TData4 data4, TData5 data5, TData6 data6, TData7 data7, TData8 data8)
+        {
+            TReturn result;
+            using (var transaction = _db.BeginTransaction())
+            {
+                try
+                {
+                    result = repoFunc(data1, data2, data3, data4, data5, data6, data7, data8, transaction);
                     transaction.Commit();
                 }
                 catch (Exception)
@@ -496,94 +531,94 @@ namespace WebAPI_BAL
         #endregion 
 
         #region Count
-        public virtual int Count(IDbTransaction transaction = null, bool manageTransaction = true)
+        public virtual int Count(bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
-            return ManageOrHandleTransaction(_repo.Count, transaction, manageTransaction);
+            return ManageOrHandleTransaction(_repo.Count, includeLogicalDeleted, transaction, manageTransaction);
         }
 
-        public virtual int Count(Expression<Func<TEntityViewModel, bool>> where, IDbTransaction transaction = null, bool manageTransaction = true)
-        {
-            Expression<Func<TEntity, bool>> entityPredicate = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
-            return ManageOrHandleTransaction(_repo.Count, entityPredicate, transaction, manageTransaction);
-        }
-
-        public virtual int Count(Expression<Func<TEntityViewModel, object>> distinct, IDbTransaction transaction = null, bool manageTransaction = true)
-        {
-            Expression<Func<TEntity, object>> entityDistinctPredicate = _mapper.Map<Expression<Func<TEntity, object>>>(distinct);
-            return ManageOrHandleTransaction(_repo.Count, entityDistinctPredicate, transaction, manageTransaction);
-        }
-
-        public virtual int Count(Expression<Func<TEntityViewModel, bool>> where, Expression<Func<TEntityViewModel, object>> distinct, IDbTransaction transaction = null, bool manageTransaction = true)
+        public virtual int Count(Expression<Func<TEntityViewModel, bool>> where, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
             Expression<Func<TEntity, bool>> entityPredicate = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
-            Expression<Func<TEntity, object>> entityDistinctPredicate = _mapper.Map<Expression<Func<TEntity, object>>>(distinct);
-            return ManageOrHandleTransaction(_repo.Count, entityPredicate, entityDistinctPredicate, transaction, manageTransaction);
+            return ManageOrHandleTransaction(_repo.Count, entityPredicate, includeLogicalDeleted, transaction, manageTransaction);
         }
 
-        public virtual Task<int> CountAsync(IDbTransaction transaction = null, bool manageTransaction = true)
-        {
-            return ManageOrHandleTransaction(_repo.CountAsync, transaction, manageTransaction);
-        }
-
-        public virtual Task<int> CountAsync(Expression<Func<TEntityViewModel, bool>> where, IDbTransaction transaction = null, bool manageTransaction = true)
-        {
-            Expression<Func<TEntity, bool>> entityPredicate = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
-            return ManageOrHandleTransaction(_repo.CountAsync, entityPredicate, transaction, manageTransaction);
-        }
-
-        public virtual Task<int> CountAsync(Expression<Func<TEntityViewModel, object>> distinct, IDbTransaction transaction = null, bool manageTransaction = true)
+        public virtual int Count(Expression<Func<TEntityViewModel, object>> distinct, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
             Expression<Func<TEntity, object>> entityDistinctPredicate = _mapper.Map<Expression<Func<TEntity, object>>>(distinct);
-            return ManageOrHandleTransaction(_repo.CountAsync, entityDistinctPredicate, transaction, manageTransaction);
+            return ManageOrHandleTransaction(_repo.Count, entityDistinctPredicate, includeLogicalDeleted, transaction, manageTransaction);
         }
 
-        public virtual Task<int> CountAsync(Expression<Func<TEntityViewModel, bool>> where, Expression<Func<TEntityViewModel, object>> distinct, IDbTransaction transaction = null, bool manageTransaction = true)
+        public virtual int Count(Expression<Func<TEntityViewModel, bool>> where, Expression<Func<TEntityViewModel, object>> distinct, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
             Expression<Func<TEntity, bool>> entityPredicate = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
             Expression<Func<TEntity, object>> entityDistinctPredicate = _mapper.Map<Expression<Func<TEntity, object>>>(distinct);
-            return ManageOrHandleTransaction(_repo.CountAsync, entityPredicate, entityDistinctPredicate, transaction, manageTransaction);
+            return ManageOrHandleTransaction(_repo.Count, entityPredicate, entityDistinctPredicate, includeLogicalDeleted, transaction, manageTransaction);
+        }
+
+        public virtual Task<int> CountAsync(bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
+        {
+            return ManageOrHandleTransaction(_repo.CountAsync, includeLogicalDeleted, transaction, manageTransaction);
+        }
+
+        public virtual Task<int> CountAsync(Expression<Func<TEntityViewModel, bool>> where, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
+        {
+            Expression<Func<TEntity, bool>> entityPredicate = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
+            return ManageOrHandleTransaction(_repo.CountAsync, entityPredicate, includeLogicalDeleted, transaction, manageTransaction);
+        }
+
+        public virtual Task<int> CountAsync(Expression<Func<TEntityViewModel, object>> distinct, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
+        {
+            Expression<Func<TEntity, object>> entityDistinctPredicate = _mapper.Map<Expression<Func<TEntity, object>>>(distinct);
+            return ManageOrHandleTransaction(_repo.CountAsync, entityDistinctPredicate, includeLogicalDeleted, transaction, manageTransaction);
+        }
+
+        public virtual Task<int> CountAsync(Expression<Func<TEntityViewModel, bool>> where, Expression<Func<TEntityViewModel, object>> distinct, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
+        {
+            Expression<Func<TEntity, bool>> entityPredicate = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
+            Expression<Func<TEntity, object>> entityDistinctPredicate = _mapper.Map<Expression<Func<TEntity, object>>>(distinct);
+            return ManageOrHandleTransaction(_repo.CountAsync, entityPredicate, entityDistinctPredicate, includeLogicalDeleted, transaction, manageTransaction);
         }
         #endregion
 
         #region Select
         #region Find
-        public virtual TEntityViewModel Find(IDbTransaction transaction = null, bool manageTransaction = true)
+        public virtual TEntityViewModel Find(bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
-            TEntity data = ManageOrHandleTransaction(_repo.Find, transaction, manageTransaction);
+            TEntity data = ManageOrHandleTransaction(_repo.Find, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<TEntityViewModel>(data);
         }
 
-        public virtual TEntityViewModel Find(Expression<Func<TEntityViewModel, bool>> @where, IDbTransaction transaction = null, bool manageTransaction = true)
+        public virtual TEntityViewModel Find(Expression<Func<TEntityViewModel, bool>> @where, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
             Expression<Func<TEntity, bool>> whereEntity = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
-            TEntity data = ManageOrHandleTransaction(_repo.Find, whereEntity, transaction, manageTransaction);
+            TEntity data = ManageOrHandleTransaction(_repo.Find, whereEntity, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<TEntityViewModel>(data);
         }
 
-        public virtual TEntityViewModel Find<TChild1>(Expression<Func<TEntityViewModel, bool>> @where, Expression<Func<TEntityViewModel, object>> tChild1, IDbTransaction transaction = null,
+        public virtual TEntityViewModel Find<TChild1>(Expression<Func<TEntityViewModel, bool>> @where, Expression<Func<TEntityViewModel, object>> tChild1, bool includeLogicalDeleted = false, IDbTransaction transaction = null,
             bool manageTransaction = true)
         {
             Expression<Func<TEntity, bool>> whereEntity = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
             Expression<Func<TEntity, object>> whereChild1 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild1);
-            TEntity data = ManageOrHandleTransaction(_repo.Find<TChild1>, whereEntity, whereChild1, transaction, manageTransaction);
+            TEntity data = ManageOrHandleTransaction(_repo.Find<TChild1>, whereEntity, whereChild1, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<TEntityViewModel>(data);
         }
 
         public virtual TEntityViewModel Find<TChild1, TChild2>(Expression<Func<TEntityViewModel, bool>> @where,
             Expression<Func<TEntityViewModel, object>> tChild1, Expression<Func<TEntityViewModel, object>> tChild2,
-            IDbTransaction transaction = null, bool manageTransaction = true)
+            bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
             Expression<Func<TEntity, bool>> whereEntity = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
             Expression<Func<TEntity, object>> whereChild1 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild1);
             Expression<Func<TEntity, object>> whereChild2 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild2);
             TEntity data = ManageOrHandleTransaction(_repo.Find<TChild1, TChild2>, whereEntity, whereChild1,
-                whereChild2, transaction, manageTransaction);
+                whereChild2, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<TEntityViewModel>(data);
         }
 
         public virtual TEntityViewModel Find<TChild1, TChild2, TChild3>(Expression<Func<TEntityViewModel, bool>> @where,
             Expression<Func<TEntityViewModel, object>> tChild1, Expression<Func<TEntityViewModel, object>> tChild2,
-            Expression<Func<TEntityViewModel, object>> tChild3, IDbTransaction transaction = null,
+            Expression<Func<TEntityViewModel, object>> tChild3, bool includeLogicalDeleted = false, IDbTransaction transaction = null,
             bool manageTransaction = true)
         {
             Expression<Func<TEntity, bool>> whereEntity = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
@@ -592,12 +627,12 @@ namespace WebAPI_BAL
             Expression<Func<TEntity, object>> whereChild3 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild3);
 
             TEntity data = ManageOrHandleTransaction(_repo.Find<TChild1, TChild2, TChild3>, whereEntity, whereChild1,
-                whereChild2, whereChild3, transaction, manageTransaction);
+                whereChild2, whereChild3, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<TEntityViewModel>(data);
         }
 
         public virtual TEntityViewModel Find<TChild1, TChild2, TChild3, TChild4>(Expression<Func<TEntityViewModel, bool>> @where, Expression<Func<TEntityViewModel, object>> tChild1, Expression<Func<TEntityViewModel, object>> tChild2,
-            Expression<Func<TEntityViewModel, object>> tChild3, Expression<Func<TEntityViewModel, object>> tChild4, IDbTransaction transaction = null, bool manageTransaction = true)
+            Expression<Func<TEntityViewModel, object>> tChild3, Expression<Func<TEntityViewModel, object>> tChild4, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
             Expression<Func<TEntity, bool>> whereEntity = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
             Expression<Func<TEntity, object>> whereChild1 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild1);
@@ -606,12 +641,12 @@ namespace WebAPI_BAL
             Expression<Func<TEntity, object>> whereChild4 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild4);
 
             TEntity data = ManageOrHandleTransaction(_repo.Find<TChild1, TChild2, TChild3, TChild4>, whereEntity, whereChild1,
-                whereChild2, whereChild3, whereChild4, transaction, manageTransaction);
+                whereChild2, whereChild3, whereChild4, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<TEntityViewModel>(data);
         }
 
         public virtual TEntityViewModel Find<TChild1, TChild2, TChild3, TChild4, TChild5>(Expression<Func<TEntityViewModel, bool>> @where, Expression<Func<TEntityViewModel, object>> tChild1,
-            Expression<Func<TEntityViewModel, object>> tChild2, Expression<Func<TEntityViewModel, object>> tChild3, Expression<Func<TEntityViewModel, object>> tChild4, Expression<Func<TEntityViewModel, object>> tChild5, IDbTransaction transaction = null,
+            Expression<Func<TEntityViewModel, object>> tChild2, Expression<Func<TEntityViewModel, object>> tChild3, Expression<Func<TEntityViewModel, object>> tChild4, Expression<Func<TEntityViewModel, object>> tChild5, bool includeLogicalDeleted = false, IDbTransaction transaction = null,
             bool manageTransaction = true)
         {
             Expression<Func<TEntity, bool>> whereEntity = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
@@ -622,13 +657,13 @@ namespace WebAPI_BAL
             Expression<Func<TEntity, object>> whereChild5 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild5);
 
             TEntity data = ManageOrHandleTransaction(_repo.Find<TChild1, TChild2, TChild3, TChild4, TChild5>, whereEntity, whereChild1,
-                whereChild2, whereChild3, whereChild4, whereChild5, transaction, manageTransaction);
+                whereChild2, whereChild3, whereChild4, whereChild5, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<TEntityViewModel>(data);
         }
 
         public virtual TEntityViewModel Find<TChild1, TChild2, TChild3, TChild4, TChild5, TChild6>(Expression<Func<TEntityViewModel, bool>> @where, Expression<Func<TEntityViewModel, object>> tChild1,
             Expression<Func<TEntityViewModel, object>> tChild2, Expression<Func<TEntityViewModel, object>> tChild3, Expression<Func<TEntityViewModel, object>> tChild4, Expression<Func<TEntityViewModel, object>> tChild5, Expression<Func<TEntityViewModel, object>> tChild6,
-            IDbTransaction transaction = null, bool manageTransaction = true)
+            bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
             Expression<Func<TEntity, bool>> whereEntity = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
             Expression<Func<TEntity, object>> whereChild1 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild1);
@@ -639,45 +674,45 @@ namespace WebAPI_BAL
             Expression<Func<TEntity, object>> whereChild6 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild6);
 
             TEntity data = ManageOrHandleTransaction(_repo.Find<TChild1, TChild2, TChild3, TChild4, TChild5, TChild6>, whereEntity, whereChild1,
-                whereChild2, whereChild3, whereChild4, whereChild5, whereChild6, transaction, manageTransaction);
+                whereChild2, whereChild3, whereChild4, whereChild5, whereChild6, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<TEntityViewModel>(data);
         }
 
-        public virtual async Task<TEntityViewModel> FindAsync(IDbTransaction transaction = null, bool manageTransaction = true)
+        public virtual async Task<TEntityViewModel> FindAsync(bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
-            TEntity data = await ManageOrHandleTransaction(_repo.FindAsync, transaction, manageTransaction);
+            TEntity data = await ManageOrHandleTransaction(_repo.FindAsync, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<TEntityViewModel>(data);
         }
 
-        public virtual async Task<TEntityViewModel> FindAsync(Expression<Func<TEntityViewModel, bool>> @where, IDbTransaction transaction = null, bool manageTransaction = true)
+        public virtual async Task<TEntityViewModel> FindAsync(Expression<Func<TEntityViewModel, bool>> @where, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
             Expression<Func<TEntity, bool>> whereEntity = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
-            TEntity data = await ManageOrHandleTransaction(_repo.FindAsync, whereEntity, transaction, manageTransaction);
+            TEntity data = await ManageOrHandleTransaction(_repo.FindAsync, whereEntity, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<TEntityViewModel>(data);
         }
 
-        public virtual async Task<TEntityViewModel> FindAsync<TChild1>(Expression<Func<TEntityViewModel, bool>> @where, Expression<Func<TEntityViewModel, object>> tChild1, IDbTransaction transaction = null,
+        public virtual async Task<TEntityViewModel> FindAsync<TChild1>(Expression<Func<TEntityViewModel, bool>> @where, Expression<Func<TEntityViewModel, object>> tChild1, bool includeLogicalDeleted = false, IDbTransaction transaction = null,
             bool manageTransaction = true)
         {
             Expression<Func<TEntity, bool>> whereEntity = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
             Expression<Func<TEntity, object>> whereChild1 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild1);
-            TEntity data = await ManageOrHandleTransaction(_repo.FindAsync<TChild1>, whereEntity, whereChild1, transaction, manageTransaction);
+            TEntity data = await ManageOrHandleTransaction(_repo.FindAsync<TChild1>, whereEntity, whereChild1, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<TEntityViewModel>(data);
         }
 
         public virtual async Task<TEntityViewModel> FindAsync<TChild1, TChild2>(Expression<Func<TEntityViewModel, bool>> @where, Expression<Func<TEntityViewModel, object>> tChild1, Expression<Func<TEntityViewModel, object>> tChild2,
-            IDbTransaction transaction = null, bool manageTransaction = true)
+            bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
             Expression<Func<TEntity, bool>> whereEntity = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
             Expression<Func<TEntity, object>> whereChild1 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild1);
             Expression<Func<TEntity, object>> whereChild2 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild2);
             TEntity data = await ManageOrHandleTransaction(_repo.FindAsync<TChild1, TChild2>, whereEntity, whereChild1,
-                whereChild2, transaction, manageTransaction);
+                whereChild2, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<TEntityViewModel>(data);
         }
 
         public virtual async Task<TEntityViewModel> FindAsync<TChild1, TChild2, TChild3>(Expression<Func<TEntityViewModel, bool>> @where, Expression<Func<TEntityViewModel, object>> tChild1, Expression<Func<TEntityViewModel, object>> tChild2, Expression<Func<TEntityViewModel, object>> tChild3,
-            IDbTransaction transaction = null, bool manageTransaction = true)
+            bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
             Expression<Func<TEntity, bool>> whereEntity = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
             Expression<Func<TEntity, object>> whereChild1 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild1);
@@ -685,12 +720,12 @@ namespace WebAPI_BAL
             Expression<Func<TEntity, object>> whereChild3 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild3);
 
             TEntity data = await ManageOrHandleTransaction(_repo.FindAsync<TChild1, TChild2, TChild3>, whereEntity, whereChild1,
-                whereChild2, whereChild3, transaction, manageTransaction);
+                whereChild2, whereChild3, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<TEntityViewModel>(data);
         }
 
         public virtual async Task<TEntityViewModel> FindAsync<TChild1, TChild2, TChild3, TChild4>(Expression<Func<TEntityViewModel, bool>> @where, Expression<Func<TEntityViewModel, object>> tChild1, Expression<Func<TEntityViewModel, object>> tChild2,
-            Expression<Func<TEntityViewModel, object>> tChild3, Expression<Func<TEntityViewModel, object>> tChild4, IDbTransaction transaction = null, bool manageTransaction = true)
+            Expression<Func<TEntityViewModel, object>> tChild3, Expression<Func<TEntityViewModel, object>> tChild4, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
             Expression<Func<TEntity, bool>> whereEntity = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
             Expression<Func<TEntity, object>> whereChild1 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild1);
@@ -699,12 +734,12 @@ namespace WebAPI_BAL
             Expression<Func<TEntity, object>> whereChild4 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild4);
 
             TEntity data = await ManageOrHandleTransaction(_repo.FindAsync<TChild1, TChild2, TChild3, TChild4>, whereEntity, whereChild1,
-                whereChild2, whereChild3, whereChild4, transaction, manageTransaction);
+                whereChild2, whereChild3, whereChild4, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<TEntityViewModel>(data);
         }
 
         public virtual async Task<TEntityViewModel> FindAsync<TChild1, TChild2, TChild3, TChild4, TChild5>(Expression<Func<TEntityViewModel, bool>> @where, Expression<Func<TEntityViewModel, object>> tChild1, Expression<Func<TEntityViewModel, object>> tChild2,
-            Expression<Func<TEntityViewModel, object>> tChild3, Expression<Func<TEntityViewModel, object>> tChild4, Expression<Func<TEntityViewModel, object>> tChild5, IDbTransaction transaction = null,
+            Expression<Func<TEntityViewModel, object>> tChild3, Expression<Func<TEntityViewModel, object>> tChild4, Expression<Func<TEntityViewModel, object>> tChild5, bool includeLogicalDeleted = false, IDbTransaction transaction = null,
             bool manageTransaction = true)
         {
             Expression<Func<TEntity, bool>> whereEntity = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
@@ -715,13 +750,13 @@ namespace WebAPI_BAL
             Expression<Func<TEntity, object>> whereChild5 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild5);
 
             TEntity data = await ManageOrHandleTransaction(_repo.FindAsync<TChild1, TChild2, TChild3, TChild4, TChild5>, whereEntity, whereChild1,
-                whereChild2, whereChild3, whereChild4, whereChild5, transaction, manageTransaction);
+                whereChild2, whereChild3, whereChild4, whereChild5, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<TEntityViewModel>(data);
         }
 
         public virtual async Task<TEntityViewModel> FindAsync<TChild1, TChild2, TChild3, TChild4, TChild5, TChild6>(Expression<Func<TEntityViewModel, bool>> @where, Expression<Func<TEntityViewModel, object>> tChild1,
             Expression<Func<TEntityViewModel, object>> tChild2, Expression<Func<TEntityViewModel, object>> tChild3, Expression<Func<TEntityViewModel, object>> tChild4, Expression<Func<TEntityViewModel, object>> tChild5, Expression<Func<TEntityViewModel, object>> tChild6,
-            IDbTransaction transaction = null, bool manageTransaction = true)
+            bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
             Expression<Func<TEntity, bool>> whereEntity = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
             Expression<Func<TEntity, object>> whereChild1 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild1);
@@ -732,61 +767,61 @@ namespace WebAPI_BAL
             Expression<Func<TEntity, object>> whereChild6 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild6);
 
             TEntity data = await ManageOrHandleTransaction(_repo.FindAsync<TChild1, TChild2, TChild3, TChild4, TChild5, TChild6>, whereEntity, whereChild1,
-                whereChild2, whereChild3, whereChild4, whereChild5, whereChild6, transaction, manageTransaction);
+                whereChild2, whereChild3, whereChild4, whereChild5, whereChild6, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<TEntityViewModel>(data);
         }
         #endregion
 
         #region Find By Id
-        public virtual TEntityViewModel FindById(object id, IDbTransaction transaction = null, bool manageTransaction = true)
+        public virtual TEntityViewModel FindById(object id, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
-            TEntity data = ManageOrHandleTransaction(_repo.FindById, id, transaction, manageTransaction);
+            TEntity data = ManageOrHandleTransaction(_repo.FindById, id, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<TEntityViewModel>(data);
         }
 
-        public virtual TEntityViewModel FindById<TChild1>(object id, Expression<Func<TEntityViewModel, object>> tChild1, IDbTransaction transaction = null,
+        public virtual TEntityViewModel FindById<TChild1>(object id, Expression<Func<TEntityViewModel, object>> tChild1, bool includeLogicalDeleted = false, IDbTransaction transaction = null,
             bool manageTransaction = true)
         {
             Expression<Func<TEntity, object>> whereChild1 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild1);
-            TEntity data = ManageOrHandleTransaction(_repo.FindById<TChild1>, id, whereChild1, transaction, manageTransaction);
+            TEntity data = ManageOrHandleTransaction(_repo.FindById<TChild1>, id, whereChild1, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<TEntityViewModel>(data);
         }
 
         public virtual TEntityViewModel FindById<TChild1, TChild2>(object id, Expression<Func<TEntityViewModel, object>> tChild1, Expression<Func<TEntityViewModel, object>> tChild2,
-            IDbTransaction transaction = null, bool manageTransaction = true)
+            bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
             Expression<Func<TEntity, object>> whereChild1 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild1);
             Expression<Func<TEntity, object>> whereChild2 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild2);
             TEntity data = ManageOrHandleTransaction(_repo.FindById<TChild1, TChild2>, id, whereChild1,
-                whereChild2, transaction, manageTransaction);
+                whereChild2, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<TEntityViewModel>(data);
         }
 
         public virtual TEntityViewModel FindById<TChild1, TChild2, TChild3>(object id, Expression<Func<TEntityViewModel, object>> tChild1, Expression<Func<TEntityViewModel, object>> tChild2,
-            Expression<Func<TEntityViewModel, object>> tChild3, IDbTransaction transaction = null, bool manageTransaction = true)
+            Expression<Func<TEntityViewModel, object>> tChild3, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
             Expression<Func<TEntity, object>> whereChild1 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild1);
             Expression<Func<TEntity, object>> whereChild2 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild2);
             Expression<Func<TEntity, object>> whereChild3 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild3);
             TEntity data = ManageOrHandleTransaction(_repo.FindById<TChild1, TChild2, TChild3>, id, whereChild1,
-                whereChild2, whereChild3, transaction, manageTransaction);
+                whereChild2, whereChild3, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<TEntityViewModel>(data);
         }
 
         public virtual TEntityViewModel FindById<TChild1, TChild2, TChild3, TChild4>(object id, Expression<Func<TEntityViewModel, object>> tChild1, Expression<Func<TEntityViewModel, object>> tChild2,
-            Expression<Func<TEntityViewModel, object>> tChild3, Expression<Func<TEntityViewModel, object>> tChild4, IDbTransaction transaction = null, bool manageTransaction = true)
+            Expression<Func<TEntityViewModel, object>> tChild3, Expression<Func<TEntityViewModel, object>> tChild4, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
             Expression<Func<TEntity, object>> whereChild1 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild1);
             Expression<Func<TEntity, object>> whereChild2 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild2);
             Expression<Func<TEntity, object>> whereChild3 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild3);
             Expression<Func<TEntity, object>> whereChild4 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild4);
             TEntity data = ManageOrHandleTransaction(_repo.FindById<TChild1, TChild2, TChild3, TChild4>, id, whereChild1,
-                whereChild2, whereChild3, whereChild4, transaction, manageTransaction);
+                whereChild2, whereChild3, whereChild4, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<TEntityViewModel>(data);
         }
 
         public virtual TEntityViewModel FindById<TChild1, TChild2, TChild3, TChild4, TChild5>(object id, Expression<Func<TEntityViewModel, object>> tChild1,
-            Expression<Func<TEntityViewModel, object>> tChild2, Expression<Func<TEntityViewModel, object>> tChild3, Expression<Func<TEntityViewModel, object>> tChild4, Expression<Func<TEntityViewModel, object>> tChild5, IDbTransaction transaction = null,
+            Expression<Func<TEntityViewModel, object>> tChild2, Expression<Func<TEntityViewModel, object>> tChild3, Expression<Func<TEntityViewModel, object>> tChild4, Expression<Func<TEntityViewModel, object>> tChild5, bool includeLogicalDeleted = false, IDbTransaction transaction = null,
             bool manageTransaction = true)
         {
             Expression<Func<TEntity, object>> whereChild1 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild1);
@@ -795,13 +830,13 @@ namespace WebAPI_BAL
             Expression<Func<TEntity, object>> whereChild4 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild4);
             Expression<Func<TEntity, object>> whereChild5 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild5);
             TEntity data = ManageOrHandleTransaction(_repo.FindById<TChild1, TChild2, TChild3, TChild4, TChild5>, id, whereChild1,
-                whereChild2, whereChild3, whereChild4, whereChild5, transaction, manageTransaction);
+                whereChild2, whereChild3, whereChild4, whereChild5, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<TEntityViewModel>(data);
         }
 
         public virtual TEntityViewModel FindById<TChild1, TChild2, TChild3, TChild4, TChild5, TChild6>(object id, Expression<Func<TEntityViewModel, object>> tChild1,
             Expression<Func<TEntityViewModel, object>> tChild2, Expression<Func<TEntityViewModel, object>> tChild3, Expression<Func<TEntityViewModel, object>> tChild4, Expression<Func<TEntityViewModel, object>> tChild5, Expression<Func<TEntityViewModel, object>> tChild6,
-            IDbTransaction transaction = null, bool manageTransaction = true)
+            bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
             Expression<Func<TEntity, object>> whereChild1 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild1);
             Expression<Func<TEntity, object>> whereChild2 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild2);
@@ -810,59 +845,59 @@ namespace WebAPI_BAL
             Expression<Func<TEntity, object>> whereChild5 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild5);
             Expression<Func<TEntity, object>> whereChild6 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild6);
             TEntity data = ManageOrHandleTransaction(_repo.FindById<TChild1, TChild2, TChild3, TChild4, TChild5, TChild6>, id, whereChild1,
-                whereChild2, whereChild3, whereChild4, whereChild5, whereChild6, transaction, manageTransaction);
+                whereChild2, whereChild3, whereChild4, whereChild5, whereChild6, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<TEntityViewModel>(data);
         }
 
-        public virtual async Task<TEntityViewModel> FindByIdAsync(object id, IDbTransaction transaction = null, bool manageTransaction = true)
+        public virtual async Task<TEntityViewModel> FindByIdAsync(object id, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
-            TEntity data = await ManageOrHandleTransaction(_repo.FindByIdAsync, id, transaction, manageTransaction);
+            TEntity data = await ManageOrHandleTransaction(_repo.FindByIdAsync, id, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<TEntityViewModel>(data);
         }
 
-        public virtual async Task<TEntityViewModel> FindByIdAsync<TChild1>(object id, Expression<Func<TEntityViewModel, object>> tChild1, IDbTransaction transaction = null,
+        public virtual async Task<TEntityViewModel> FindByIdAsync<TChild1>(object id, Expression<Func<TEntityViewModel, object>> tChild1, bool includeLogicalDeleted = false, IDbTransaction transaction = null,
             bool manageTransaction = true)
         {
             Expression<Func<TEntity, object>> whereChild1 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild1);
-            TEntity data = await ManageOrHandleTransaction(_repo.FindByIdAsync<TChild1>, id, whereChild1, transaction, manageTransaction);
+            TEntity data = await ManageOrHandleTransaction(_repo.FindByIdAsync<TChild1>, id, whereChild1, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<TEntityViewModel>(data);
         }
 
         public virtual async Task<TEntityViewModel> FindByIdAsync<TChild1, TChild2>(object id, Expression<Func<TEntityViewModel, object>> tChild1, Expression<Func<TEntityViewModel, object>> tChild2,
-            IDbTransaction transaction = null, bool manageTransaction = true)
+            bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
             Expression<Func<TEntity, object>> whereChild1 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild1);
             Expression<Func<TEntity, object>> whereChild2 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild2);
             TEntity data = await ManageOrHandleTransaction(_repo.FindByIdAsync<TChild1, TChild2>, id, whereChild1,
-                whereChild2, transaction, manageTransaction);
+                whereChild2, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<TEntityViewModel>(data);
         }
 
         public virtual async Task<TEntityViewModel> FindByIdAsync<TChild1, TChild2, TChild3>(object id, Expression<Func<TEntityViewModel, object>> tChild1, Expression<Func<TEntityViewModel, object>> tChild2, Expression<Func<TEntityViewModel, object>> tChild3,
-            IDbTransaction transaction = null, bool manageTransaction = true)
+            bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
             Expression<Func<TEntity, object>> whereChild1 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild1);
             Expression<Func<TEntity, object>> whereChild2 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild2);
             Expression<Func<TEntity, object>> whereChild3 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild3);
             TEntity data = await ManageOrHandleTransaction(_repo.FindByIdAsync<TChild1, TChild2, TChild3>, id, whereChild1,
-                whereChild2, whereChild3, transaction, manageTransaction);
+                whereChild2, whereChild3, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<TEntityViewModel>(data);
         }
 
         public virtual async Task<TEntityViewModel> FindByIdAsync<TChild1, TChild2, TChild3, TChild4>(object id, Expression<Func<TEntityViewModel, object>> tChild1, Expression<Func<TEntityViewModel, object>> tChild2,
-            Expression<Func<TEntityViewModel, object>> tChild3, Expression<Func<TEntityViewModel, object>> tChild4, IDbTransaction transaction = null, bool manageTransaction = true)
+            Expression<Func<TEntityViewModel, object>> tChild3, Expression<Func<TEntityViewModel, object>> tChild4, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
             Expression<Func<TEntity, object>> whereChild1 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild1);
             Expression<Func<TEntity, object>> whereChild2 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild2);
             Expression<Func<TEntity, object>> whereChild3 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild3);
             Expression<Func<TEntity, object>> whereChild4 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild4);
             TEntity data = await ManageOrHandleTransaction(_repo.FindByIdAsync<TChild1, TChild2, TChild3, TChild4>, id, whereChild1,
-                whereChild2, whereChild3, whereChild4, transaction, manageTransaction);
+                whereChild2, whereChild3, whereChild4, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<TEntityViewModel>(data);
         }
 
         public virtual async Task<TEntityViewModel> FindByIdAsync<TChild1, TChild2, TChild3, TChild4, TChild5>(object id, Expression<Func<TEntityViewModel, object>> tChild1, Expression<Func<TEntityViewModel, object>> tChild2,
-            Expression<Func<TEntityViewModel, object>> tChild3, Expression<Func<TEntityViewModel, object>> tChild4, Expression<Func<TEntityViewModel, object>> tChild5, IDbTransaction transaction = null,
+            Expression<Func<TEntityViewModel, object>> tChild3, Expression<Func<TEntityViewModel, object>> tChild4, Expression<Func<TEntityViewModel, object>> tChild5, bool includeLogicalDeleted = false, IDbTransaction transaction = null,
             bool manageTransaction = true)
         {
             Expression<Func<TEntity, object>> whereChild1 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild1);
@@ -871,13 +906,13 @@ namespace WebAPI_BAL
             Expression<Func<TEntity, object>> whereChild4 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild4);
             Expression<Func<TEntity, object>> whereChild5 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild5);
             TEntity data = await ManageOrHandleTransaction(_repo.FindByIdAsync<TChild1, TChild2, TChild3, TChild4, TChild5>, id, whereChild1,
-                whereChild2, whereChild3, whereChild4, whereChild5, transaction, manageTransaction);
+                whereChild2, whereChild3, whereChild4, whereChild5, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<TEntityViewModel>(data);
         }
 
         public virtual async Task<TEntityViewModel> FindByIdAsync<TChild1, TChild2, TChild3, TChild4, TChild5, TChild6>(object id, Expression<Func<TEntityViewModel, object>> tChild1,
             Expression<Func<TEntityViewModel, object>> tChild2, Expression<Func<TEntityViewModel, object>> tChild3, Expression<Func<TEntityViewModel, object>> tChild4, Expression<Func<TEntityViewModel, object>> tChild5, Expression<Func<TEntityViewModel, object>> tChild6,
-            IDbTransaction transaction = null, bool manageTransaction = true)
+            bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
             Expression<Func<TEntity, object>> whereChild1 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild1);
             Expression<Func<TEntity, object>> whereChild2 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild2);
@@ -886,60 +921,60 @@ namespace WebAPI_BAL
             Expression<Func<TEntity, object>> whereChild5 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild5);
             Expression<Func<TEntity, object>> whereChild6 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild6);
             TEntity data = await ManageOrHandleTransaction(_repo.FindByIdAsync<TChild1, TChild2, TChild3, TChild4, TChild5, TChild6>, id, whereChild1,
-                whereChild2, whereChild3, whereChild4, whereChild5, whereChild6, transaction, manageTransaction);
+                whereChild2, whereChild3, whereChild4, whereChild5, whereChild6, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<TEntityViewModel>(data);
         }
         #endregion
 
         #region Find All
-        public virtual IEnumerable<TEntityViewModel> FindAll(IDbTransaction transaction = null, bool manageTransaction = true)
+        public virtual IEnumerable<TEntityViewModel> FindAll(bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
-            IEnumerable<TEntity> data = ManageOrHandleTransaction(_repo.FindAll, transaction, manageTransaction);
+            IEnumerable<TEntity> data = ManageOrHandleTransaction(_repo.FindAll, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map< IEnumerable<TEntityViewModel>>(data);
         }
 
-        public virtual IEnumerable<TEntityViewModel> FindAll(Expression<Func<TEntityViewModel, bool>> @where, IDbTransaction transaction = null, bool manageTransaction = true)
+        public virtual IEnumerable<TEntityViewModel> FindAll(Expression<Func<TEntityViewModel, bool>> @where, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
             Expression<Func<TEntity, bool>> whereEntity = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
             IEnumerable<TEntity> data =
-                ManageOrHandleTransaction(_repo.FindAll, whereEntity, transaction, manageTransaction);
+                ManageOrHandleTransaction(_repo.FindAll, whereEntity, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<IEnumerable<TEntityViewModel>>(data);
         }
 
-        public virtual IEnumerable<TEntityViewModel> FindAll<TChild1>(Expression<Func<TEntityViewModel, bool>> @where, Expression<Func<TEntityViewModel, object>> tChild1, IDbTransaction transaction = null,
+        public virtual IEnumerable<TEntityViewModel> FindAll<TChild1>(Expression<Func<TEntityViewModel, bool>> @where, Expression<Func<TEntityViewModel, object>> tChild1, bool includeLogicalDeleted = false, IDbTransaction transaction = null,
             bool manageTransaction = true)
         {
             Expression<Func<TEntity, bool>> whereEntity = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
             Expression<Func<TEntity, object>> whereChild1 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild1);
-            IEnumerable<TEntity> data = ManageOrHandleTransaction(_repo.FindAll<TChild1>, whereEntity, whereChild1, transaction, manageTransaction);
+            IEnumerable<TEntity> data = ManageOrHandleTransaction(_repo.FindAll<TChild1>, whereEntity, whereChild1, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<IEnumerable<TEntityViewModel>>(data);
         }
 
         public virtual IEnumerable<TEntityViewModel> FindAll<TChild1, TChild2>(Expression<Func<TEntityViewModel, bool>> @where, Expression<Func<TEntityViewModel, object>> tChild1, Expression<Func<TEntityViewModel, object>> tChild2,
-            IDbTransaction transaction = null, bool manageTransaction = true)
+            bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
             Expression<Func<TEntity, bool>> whereEntity = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
             Expression<Func<TEntity, object>> whereChild1 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild1);
             Expression<Func<TEntity, object>> whereChild2 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild2);
             IEnumerable<TEntity> data = ManageOrHandleTransaction(_repo.FindAll<TChild1, TChild2>, whereEntity,
-                whereChild1, whereChild2, transaction, manageTransaction);
+                whereChild1, whereChild2, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<IEnumerable<TEntityViewModel>>(data);
         }
 
         public virtual IEnumerable<TEntityViewModel> FindAll<TChild1, TChild2, TChild3>(Expression<Func<TEntityViewModel, bool>> @where, Expression<Func<TEntityViewModel, object>> tChild1, Expression<Func<TEntityViewModel, object>> tChild2,
-            Expression<Func<TEntityViewModel, object>> tChild3, IDbTransaction transaction = null, bool manageTransaction = true)
+            Expression<Func<TEntityViewModel, object>> tChild3, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
             Expression<Func<TEntity, bool>> whereEntity = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
             Expression<Func<TEntity, object>> whereChild1 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild1);
             Expression<Func<TEntity, object>> whereChild2 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild2);
             Expression<Func<TEntity, object>> whereChild3 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild3);
             IEnumerable<TEntity> data = ManageOrHandleTransaction(_repo.FindAll<TChild1, TChild2, TChild3>, whereEntity,
-                whereChild1, whereChild2, whereChild3, transaction, manageTransaction);
+                whereChild1, whereChild2, whereChild3, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<IEnumerable<TEntityViewModel>>(data);
         }
 
         public virtual IEnumerable<TEntityViewModel> FindAll<TChild1, TChild2, TChild3, TChild4>(Expression<Func<TEntityViewModel, bool>> @where, Expression<Func<TEntityViewModel, object>> tChild1, Expression<Func<TEntityViewModel, object>> tChild2,
-            Expression<Func<TEntityViewModel, object>> tChild3, Expression<Func<TEntityViewModel, object>> tChild4, IDbTransaction transaction = null, bool manageTransaction = true)
+            Expression<Func<TEntityViewModel, object>> tChild3, Expression<Func<TEntityViewModel, object>> tChild4, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
             Expression<Func<TEntity, bool>> whereEntity = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
             Expression<Func<TEntity, object>> whereChild1 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild1);
@@ -947,12 +982,12 @@ namespace WebAPI_BAL
             Expression<Func<TEntity, object>> whereChild3 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild3);
             Expression<Func<TEntity, object>> whereChild4 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild4);
             IEnumerable<TEntity> data = ManageOrHandleTransaction(_repo.FindAll<TChild1, TChild2, TChild3, TChild4>,
-                whereEntity, whereChild1, whereChild2, whereChild3, whereChild4, transaction, manageTransaction);
+                whereEntity, whereChild1, whereChild2, whereChild3, whereChild4, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<IEnumerable<TEntityViewModel>>(data);
         }
 
         public virtual IEnumerable<TEntityViewModel> FindAll<TChild1, TChild2, TChild3, TChild4, TChild5>(Expression<Func<TEntityViewModel, bool>> @where, Expression<Func<TEntityViewModel, object>> tChild1,
-            Expression<Func<TEntityViewModel, object>> tChild2, Expression<Func<TEntityViewModel, object>> tChild3, Expression<Func<TEntityViewModel, object>> tChild4, Expression<Func<TEntityViewModel, object>> tChild5, IDbTransaction transaction = null,
+            Expression<Func<TEntityViewModel, object>> tChild2, Expression<Func<TEntityViewModel, object>> tChild3, Expression<Func<TEntityViewModel, object>> tChild4, Expression<Func<TEntityViewModel, object>> tChild5, bool includeLogicalDeleted = false, IDbTransaction transaction = null,
             bool manageTransaction = true)
         {
             Expression<Func<TEntity, bool>> whereEntity = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
@@ -963,13 +998,13 @@ namespace WebAPI_BAL
             Expression<Func<TEntity, object>> whereChild5 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild5);
             IEnumerable<TEntity> data = ManageOrHandleTransaction(
                 _repo.FindAll<TChild1, TChild2, TChild3, TChild4, TChild5>, whereEntity, whereChild1, whereChild2,
-                whereChild3, whereChild4, whereChild5, transaction, manageTransaction);
+                whereChild3, whereChild4, whereChild5, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<IEnumerable<TEntityViewModel>>(data);
         }
 
         public virtual IEnumerable<TEntityViewModel> FindAll<TChild1, TChild2, TChild3, TChild4, TChild5, TChild6>(Expression<Func<TEntityViewModel, bool>> @where, Expression<Func<TEntityViewModel, object>> tChild1,
             Expression<Func<TEntityViewModel, object>> tChild2, Expression<Func<TEntityViewModel, object>> tChild3, Expression<Func<TEntityViewModel, object>> tChild4, Expression<Func<TEntityViewModel, object>> tChild5, Expression<Func<TEntityViewModel, object>> tChild6,
-            IDbTransaction transaction = null, bool manageTransaction = true)
+            bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
             Expression<Func<TEntity, bool>> whereEntity = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
             Expression<Func<TEntity, object>> whereChild1 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild1);
@@ -980,58 +1015,58 @@ namespace WebAPI_BAL
             Expression<Func<TEntity, object>> whereChild6 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild6);
             IEnumerable<TEntity> data = ManageOrHandleTransaction(
                 _repo.FindAll<TChild1, TChild2, TChild3, TChild4, TChild5, TChild6>, whereEntity, whereChild1, whereChild2,
-                whereChild3, whereChild4, whereChild5, whereChild6, transaction, manageTransaction);
+                whereChild3, whereChild4, whereChild5, whereChild6, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<IEnumerable<TEntityViewModel>>(data);
         }
 
-        public virtual async Task<IEnumerable<TEntityViewModel>> FindAllAsync(IDbTransaction transaction = null, bool manageTransaction = true)
+        public virtual async Task<IEnumerable<TEntityViewModel>> FindAllAsync(bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
-            IEnumerable<TEntity> data = await ManageOrHandleTransaction(_repo.FindAllAsync, transaction, manageTransaction);
+            IEnumerable<TEntity> data = await ManageOrHandleTransaction(_repo.FindAllAsync, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<IEnumerable<TEntityViewModel>>(data);
         }
 
-        public virtual async Task<IEnumerable<TEntityViewModel>> FindAllAsync(Expression<Func<TEntityViewModel, bool>> @where, IDbTransaction transaction = null, bool manageTransaction = true)
+        public virtual async Task<IEnumerable<TEntityViewModel>> FindAllAsync(Expression<Func<TEntityViewModel, bool>> @where, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
             Expression<Func<TEntity, bool>> whereEntity = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
             IEnumerable<TEntity> data =
-                await ManageOrHandleTransaction(_repo.FindAllAsync, whereEntity, transaction, manageTransaction);
+                await ManageOrHandleTransaction(_repo.FindAllAsync, whereEntity, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<IEnumerable<TEntityViewModel>>(data);
         }
 
-        public virtual async Task<IEnumerable<TEntityViewModel>> FindAllAsync<TChild1>(Expression<Func<TEntityViewModel, bool>> @where, Expression<Func<TEntityViewModel, object>> tChild1, IDbTransaction transaction = null,
+        public virtual async Task<IEnumerable<TEntityViewModel>> FindAllAsync<TChild1>(Expression<Func<TEntityViewModel, bool>> @where, Expression<Func<TEntityViewModel, object>> tChild1, bool includeLogicalDeleted = false, IDbTransaction transaction = null,
             bool manageTransaction = true)
         {
             Expression<Func<TEntity, bool>> whereEntity = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
             Expression<Func<TEntity, object>> whereChild1 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild1);
-            IEnumerable<TEntity> data = await ManageOrHandleTransaction(_repo.FindAllAsync<TChild1>, whereEntity, whereChild1, transaction, manageTransaction);
+            IEnumerable<TEntity> data = await ManageOrHandleTransaction(_repo.FindAllAsync<TChild1>, whereEntity, whereChild1, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<IEnumerable<TEntityViewModel>>(data);
         }
         
         public virtual async Task<IEnumerable<TEntityViewModel>> FindAllAsync<TChild1, TChild2>(Expression<Func<TEntityViewModel, bool>> @where, Expression<Func<TEntityViewModel, object>> tChild1, Expression<Func<TEntityViewModel, object>> tChild2,
-            IDbTransaction transaction = null, bool manageTransaction = true)
+            bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
             Expression<Func<TEntity, bool>> whereEntity = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
             Expression<Func<TEntity, object>> whereChild1 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild1);
             Expression<Func<TEntity, object>> whereChild2 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild2);
             IEnumerable<TEntity> data = await ManageOrHandleTransaction(_repo.FindAllAsync<TChild1, TChild2>, whereEntity,
-                whereChild1, whereChild2, transaction, manageTransaction);
+                whereChild1, whereChild2, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<IEnumerable<TEntityViewModel>>(data);
         }
 
         public virtual async Task<IEnumerable<TEntityViewModel>> FindAllAsync<TChild1, TChild2, TChild3>(Expression<Func<TEntityViewModel, bool>> @where, Expression<Func<TEntityViewModel, object>> tChild1, Expression<Func<TEntityViewModel, object>> tChild2,
-            Expression<Func<TEntityViewModel, object>> tChild3, IDbTransaction transaction = null, bool manageTransaction = true)
+            Expression<Func<TEntityViewModel, object>> tChild3, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
             Expression<Func<TEntity, bool>> whereEntity = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
             Expression<Func<TEntity, object>> whereChild1 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild1);
             Expression<Func<TEntity, object>> whereChild2 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild2);
             Expression<Func<TEntity, object>> whereChild3 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild3);
             IEnumerable<TEntity> data = await ManageOrHandleTransaction(_repo.FindAllAsync<TChild1, TChild2, TChild3>, whereEntity,
-                whereChild1, whereChild2, whereChild3, transaction, manageTransaction);
+                whereChild1, whereChild2, whereChild3, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<IEnumerable<TEntityViewModel>>(data);
         }
 
         public virtual async Task<IEnumerable<TEntityViewModel>> FindAllAsync<TChild1, TChild2, TChild3, TChild4>(Expression<Func<TEntityViewModel, bool>> @where, Expression<Func<TEntityViewModel, object>> tChild1, Expression<Func<TEntityViewModel, object>> tChild2,
-            Expression<Func<TEntityViewModel, object>> tChild3, Expression<Func<TEntityViewModel, object>> tChild4, IDbTransaction transaction = null, bool manageTransaction = true)
+            Expression<Func<TEntityViewModel, object>> tChild3, Expression<Func<TEntityViewModel, object>> tChild4, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
             Expression<Func<TEntity, bool>> whereEntity = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
             Expression<Func<TEntity, object>> whereChild1 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild1);
@@ -1039,12 +1074,12 @@ namespace WebAPI_BAL
             Expression<Func<TEntity, object>> whereChild3 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild3);
             Expression<Func<TEntity, object>> whereChild4 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild4);
             IEnumerable<TEntity> data = await ManageOrHandleTransaction(_repo.FindAllAsync<TChild1, TChild2, TChild3, TChild4>,
-                whereEntity, whereChild1, whereChild2, whereChild3, whereChild4, transaction, manageTransaction);
+                whereEntity, whereChild1, whereChild2, whereChild3, whereChild4, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<IEnumerable<TEntityViewModel>>(data);
         }
 
         public virtual async Task<IEnumerable<TEntityViewModel>> FindAllAsync<TChild1, TChild2, TChild3, TChild4, TChild5>(Expression<Func<TEntityViewModel, bool>> @where, Expression<Func<TEntityViewModel, object>> tChild1,
-            Expression<Func<TEntityViewModel, object>> tChild2, Expression<Func<TEntityViewModel, object>> tChild3, Expression<Func<TEntityViewModel, object>> tChild4, Expression<Func<TEntityViewModel, object>> tChild5, IDbTransaction transaction = null,
+            Expression<Func<TEntityViewModel, object>> tChild2, Expression<Func<TEntityViewModel, object>> tChild3, Expression<Func<TEntityViewModel, object>> tChild4, Expression<Func<TEntityViewModel, object>> tChild5, bool includeLogicalDeleted = false, IDbTransaction transaction = null,
             bool manageTransaction = true)
         {
             Expression<Func<TEntity, bool>> whereEntity = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
@@ -1055,13 +1090,13 @@ namespace WebAPI_BAL
             Expression<Func<TEntity, object>> whereChild5 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild5);
             IEnumerable<TEntity> data = await ManageOrHandleTransaction(
                 _repo.FindAllAsync<TChild1, TChild2, TChild3, TChild4, TChild5>, whereEntity, whereChild1, whereChild2,
-                whereChild3, whereChild4, whereChild5, transaction, manageTransaction);
+                whereChild3, whereChild4, whereChild5, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<IEnumerable<TEntityViewModel>>(data);
         }
 
         public virtual async Task<IEnumerable<TEntityViewModel>> FindAllAsync<TChild1, TChild2, TChild3, TChild4, TChild5, TChild6>(Expression<Func<TEntityViewModel, bool>> @where, Expression<Func<TEntityViewModel, object>> tChild1,
             Expression<Func<TEntityViewModel, object>> tChild2, Expression<Func<TEntityViewModel, object>> tChild3, Expression<Func<TEntityViewModel, object>> tChild4, Expression<Func<TEntityViewModel, object>> tChild5, Expression<Func<TEntityViewModel, object>> tChild6,
-            IDbTransaction transaction = null, bool manageTransaction = true)
+            bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
             Expression<Func<TEntity, bool>> whereEntity = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
             Expression<Func<TEntity, object>> whereChild1 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild1);
@@ -1072,85 +1107,85 @@ namespace WebAPI_BAL
             Expression<Func<TEntity, object>> whereChild6 = _mapper.Map<Expression<Func<TEntity, object>>>(tChild6);
             IEnumerable<TEntity> data = await ManageOrHandleTransaction(
                 _repo.FindAllAsync<TChild1, TChild2, TChild3, TChild4, TChild5, TChild6>, whereEntity, whereChild1, whereChild2,
-                whereChild3, whereChild4, whereChild5, whereChild6, transaction, manageTransaction);
+                whereChild3, whereChild4, whereChild5, whereChild6, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<IEnumerable<TEntityViewModel>>(data);
         }
         #endregion
 
         #region Find All Between
-        public virtual IEnumerable<TEntityViewModel> FindAllBetween(object @from, object to, Expression<Func<TEntityViewModel, object>> btwField, IDbTransaction transaction = null,
+        public virtual IEnumerable<TEntityViewModel> FindAllBetween(object @from, object to, Expression<Func<TEntityViewModel, object>> btwField, bool includeLogicalDeleted = false, IDbTransaction transaction = null,
             bool manageTransaction = true)
         {
             Expression<Func<TEntity, object>> btwFieldEntity = _mapper.Map<Expression<Func<TEntity, object>>>(btwField);
             IEnumerable<TEntity> data =
-                ManageOrHandleTransaction(_repo.FindAllBetween, from, to, btwFieldEntity, transaction, manageTransaction);
+                ManageOrHandleTransaction(_repo.FindAllBetween, from, to, btwFieldEntity, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<IEnumerable<TEntityViewModel>>(data);
         }
 
         public virtual IEnumerable<TEntityViewModel> FindAllBetween(object @from, object to, Expression<Func<TEntityViewModel, object>> btwField, Expression<Func<TEntityViewModel, bool>> @where = null,
-            IDbTransaction transaction = null, bool manageTransaction = true)
+            bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
             Expression<Func<TEntity, object>> btwFieldEntity = _mapper.Map<Expression<Func<TEntity, object>>>(btwField);
             Expression<Func<TEntity, bool>> whereEntity = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
             IEnumerable<TEntity> data =
-                ManageOrHandleTransaction(_repo.FindAllBetween, from, to, btwFieldEntity, whereEntity, transaction, manageTransaction);
+                ManageOrHandleTransaction(_repo.FindAllBetween, from, to, btwFieldEntity, whereEntity, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<IEnumerable<TEntityViewModel>>(data);
         }
 
-        public virtual IEnumerable<TEntityViewModel> FindAllBetween(DateTime @from, DateTime to, Expression<Func<TEntityViewModel, object>> btwField, IDbTransaction transaction = null,
+        public virtual IEnumerable<TEntityViewModel> FindAllBetween(DateTime @from, DateTime to, Expression<Func<TEntityViewModel, object>> btwField, bool includeLogicalDeleted = false, IDbTransaction transaction = null,
             bool manageTransaction = true)
         {
             Expression<Func<TEntity, object>> btwFieldEntity = _mapper.Map<Expression<Func<TEntity, object>>>(btwField);
             IEnumerable<TEntity> data =
-                ManageOrHandleTransaction(_repo.FindAllBetween, from, to, btwFieldEntity, transaction, manageTransaction);
+                ManageOrHandleTransaction(_repo.FindAllBetween, from, to, btwFieldEntity, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<IEnumerable<TEntityViewModel>>(data);
         }
 
         public virtual IEnumerable<TEntityViewModel> FindAllBetween(DateTime @from, DateTime to, Expression<Func<TEntityViewModel, object>> btwField, Expression<Func<TEntityViewModel, bool>> @where,
-            IDbTransaction transaction = null, bool manageTransaction = true)
+            bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
             Expression<Func<TEntity, object>> btwFieldEntity = _mapper.Map<Expression<Func<TEntity, object>>>(btwField);
             Expression<Func<TEntity, bool>> whereEntity = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
             IEnumerable<TEntity> data =
-                ManageOrHandleTransaction(_repo.FindAllBetween, from, to, btwFieldEntity, whereEntity, transaction, manageTransaction);
+                ManageOrHandleTransaction(_repo.FindAllBetween, from, to, btwFieldEntity, whereEntity, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<IEnumerable<TEntityViewModel>>(data);
         }
 
-        public virtual async Task<IEnumerable<TEntityViewModel>> FindAllBetweenAsync(object @from, object to, Expression<Func<TEntityViewModel, object>> btwField, IDbTransaction transaction = null,
+        public virtual async Task<IEnumerable<TEntityViewModel>> FindAllBetweenAsync(object @from, object to, Expression<Func<TEntityViewModel, object>> btwField, bool includeLogicalDeleted = false, IDbTransaction transaction = null,
             bool manageTransaction = true)
         {
             Expression<Func<TEntity, object>> btwFieldEntity = _mapper.Map<Expression<Func<TEntity, object>>>(btwField);
             IEnumerable<TEntity> data =
-                await ManageOrHandleTransaction(_repo.FindAllBetweenAsync, from, to, btwFieldEntity, transaction, manageTransaction);
+                await ManageOrHandleTransaction(_repo.FindAllBetweenAsync, from, to, btwFieldEntity, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<IEnumerable<TEntityViewModel>>(data);
         }
 
         public virtual async Task<IEnumerable<TEntityViewModel>> FindAllBetweenAsync(object @from, object to, Expression<Func<TEntityViewModel, object>> btwField, Expression<Func<TEntity, bool>> @where,
-            IDbTransaction transaction = null, bool manageTransaction = true)
+            bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
             Expression<Func<TEntity, object>> btwFieldEntity = _mapper.Map<Expression<Func<TEntity, object>>>(btwField);
             Expression<Func<TEntity, bool>> whereEntity = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
             IEnumerable<TEntity> data =
-                await ManageOrHandleTransaction(_repo.FindAllBetweenAsync, from, to, btwFieldEntity, whereEntity, transaction, manageTransaction);
+                await ManageOrHandleTransaction(_repo.FindAllBetweenAsync, from, to, btwFieldEntity, whereEntity, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<IEnumerable<TEntityViewModel>>(data);
         }
 
-        public virtual async Task<IEnumerable<TEntityViewModel>> FindAllBetweenAsync(DateTime @from, DateTime to, Expression<Func<TEntityViewModel, object>> btwField, IDbTransaction transaction = null,
+        public virtual async Task<IEnumerable<TEntityViewModel>> FindAllBetweenAsync(DateTime @from, DateTime to, Expression<Func<TEntityViewModel, object>> btwField, bool includeLogicalDeleted = false, IDbTransaction transaction = null,
             bool manageTransaction = true)
         {
             Expression<Func<TEntity, object>> btwFieldEntity = _mapper.Map<Expression<Func<TEntity, object>>>(btwField);
             IEnumerable<TEntity> data =
-                await ManageOrHandleTransaction(_repo.FindAllBetweenAsync, from, to, btwFieldEntity, transaction, manageTransaction);
+                await ManageOrHandleTransaction(_repo.FindAllBetweenAsync, from, to, btwFieldEntity, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<IEnumerable<TEntityViewModel>>(data);
         }
 
         public virtual async Task<IEnumerable<TEntityViewModel>> FindAllBetweenAsync(DateTime @from, DateTime to, Expression<Func<TEntityViewModel, object>> btwField, Expression<Func<TEntity, bool>> @where,
-            IDbTransaction transaction = null, bool manageTransaction = true)
+            bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true)
         {
             Expression<Func<TEntity, object>> btwFieldEntity = _mapper.Map<Expression<Func<TEntity, object>>>(btwField);
             Expression<Func<TEntity, bool>> whereEntity = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
             IEnumerable<TEntity> data =
-                await ManageOrHandleTransaction(_repo.FindAllBetweenAsync, from, to, btwFieldEntity, whereEntity, transaction, manageTransaction);
+                await ManageOrHandleTransaction(_repo.FindAllBetweenAsync, from, to, btwFieldEntity, whereEntity, includeLogicalDeleted, transaction, manageTransaction);
             return _mapper.Map<IEnumerable<TEntityViewModel>>(data);
         }
         #endregion

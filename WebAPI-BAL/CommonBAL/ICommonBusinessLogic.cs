@@ -43,6 +43,11 @@ namespace WebAPI_BAL
             Func<TData1, TData2, TData3, TData4, TData5, TData6, TData7, IDbTransaction, TReturn> repoFunc,
             TData1 data1, TData2 data2,
             TData3 data3, TData4 data4, TData5 data5, TData6 data6, TData7 data7);
+
+        TReturn HandleTransaction<TReturn, TData1, TData2, TData3, TData4, TData5, TData6, TData7, TData8>(
+            Func<TData1, TData2, TData3, TData4, TData5, TData6, TData7, TData8, IDbTransaction, TReturn> repoFunc,
+            TData1 data1, TData2 data2,
+            TData3 data3, TData4 data4, TData5 data5, TData6 data6, TData7 data7, TData8 data8);
         #endregion
 
         #region Store Procedure
@@ -147,42 +152,42 @@ namespace WebAPI_BAL
         /// <summary>
         ///     Get number of rows
         /// </summary>
-        int Count(IDbTransaction transaction = null, bool manageTransaction = true);
+        int Count(bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get number of rows with WHERE clause
         /// </summary>
-        int Count(Expression<Func<TEntityViewModel, bool>> where, IDbTransaction transaction = null, bool manageTransaction = true);
+        int Count(Expression<Func<TEntityViewModel, bool>> where, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get number of rows with DISTINCT clause
         /// </summary>
-        int Count(Expression<Func<TEntityViewModel, object>> distinct, IDbTransaction transaction = null, bool manageTransaction = true);
+        int Count(Expression<Func<TEntityViewModel, object>> distinct, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get number of rows with DISTINCT and WHERE clause
         /// </summary>
-        int Count(Expression<Func<TEntityViewModel, bool>> where, Expression<Func<TEntityViewModel, object>> distinct, IDbTransaction transaction = null, bool manageTransaction = true);
+        int Count(Expression<Func<TEntityViewModel, bool>> where, Expression<Func<TEntityViewModel, object>> distinct, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get number of rows
         /// </summary>
-        Task<int> CountAsync(IDbTransaction transaction = null, bool manageTransaction = true);
+        Task<int> CountAsync(bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get number of rows with WHERE clause
         /// </summary>
-        Task<int> CountAsync(Expression<Func<TEntityViewModel, bool>> where, IDbTransaction transaction = null, bool manageTransaction = true);
+        Task<int> CountAsync(Expression<Func<TEntityViewModel, bool>> where, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get number of rows with DISTINCT clause
         /// </summary>
-        Task<int> CountAsync(Expression<Func<TEntityViewModel, object>> distinct, IDbTransaction transaction = null, bool manageTransaction = true);
+        Task<int> CountAsync(Expression<Func<TEntityViewModel, object>> distinct, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get number of rows with DISTINCT and WHERE clause
         /// </summary>
-        Task<int> CountAsync(Expression<Func<TEntityViewModel, bool>> where, Expression<Func<TEntityViewModel, object>> distinct, IDbTransaction transaction = null, bool manageTransaction = true);
+        Task<int> CountAsync(Expression<Func<TEntityViewModel, bool>> where, Expression<Func<TEntityViewModel, object>> distinct, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
         #endregion
 
         #region Select
@@ -191,25 +196,25 @@ namespace WebAPI_BAL
         /// <summary>
         ///     Get first object
         /// </summary>
-        TEntityViewModel Find(IDbTransaction transaction = null, bool manageTransaction = true);
+        TEntityViewModel Find(bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get first object
         /// </summary>
-        TEntityViewModel Find(Expression<Func<TEntityViewModel, bool>> where, IDbTransaction transaction = null, bool manageTransaction = true);
+        TEntityViewModel Find(Expression<Func<TEntityViewModel, bool>> where, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get first object with join objects
         /// </summary>
         TEntityViewModel Find<TChild1>(Expression<Func<TEntityViewModel, bool>> where,
-            Expression<Func<TEntityViewModel, object>> tChild1, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild1, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get first object with join objects
         /// </summary>
         TEntityViewModel Find<TChild1, TChild2>(Expression<Func<TEntityViewModel, bool>> where,
             Expression<Func<TEntityViewModel, object>> tChild1,
-            Expression<Func<TEntityViewModel, object>> tChild2, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild2, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get first object with join objects
@@ -217,7 +222,7 @@ namespace WebAPI_BAL
         TEntityViewModel Find<TChild1, TChild2, TChild3>(Expression<Func<TEntityViewModel, bool>> where,
             Expression<Func<TEntityViewModel, object>> tChild1,
             Expression<Func<TEntityViewModel, object>> tChild2,
-            Expression<Func<TEntityViewModel, object>> tChild3, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild3, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get first object with join objects
@@ -226,7 +231,7 @@ namespace WebAPI_BAL
             Expression<Func<TEntityViewModel, object>> tChild1,
             Expression<Func<TEntityViewModel, object>> tChild2,
             Expression<Func<TEntityViewModel, object>> tChild3,
-            Expression<Func<TEntityViewModel, object>> tChild4, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild4, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get first object with join objects
@@ -236,7 +241,7 @@ namespace WebAPI_BAL
             Expression<Func<TEntityViewModel, object>> tChild2,
             Expression<Func<TEntityViewModel, object>> tChild3,
             Expression<Func<TEntityViewModel, object>> tChild4,
-            Expression<Func<TEntityViewModel, object>> tChild5, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild5, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get first object with join objects
@@ -247,30 +252,30 @@ namespace WebAPI_BAL
             Expression<Func<TEntityViewModel, object>> tChild3,
             Expression<Func<TEntityViewModel, object>> tChild4,
             Expression<Func<TEntityViewModel, object>> tChild5,
-            Expression<Func<TEntityViewModel, object>> tChild6, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild6, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get first object
         /// </summary>
-        Task<TEntityViewModel> FindAsync(IDbTransaction transaction = null, bool manageTransaction = true);
+        Task<TEntityViewModel> FindAsync(bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get first object
         /// </summary>
-        Task<TEntityViewModel> FindAsync(Expression<Func<TEntityViewModel, bool>> where, IDbTransaction transaction = null, bool manageTransaction = true);
+        Task<TEntityViewModel> FindAsync(Expression<Func<TEntityViewModel, bool>> where, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get first object with join objects
         /// </summary>
         Task<TEntityViewModel> FindAsync<TChild1>(Expression<Func<TEntityViewModel, bool>> where,
-            Expression<Func<TEntityViewModel, object>> tChild1, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild1, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get first object with join objects
         /// </summary>
         Task<TEntityViewModel> FindAsync<TChild1, TChild2>(Expression<Func<TEntityViewModel, bool>> where,
             Expression<Func<TEntityViewModel, object>> tChild1,
-            Expression<Func<TEntityViewModel, object>> tChild2, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild2, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get first object with join objects
@@ -278,7 +283,7 @@ namespace WebAPI_BAL
         Task<TEntityViewModel> FindAsync<TChild1, TChild2, TChild3>(Expression<Func<TEntityViewModel, bool>> where,
             Expression<Func<TEntityViewModel, object>> tChild1,
             Expression<Func<TEntityViewModel, object>> tChild2,
-            Expression<Func<TEntityViewModel, object>> tChild3, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild3, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get first object with join objects
@@ -287,7 +292,7 @@ namespace WebAPI_BAL
             Expression<Func<TEntityViewModel, object>> tChild1,
             Expression<Func<TEntityViewModel, object>> tChild2,
             Expression<Func<TEntityViewModel, object>> tChild3,
-            Expression<Func<TEntityViewModel, object>> tChild4, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild4, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get first object with join objects
@@ -297,7 +302,7 @@ namespace WebAPI_BAL
             Expression<Func<TEntityViewModel, object>> tChild2,
             Expression<Func<TEntityViewModel, object>> tChild3,
             Expression<Func<TEntityViewModel, object>> tChild4,
-            Expression<Func<TEntityViewModel, object>> tChild5, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild5, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get first object with join objects
@@ -308,27 +313,27 @@ namespace WebAPI_BAL
             Expression<Func<TEntityViewModel, object>> tChild3,
             Expression<Func<TEntityViewModel, object>> tChild4,
             Expression<Func<TEntityViewModel, object>> tChild5,
-            Expression<Func<TEntityViewModel, object>> tChild6, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild6, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
         #endregion
 
         #region Find By Id
         /// <summary>
         ///     Get object by Id
         /// </summary>
-        TEntityViewModel FindById(object id, IDbTransaction transaction = null, bool manageTransaction = true);
+        TEntityViewModel FindById(object id, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get object by Id with join objects
         /// </summary>
         TEntityViewModel FindById<TChild1>(object id,
-            Expression<Func<TEntityViewModel, object>> tChild1, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild1, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get object by Id with join objects
         /// </summary>
         TEntityViewModel FindById<TChild1, TChild2>(object id,
             Expression<Func<TEntityViewModel, object>> tChild1,
-            Expression<Func<TEntityViewModel, object>> tChild2, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild2, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get object by Id with join objects
@@ -336,7 +341,7 @@ namespace WebAPI_BAL
         TEntityViewModel FindById<TChild1, TChild2, TChild3>(object id,
             Expression<Func<TEntityViewModel, object>> tChild1,
             Expression<Func<TEntityViewModel, object>> tChild2,
-            Expression<Func<TEntityViewModel, object>> tChild3, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild3, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get object by Id with join objects
@@ -345,7 +350,7 @@ namespace WebAPI_BAL
             Expression<Func<TEntityViewModel, object>> tChild1,
             Expression<Func<TEntityViewModel, object>> tChild2,
             Expression<Func<TEntityViewModel, object>> tChild3,
-            Expression<Func<TEntityViewModel, object>> tChild4, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild4, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get object by Id with join objects
@@ -355,7 +360,7 @@ namespace WebAPI_BAL
             Expression<Func<TEntityViewModel, object>> tChild2,
             Expression<Func<TEntityViewModel, object>> tChild3,
             Expression<Func<TEntityViewModel, object>> tChild4,
-            Expression<Func<TEntityViewModel, object>> tChild5, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild5, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get object by Id with join objects
@@ -366,25 +371,25 @@ namespace WebAPI_BAL
             Expression<Func<TEntityViewModel, object>> tChild3,
             Expression<Func<TEntityViewModel, object>> tChild4,
             Expression<Func<TEntityViewModel, object>> tChild5,
-            Expression<Func<TEntityViewModel, object>> tChild6, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild6, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get object by Id
         /// </summary>
-        Task<TEntityViewModel> FindByIdAsync(object id, IDbTransaction transaction = null, bool manageTransaction = true);
+        Task<TEntityViewModel> FindByIdAsync(object id, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get object by Id with join objects
         /// </summary>
         Task<TEntityViewModel> FindByIdAsync<TChild1>(object id,
-            Expression<Func<TEntityViewModel, object>> tChild1, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild1, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get object by Id with join objects
         /// </summary>
         Task<TEntityViewModel> FindByIdAsync<TChild1, TChild2>(object id,
             Expression<Func<TEntityViewModel, object>> tChild1,
-            Expression<Func<TEntityViewModel, object>> tChild2, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild2, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get object by Id with join objects
@@ -392,7 +397,7 @@ namespace WebAPI_BAL
         Task<TEntityViewModel> FindByIdAsync<TChild1, TChild2, TChild3>(object id,
             Expression<Func<TEntityViewModel, object>> tChild1,
             Expression<Func<TEntityViewModel, object>> tChild2,
-            Expression<Func<TEntityViewModel, object>> tChild3, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild3, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get object by Id with join objects
@@ -401,7 +406,7 @@ namespace WebAPI_BAL
             Expression<Func<TEntityViewModel, object>> tChild1,
             Expression<Func<TEntityViewModel, object>> tChild2,
             Expression<Func<TEntityViewModel, object>> tChild3,
-            Expression<Func<TEntityViewModel, object>> tChild4, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild4, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get object by Id with join objects
@@ -411,7 +416,7 @@ namespace WebAPI_BAL
             Expression<Func<TEntityViewModel, object>> tChild2,
             Expression<Func<TEntityViewModel, object>> tChild3,
             Expression<Func<TEntityViewModel, object>> tChild4,
-            Expression<Func<TEntityViewModel, object>> tChild5, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild5, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get object by Id with join objects
@@ -422,25 +427,25 @@ namespace WebAPI_BAL
             Expression<Func<TEntityViewModel, object>> tChild3,
             Expression<Func<TEntityViewModel, object>> tChild4,
             Expression<Func<TEntityViewModel, object>> tChild5,
-            Expression<Func<TEntityViewModel, object>> tChild6, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild6, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
         #endregion
 
         #region Find All
         /// <summary>
         ///     Get all objects
         /// </summary>
-        IEnumerable<TEntityViewModel> FindAll(IDbTransaction transaction = null, bool manageTransaction = true);
+        IEnumerable<TEntityViewModel> FindAll(bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get all objects
         /// </summary>
-        IEnumerable<TEntityViewModel> FindAll(Expression<Func<TEntityViewModel, bool>> where, IDbTransaction transaction = null, bool manageTransaction = true);
+        IEnumerable<TEntityViewModel> FindAll(Expression<Func<TEntityViewModel, bool>> where, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
 
         /// <summary>
         ///     Get all objects with join objects
         /// </summary>
-        IEnumerable<TEntityViewModel> FindAll<TChild1>(Expression<Func<TEntityViewModel, bool>> where, Expression<Func<TEntityViewModel, object>> tChild1, IDbTransaction transaction = null, bool manageTransaction = true);
+        IEnumerable<TEntityViewModel> FindAll<TChild1>(Expression<Func<TEntityViewModel, bool>> where, Expression<Func<TEntityViewModel, object>> tChild1, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
 
         /// <summary>
@@ -449,7 +454,7 @@ namespace WebAPI_BAL
         IEnumerable<TEntityViewModel> FindAll<TChild1, TChild2>(
             Expression<Func<TEntityViewModel, bool>> where,
             Expression<Func<TEntityViewModel, object>> tChild1,
-            Expression<Func<TEntityViewModel, object>> tChild2, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild2, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get all objects with join objects
@@ -458,7 +463,7 @@ namespace WebAPI_BAL
             Expression<Func<TEntityViewModel, bool>> where,
             Expression<Func<TEntityViewModel, object>> tChild1,
             Expression<Func<TEntityViewModel, object>> tChild2,
-            Expression<Func<TEntityViewModel, object>> tChild3, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild3, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get all objects with join objects
@@ -468,7 +473,7 @@ namespace WebAPI_BAL
             Expression<Func<TEntityViewModel, object>> tChild1,
             Expression<Func<TEntityViewModel, object>> tChild2,
             Expression<Func<TEntityViewModel, object>> tChild3,
-            Expression<Func<TEntityViewModel, object>> tChild4, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild4, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get all objects with join objects
@@ -479,7 +484,7 @@ namespace WebAPI_BAL
             Expression<Func<TEntityViewModel, object>> tChild2,
             Expression<Func<TEntityViewModel, object>> tChild3,
             Expression<Func<TEntityViewModel, object>> tChild4,
-            Expression<Func<TEntityViewModel, object>> tChild5, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild5, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get all objects with join objects
@@ -491,24 +496,24 @@ namespace WebAPI_BAL
             Expression<Func<TEntityViewModel, object>> tChild3,
             Expression<Func<TEntityViewModel, object>> tChild4,
             Expression<Func<TEntityViewModel, object>> tChild5,
-            Expression<Func<TEntityViewModel, object>> tChild6, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild6, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get all objects
         /// </summary>
-        Task<IEnumerable<TEntityViewModel>> FindAllAsync(IDbTransaction transaction = null, bool manageTransaction = true);
+        Task<IEnumerable<TEntityViewModel>> FindAllAsync(bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get all objects
         /// </summary>
-        Task<IEnumerable<TEntityViewModel>> FindAllAsync(Expression<Func<TEntityViewModel, bool>> where, IDbTransaction transaction = null, bool manageTransaction = true);
+        Task<IEnumerable<TEntityViewModel>> FindAllAsync(Expression<Func<TEntityViewModel, bool>> where, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
 
         /// <summary>
         ///     Get all objects with join objects
         /// </summary>
         Task<IEnumerable<TEntityViewModel>> FindAllAsync<TChild1>(Expression<Func<TEntityViewModel, bool>> where,
-            Expression<Func<TEntityViewModel, object>> tChild1, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild1, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get all objects with join objects
@@ -516,7 +521,7 @@ namespace WebAPI_BAL
         Task<IEnumerable<TEntityViewModel>> FindAllAsync<TChild1, TChild2>(
             Expression<Func<TEntityViewModel, bool>> where,
             Expression<Func<TEntityViewModel, object>> tChild1,
-            Expression<Func<TEntityViewModel, object>> tChild2, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild2, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
 
         /// <summary>
@@ -526,7 +531,7 @@ namespace WebAPI_BAL
             Expression<Func<TEntityViewModel, bool>> where,
             Expression<Func<TEntityViewModel, object>> tChild1,
             Expression<Func<TEntityViewModel, object>> tChild2,
-            Expression<Func<TEntityViewModel, object>> tChild3, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild3, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get all objects with join objects
@@ -536,7 +541,7 @@ namespace WebAPI_BAL
             Expression<Func<TEntityViewModel, object>> tChild1,
             Expression<Func<TEntityViewModel, object>> tChild2,
             Expression<Func<TEntityViewModel, object>> tChild3,
-            Expression<Func<TEntityViewModel, object>> tChild4, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild4, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get all objects with join objects
@@ -547,7 +552,7 @@ namespace WebAPI_BAL
             Expression<Func<TEntityViewModel, object>> tChild2,
             Expression<Func<TEntityViewModel, object>> tChild3,
             Expression<Func<TEntityViewModel, object>> tChild4,
-            Expression<Func<TEntityViewModel, object>> tChild5, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild5, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get all objects with join objects
@@ -559,27 +564,27 @@ namespace WebAPI_BAL
             Expression<Func<TEntityViewModel, object>> tChild3,
             Expression<Func<TEntityViewModel, object>> tChild4,
             Expression<Func<TEntityViewModel, object>> tChild5,
-            Expression<Func<TEntityViewModel, object>> tChild6, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild6, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
         #endregion
 
         #region Find All Between
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
-        IEnumerable<TEntityViewModel> FindAllBetween(object from, object to, Expression<Func<TEntityViewModel, object>> btwField, IDbTransaction transaction = null, bool manageTransaction = true);
+        IEnumerable<TEntityViewModel> FindAllBetween(object from, object to, Expression<Func<TEntityViewModel, object>> btwField, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
         IEnumerable<TEntityViewModel> FindAllBetween(object from, object to, Expression<Func<TEntityViewModel, object>> btwField,
-            Expression<Func<TEntityViewModel, bool>> where = null, IDbTransaction transaction = null,
+            Expression<Func<TEntityViewModel, bool>> where = null, bool includeLogicalDeleted = false, IDbTransaction transaction = null,
             bool manageTransaction = true);
 
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
         IEnumerable<TEntityViewModel> FindAllBetween(DateTime from, DateTime to,
-            Expression<Func<TEntityViewModel, object>> btwField, IDbTransaction transaction = null,
+            Expression<Func<TEntityViewModel, object>> btwField, bool includeLogicalDeleted = false, IDbTransaction transaction = null,
             bool manageTransaction = true);
 
         /// <summary>
@@ -587,13 +592,13 @@ namespace WebAPI_BAL
         /// </summary>
         IEnumerable<TEntityViewModel> FindAllBetween(DateTime from, DateTime to,
             Expression<Func<TEntityViewModel, object>> btwField, Expression<Func<TEntityViewModel, bool>> where,
-            IDbTransaction transaction = null, bool manageTransaction = true);
+            bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
         Task<IEnumerable<TEntityViewModel>> FindAllBetweenAsync(object from, object to,
-            Expression<Func<TEntityViewModel, object>> btwField, IDbTransaction transaction = null,
+            Expression<Func<TEntityViewModel, object>> btwField, bool includeLogicalDeleted = false, IDbTransaction transaction = null,
             bool manageTransaction = true);
 
         /// <summary>
@@ -601,13 +606,13 @@ namespace WebAPI_BAL
         /// </summary>
         Task<IEnumerable<TEntityViewModel>> FindAllBetweenAsync(object from, object to,
             Expression<Func<TEntityViewModel, object>> btwField, Expression<Func<TEntity, bool>> where,
-            IDbTransaction transaction = null, bool manageTransaction = true);
+            bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
         Task<IEnumerable<TEntityViewModel>> FindAllBetweenAsync(DateTime from, DateTime to,
-            Expression<Func<TEntityViewModel, object>> btwField, IDbTransaction transaction = null,
+            Expression<Func<TEntityViewModel, object>> btwField, bool includeLogicalDeleted = false, IDbTransaction transaction = null,
             bool manageTransaction = true);
 
         /// <summary>
@@ -615,7 +620,7 @@ namespace WebAPI_BAL
         /// </summary>
         Task<IEnumerable<TEntityViewModel>> FindAllBetweenAsync(DateTime from, DateTime to,
             Expression<Func<TEntityViewModel, object>> btwField, Expression<Func<TEntity, bool>> where,
-            IDbTransaction transaction = null, bool manageTransaction = true);
+            bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         #endregion
 

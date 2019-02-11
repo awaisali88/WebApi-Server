@@ -81,7 +81,7 @@ namespace WebAPI_Server.Controllers.v1
 
             bool result = _cBal.HandleTransaction((IDbTransaction trans) =>
             {
-                TestRepoViewModel trData = _cBal.FindById(data.Id, trans);
+                TestRepoViewModel trData = _cBal.FindById(data.Id, transaction: trans);
                 return _cBal.Delete(User, trData, transaction: trans);
             });
 

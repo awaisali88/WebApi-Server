@@ -12,52 +12,52 @@ namespace Dapper.Repositories
         where TEntity : class
     {
         /// <inheritdoc />
-        public virtual TEntity Find()
+        public virtual TEntity Find(bool includeLogicalDeleted)
         {
-            return Find(null, null);
+            return Find(null, includeLogicalDeleted, null);
         }
 
         /// <inheritdoc />
-        public virtual TEntity Find(IDbTransaction transaction)
+        public virtual TEntity Find(bool includeLogicalDeleted, IDbTransaction transaction)
         {
-            return Find(null, transaction);
+            return Find(null, includeLogicalDeleted, transaction);
         }
 
         /// <inheritdoc />
-        public virtual TEntity Find(Expression<Func<TEntity, bool>> predicate)
+        public virtual TEntity Find(Expression<Func<TEntity, bool>> predicate, bool includeLogicalDeleted)
         {
-            return Find(predicate, null);
+            return Find(predicate, includeLogicalDeleted, null);
         }
 
         /// <inheritdoc />
-        public virtual TEntity Find(Expression<Func<TEntity, bool>> predicate, IDbTransaction transaction)
+        public virtual TEntity Find(Expression<Func<TEntity, bool>> predicate, bool includeLogicalDeleted, IDbTransaction transaction)
         {
-            var queryResult = SqlGenerator.GetSelectFirst(predicate);
+            var queryResult = SqlGenerator.GetSelectFirst(predicate, includeLogicalDeleted);
             return Connection.QueryFirstOrDefault<TEntity>(queryResult.GetSql(), queryResult.Param, transaction);
         }
 
         /// <inheritdoc />
-        public virtual Task<TEntity> FindAsync()
+        public virtual Task<TEntity> FindAsync(bool includeLogicalDeleted)
         {
-            return FindAsync(null, null);
+            return FindAsync(null, includeLogicalDeleted, null);
         }
 
         /// <inheritdoc />
-        public virtual Task<TEntity> FindAsync(IDbTransaction transaction)
+        public virtual Task<TEntity> FindAsync(bool includeLogicalDeleted, IDbTransaction transaction)
         {
-            return FindAsync(null, transaction);
+            return FindAsync(null, includeLogicalDeleted, transaction);
         }
 
         /// <inheritdoc />
-        public virtual Task<TEntity> FindAsync(Expression<Func<TEntity, bool>> predicate)
+        public virtual Task<TEntity> FindAsync(Expression<Func<TEntity, bool>> predicate, bool includeLogicalDeleted)
         {
-            return FindAsync(predicate, null);
+            return FindAsync(predicate, includeLogicalDeleted, null);
         }
 
         /// <inheritdoc />
-        public virtual Task<TEntity> FindAsync(Expression<Func<TEntity, bool>> predicate, IDbTransaction transaction)
+        public virtual Task<TEntity> FindAsync(Expression<Func<TEntity, bool>> predicate, bool includeLogicalDeleted, IDbTransaction transaction)
         {
-            var queryResult = SqlGenerator.GetSelectFirst(predicate);
+            var queryResult = SqlGenerator.GetSelectFirst(predicate, includeLogicalDeleted);
             return Connection.QueryFirstOrDefaultAsync<TEntity>(queryResult.GetSql(), queryResult.Param, transaction);
         }
     }
