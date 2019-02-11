@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using Common;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.Swagger;
@@ -19,64 +20,71 @@ namespace WebAPI_Server.AppStart
         {
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info
+                var provider = services.BuildServiceProvider()
+                    .GetRequiredService<IApiVersionDescriptionProvider>();
+
+                foreach (var description in provider.ApiVersionDescriptions)
                 {
-                    Version = "v1",
-                    Title = "Web API",
-                    Description = $"Access token: {HttpRequestHeaders.ApiKeyValue}",
-                    //TermsOfService = "None",
-                    //Contact = new Contact
-                    //{
-                    //    Name = "Awais Ali",
-                    //    Email = "",
-                    //},
-                    //License = new License
-                    //{
-                    //    Name = "Use under LICX",
-                    //    Url = "https://example.com/license"
-                    //}
-                });
+                    c.SwaggerDoc(description.GroupName, new Info
+                    {
+                        Version = description.ApiVersion.ToString(),
+                        Title = $"Web API {description.ApiVersion}",
+                        Description = $"Access token: {HttpRequestHeaders.ApiKeyValue}",
+                        //TermsOfService = "None",
+                        //Contact = new Contact
+                        //{
+                        //    Name = "Awais Ali",
+                        //    Email = "",
+                        //},
+                        //License = new License
+                        //{
+                        //    Name = "Use under LICX",
+                        //    Url = "https://example.com/license"
+                        //}
+                    });
 
-                c.DescribeAllEnumsAsStrings();
+                    c.DescribeAllEnumsAsStrings();
 
-                c.ExampleFilters();
+                    c.ExampleFilters();
 
-                c.OperationFilter<RequestCallbackUrlFilter>();
+                    c.OperationFilter<RequestCallbackUrlFilter>();
 
-                c.OperationFilter<AddResponseHeadersFilter>(); // [SwaggerResponseHeader]
+                    c.OperationFilter<AddResponseHeadersFilter>(); // [SwaggerResponseHeader]
 
-                c.OperationFilter<AppendAuthorizeToSummaryOperationFilter>();
-                // Adds "(Auth)" to the summary so that you can see which endpoints have Authorization
-                // or use the generic method, e.g. c.OperationFilter<AppendAuthorizeToSummaryOperationFilter<MyCustomAttribute>>();
+                    c.OperationFilter<AppendAuthorizeToSummaryOperationFilter>();
+                    // Adds "(Auth)" to the summary so that you can see which endpoints have Authorization
+                    // or use the generic method, e.g. c.OperationFilter<AppendAuthorizeToSummaryOperationFilter<MyCustomAttribute>>();
 
 
-                // add Security information to each operation for OAuth2
-                c.OperationFilter<CustomSecurityRequirementsOperationFilter>(true, true);
-                // or use the generic method, e.g. c.OperationFilter<SecurityRequirementsOperationFilter<MyCustomAttribute>>();
+                    // add Security information to each operation for OAuth2
+                    c.OperationFilter<CustomSecurityRequirementsOperationFilter>(description.GroupName, true, true);
+                    // or use the generic method, e.g. c.OperationFilter<SecurityRequirementsOperationFilter<MyCustomAttribute>>();
 
-                // if you're using the SecurityRequirementsOperationFilter, you also need to tell Swashbuckle you're using OAuth2
-                c.AddSecurityDefinition("oauth2", new ApiKeyScheme
-                {
-                    Description = "Standard Authorization header using the Bearer scheme. Example: \"bearer {token}\"",
-                    In = "header",
-                    Name = HttpRequestHeaders.Authorization,
-                    Type = "apiKey",
-                });
-                //c.OperationFilter<ApiKeySecurityRequirementsOperationFilter>();
-                c.AddSecurityDefinition(HttpRequestHeaders.ApiKey, new ApiKeyScheme
-                {
-                    Description = "Api Access Token",
-                    In = "header",
-                    Name = HttpRequestHeaders.ApiKey,
-                    Type = "apiKey"
-                });
+                    // if you're using the SecurityRequirementsOperationFilter, you also need to tell Swashbuckle you're using OAuth2
+                    c.AddSecurityDefinition($"oauth2_{description.GroupName}", new ApiKeyScheme
+                    {
+                        Description =
+                            "Standard Authorization header using the Bearer scheme. Example: \"bearer {token}\"",
+                        In = "header",
+                        Name = HttpRequestHeaders.Authorization,
+                        Type = "apiKey",
+                    });
+                    //c.OperationFilter<ApiKeySecurityRequirementsOperationFilter>();
+                    c.AddSecurityDefinition($"{HttpRequestHeaders.ApiKey}_{description.GroupName}", new ApiKeyScheme
+                    {
+                        Description = "Api Access Token",
+                        In = "header",
+                        Name = HttpRequestHeaders.ApiKey,
+                        Type = "apiKey"
+                    });
 
-                c.AddFluentValidationRules();
+                    c.AddFluentValidationRules();
 
-                // Set the comments path for the Swagger JSON and UI.
-                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                c.IncludeXmlComments(xmlPath);
+                    // Set the comments path for the Swagger JSON and UI.
+                    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                    c.IncludeXmlComments(xmlPath);
+                }
             });
 
             //services.AddSwaggerExamples();
@@ -95,20 +103,24 @@ namespace WebAPI_Server.AppStart
         private readonly Func<IEnumerable<TAuthorize>, IEnumerable<string>> _authorizePolicySelector;
         private readonly Func<IEnumerable<TAccessToken>, IEnumerable<string>> _accessTokenPolicySelector;
 
+        private readonly string _groupName;
+
         /// <summary>
         /// Constructor for SecurityRequirementsOperationFilter
         /// </summary>
         /// <param name="authorizePolicySelector">Used to select the authorization policy from the attribute e.g. (a => a.Policy)</param>
         /// <param name="accessTokenPolicySelector">Used to select the access token policy from the attribute e.g. (a => a.Policy)</param>
+        /// <param name="groupName">Version group name</param>
         /// <param name="includeUnauthorizedResponses">If true (default), then 401 responses will be added to every operation</param>
         /// <param name="includeForbiddenResponses">If true (default), then 403 responses will be added to every operation</param>
         public CustomSecurityRequirementsOperationFilter(Func<IEnumerable<TAuthorize>, IEnumerable<string>> authorizePolicySelector, Func<IEnumerable<TAccessToken>, IEnumerable<string>> accessTokenPolicySelector,
-            bool includeUnauthorizedResponses = true, bool includeForbiddenResponses = true)
+            string groupName, bool includeUnauthorizedResponses = true, bool includeForbiddenResponses = true)
         {
             _authorizePolicySelector = authorizePolicySelector;
             _accessTokenPolicySelector = accessTokenPolicySelector;
             _includeUnauthorizedResponses = includeUnauthorizedResponses;
             _includeForbiddenResponses = includeForbiddenResponses;
+            _groupName = groupName;
         }
 
         /// <inheritdoc />
@@ -144,7 +156,7 @@ namespace WebAPI_Server.AppStart
                     //                null))
                     //    });
 
-                    policy.Add(HttpRequestHeaders.ApiKey, tokenPolicies);
+                    policy.Add($"{HttpRequestHeaders.ApiKey}_{_groupName}", tokenPolicies);
                 }
             }
 
@@ -169,7 +181,7 @@ namespace WebAPI_Server.AppStart
                 
                 var authorizePolicies = _authorizePolicySelector(attributes) ?? Enumerable.Empty<string>();
 
-                policy.Add("oauth2", authorizePolicies);
+                policy.Add($"oauth2_{_groupName}", authorizePolicies);
 
             }
 
@@ -191,9 +203,10 @@ namespace WebAPI_Server.AppStart
         /// <summary>
         /// Constructor for SecurityRequirementsOperationFilter
         /// </summary>
+        /// <param name="groupName">Version group name</param>
         /// <param name="includeUnauthorizedResponses">If true (default), then 401 responses will be added to every operation</param>
         /// <param name="includeForbiddenResponses">If true (default), then 403 responses will be added to every operation</param>
-        public CustomSecurityRequirementsOperationFilter(bool includeUnauthorizedResponses = true, bool includeForbiddenResponses = true)
+        public CustomSecurityRequirementsOperationFilter(string groupName, bool includeUnauthorizedResponses = true, bool includeForbiddenResponses = true)
         {
             IEnumerable<string> AuthorizePolicySelector(IEnumerable<AuthorizeAttribute> authAttributes) =>
                 authAttributes.Where(a => !string.IsNullOrEmpty(a.Policy))
@@ -202,7 +215,7 @@ namespace WebAPI_Server.AppStart
                 authAttributes.Where(a => a.UseAccessToken)
                     .Select(a => a.Policy);
 
-            _filter = new CustomSecurityRequirementsOperationFilter<AuthorizeAttribute, AccessTokenFilter>(AuthorizePolicySelector, AccessTokenPolicySelector, includeUnauthorizedResponses, includeForbiddenResponses);
+            _filter = new CustomSecurityRequirementsOperationFilter<AuthorizeAttribute, AccessTokenFilter>(AuthorizePolicySelector, AccessTokenPolicySelector, groupName, includeUnauthorizedResponses, includeForbiddenResponses);
         }
 
         /// <inheritdoc />

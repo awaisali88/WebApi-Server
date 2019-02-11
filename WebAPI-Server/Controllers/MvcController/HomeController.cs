@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using WebAPI_BAL.IdentityManager;
 using WebAPI_BAL.JwtGenerator;
+using WebAPI_Server.Controllers.v1;
 using WebAPI_ViewModel.Identity;
 using IAuthenticationService = WebAPI_Service.Service.IAuthenticationService;
 

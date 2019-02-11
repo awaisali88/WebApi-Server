@@ -18,10 +18,11 @@ using WebAPI_ViewModel.ConfigSettings;
 using WebAPI_ViewModel.Identity;
 using WebAPI_ViewModel.Response;
 
-namespace WebAPI_Server.Controllers
+namespace WebAPI_Server.Controllers.v1
 {
     /// <inheritdoc />
-    [Route("api/auth")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/auth")]
     [ApiController]
     public class AccountController : BaseController
     {

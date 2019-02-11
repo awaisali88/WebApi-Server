@@ -12,9 +12,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Swashbuckle.AspNetCore.SwaggerUI;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using WebAPI_Server.AppStart;
 using WebAPI_Server.Middleware;
 
@@ -63,6 +64,9 @@ namespace WebAPI_Server
             services.ConfigureDatabase(Configuration, CurrentEnvironment);
             services.ConfigureJwt(Configuration, CurrentEnvironment);
             services.ConfigureElmah(Configuration, CurrentEnvironment);
+
+            services.AddRouting(options => options.LowercaseUrls = true);
+            services.AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV");
 
             #region Configure MVC
             services.AddMvc(options =>
@@ -114,6 +118,14 @@ namespace WebAPI_Server
             //});
             #endregion
 
+            services.AddApiVersioning(config =>
+            {
+                config.ReportApiVersions = true;
+                config.AssumeDefaultVersionWhenUnspecified = true;
+                config.DefaultApiVersion = new ApiVersion(1, 0);
+                config.ApiVersionReader = new HeaderApiVersionReader("api-version");
+            });
+
 
             #region Api Behavior Optons ([ApiController] Attribute)
             services.Configure<ApiBehaviorOptions>(options =>
@@ -149,7 +161,8 @@ namespace WebAPI_Server
         /// </summary>
         /// <param name="app"></param>
         /// <param name="env"></param>
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        /// <param name="provider"></param>
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IApiVersionDescriptionProvider provider)
         {
             if (env.IsDevelopment())
             {
@@ -205,9 +218,12 @@ namespace WebAPI_Server
             // specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Web API (V1)");
-                c.RoutePrefix = "api-doc";
-                c.DocumentTitle = "Web API Doc";
+                foreach (var description in provider.ApiVersionDescriptions)
+                {
+                    c.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
+                    c.RoutePrefix = "api-doc";
+                    c.DocumentTitle = "Web API Doc";
+                }
             });
 
             app.UseDefaultFiles();

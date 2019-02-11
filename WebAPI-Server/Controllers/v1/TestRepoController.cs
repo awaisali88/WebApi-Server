@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using System.Net.Http;
-using System.Security.Cryptography.X509Certificates;
 using Common.Messages;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -14,9 +12,10 @@ using WebAPI_Model;
 using WebAPI_Model.Test;
 using WebAPI_ViewModel.DTO;
 
-namespace WebAPI_Server.Controllers
+namespace WebAPI_Server.Controllers.v1
 {
     /// <inheritdoc />
+    [ApiVersion("1.0")]
     [Route("api/test")]
     [ApiController]
     public class TestRepoController : BaseController
