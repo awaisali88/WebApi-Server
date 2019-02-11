@@ -28,17 +28,17 @@ namespace Dapper.Repositories
         }
 
         /// <inheritdoc />
-        public virtual bool Delete(Expression<Func<TEntity, bool>> predicate, IDbTransaction transaction = null)
+        public virtual bool Delete(Expression<Func<TEntity, bool>> predicate, TEntity instance, IDbTransaction transaction = null)
         {
-            var queryResult = SqlGenerator.GetDelete(predicate);
+            var queryResult = SqlGenerator.GetDelete(predicate, instance);
             var deleted = Connection.Execute(queryResult.GetSql(), queryResult.Param, transaction) > 0;
             return deleted;
         }
 
         /// <inheritdoc />
-        public virtual async Task<bool> DeleteAsync(Expression<Func<TEntity, bool>> predicate, IDbTransaction transaction = null)
+        public virtual async Task<bool> DeleteAsync(Expression<Func<TEntity, bool>> predicate, TEntity instance, IDbTransaction transaction = null)
         {
-            var queryResult = SqlGenerator.GetDelete(predicate);
+            var queryResult = SqlGenerator.GetDelete(predicate, instance);
             var deleted = await Connection.ExecuteAsync(queryResult.GetSql(), queryResult.Param, transaction) > 0;
             return deleted;
         }

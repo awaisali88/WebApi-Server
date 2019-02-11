@@ -11,8 +11,8 @@ namespace Encryptor
         private static int _iterations = 2;
         private static int _keySize = 256;
 
-        private static string _salt = "3w659xGeC9CnAHAN"; // Random
-        private static string _vector = "TpHVHRnRQ53nzakZ"; // Random
+        private static string _salt = "tT,>_6&eBJ=mw#*H"; // Random
+        private static string _vector = "Z9fy?=K82,k$jS'r"; // Random
 
         /// <summary>
         /// Protect the data with a wrapper of Protection around it

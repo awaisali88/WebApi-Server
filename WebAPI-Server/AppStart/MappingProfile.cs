@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Dapper.Identity.Stores;
+using WebAPI_Model;
 using WebAPI_Model.Test;
 using WebAPI_ViewModel.DTO;
 using WebAPI_ViewModel.Identity;
@@ -15,6 +16,9 @@ namespace WebAPI_Server.AppStart
             CreateMap<LoginUserViewModel, ApplicationUser>().ForMember(x => x.UserName, y => y.MapFrom(map => map.Email ?? string.Empty)).ReverseMap();
             CreateMap<ApplicationRoleViewModel, ApplicationRole>().ReverseMap();
             CreateMap<TestRepo, TestRepoViewModel>().ReverseMap();
+
+            CreateMap<TestTicketCustomProcedureParam, TestTicketCustomProcedureParamViewModel>().ReverseMap();
+            CreateMap<PROC_Ticket_Custom_Search_Model, PROC_Ticket_Custom_Search_ViewModel>().ReverseMap();
         }
     }
 }

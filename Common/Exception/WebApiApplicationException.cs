@@ -52,6 +52,6 @@ namespace Common.Exception
         public string ErrorMessage { get; }
         public object ErrorData { get; }
 
-        public NameValueCollection MethodParams => throw new NotImplementedException();
+        //public NameValueCollection MethodParams => throw new NotImplementedException();
     }
 }

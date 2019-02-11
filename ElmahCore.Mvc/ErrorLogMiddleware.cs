@@ -24,17 +24,18 @@ namespace ElmahCore.Mvc
         public event ErrorLoggedEventHandler Logged;
         private readonly string _elmahRoot = @"/elmah";
         private readonly List<IErrorFilter> _filters = new List<IErrorFilter>();
-        private ILogger _logger;
+        private ILogger<ErrorLogMiddleware> _logger;
 	    private Func<HttpContext, bool> _сheckPermissionAction;
 
         public delegate void ErrorLoggedEventHandler(object sender, ErrorLoggedEventArgs args);
 
-        public ErrorLogMiddleware(ElmahCore.ErrorLog errorLog, IOptions<ElmahOptions> elmahOptions)//, ILoggerFactory loggerFactory)
+        public ErrorLogMiddleware(ElmahCore.ErrorLog errorLog, IOptions<ElmahOptions> elmahOptions, ILogger<ErrorLogMiddleware> logger)
         {
             _errorLog = errorLog ?? throw new ArgumentNullException(nameof(errorLog));
 
-            //var lf = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
+            var lf = logger ?? throw new ArgumentNullException(nameof(logger));
 
+            _logger = lf;
             //_logger = lf.CreateLogger<ErrorLogMiddleware>();
 
 	        _сheckPermissionAction = elmahOptions?.Value?.CheckPermissionAction;

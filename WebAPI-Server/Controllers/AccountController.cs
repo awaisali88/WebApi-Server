@@ -64,7 +64,7 @@ namespace WebAPI_Server.Controllers
             var result = await _auth.RegisterUserAsync(data);
 
             if (result)
-                return StatusCode(StatusCodes.Status201Created, null, InfoMessages.UserRegistered);
+                return StatusCodeResult(StatusCodes.Status201Created, null, InfoMessages.UserRegistered);
 
             return BadRequest(ErrorMessages.CommonErrorMessage);
         }
@@ -84,7 +84,7 @@ namespace WebAPI_Server.Controllers
             var result = await _auth.AddNewUserAsync(User, data);
 
             if (result)
-                return StatusCode(StatusCodes.Status201Created, null, InfoMessages.CommonInfoMessage);
+                return StatusCodeResult(StatusCodes.Status201Created, null, InfoMessages.CommonInfoMessage);
 
             return BadRequest(ErrorMessages.CommonErrorMessage);
         }
@@ -341,7 +341,7 @@ namespace WebAPI_Server.Controllers
             var result = await _authorize.CreateRole(User, data);
 
             if (result)
-                return StatusCode(StatusCodes.Status201Created, null, InfoMessages.CommonInfoMessage);
+                return StatusCodeResult(StatusCodes.Status201Created, null, InfoMessages.CommonInfoMessage);
 
             return BadRequest(ErrorMessages.CommonErrorMessage);
         }
@@ -396,7 +396,7 @@ namespace WebAPI_Server.Controllers
             if (result)
                 return Ok(new { UserHasRole = true }, InfoMessages.UserHasRole);
 
-            return StatusCode(StatusCodes.Status200OK, new { UserHasRole = false }, InfoMessages.UserHasNoRole);
+            return StatusCodeResult(StatusCodes.Status200OK, new { UserHasRole = false }, InfoMessages.UserHasNoRole);
 
             //return BadRequest(ErrorMessages.CommonErrorMessage);
         }
@@ -453,7 +453,7 @@ namespace WebAPI_Server.Controllers
             if (result)
                 return Ok(new { UserHasRole = true}, InfoMessages.UserHasRole);
 
-            return StatusCode(StatusCodes.Status200OK, new { UserHasRole = false }, InfoMessages.UserHasNoRole);
+            return StatusCodeResult(StatusCodes.Status200OK, new { UserHasRole = false }, InfoMessages.UserHasNoRole);
             //return BadRequest(ErrorMessages.CommonErrorMessage);
         }
         #endregion

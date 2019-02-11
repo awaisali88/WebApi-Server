@@ -25,11 +25,12 @@ namespace Dapper.Repositories
             var sqlQuery = SqlGenerator.GetUpdate(instance);
             if (SqlGenerator.Config.SqlProvider == SqlProvider.PostgreSQL)
             {
-                var updated = Connection.Execute(sqlQuery.GetSql(), instance, transaction) > 0;
-                return (updated, null);
+                var updatedPostgreSQL = Connection.Execute(sqlQuery.GetSql(), instance, transaction) > 0;
+                return (updatedPostgreSQL, null);
             }
-            TEntity newEntity = Connection.Query<TEntity>(sqlQuery.GetSql(), sqlQuery.Param, transaction).FirstOrDefault();
-            return (true, newEntity);
+            var updated = Connection.Execute(sqlQuery.GetSql().Split(";")[0], instance, transaction) > 0;
+            TEntity newEntity = Connection.Query<TEntity>(sqlQuery.GetSql().Split(";")[1], sqlQuery.Param, transaction).FirstOrDefault();
+            return (updated, newEntity);
             //var sqlQuery = SqlGenerator.GetUpdate(instance);
             //var updated = Connection.Execute(sqlQuery.GetSql(), instance, transaction) > 0;
             //return updated;
@@ -47,14 +48,15 @@ namespace Dapper.Repositories
             var queryResult = SqlGenerator.GetUpdate(instance);
             if (SqlGenerator.Config.SqlProvider == SqlProvider.PostgreSQL)
             {
-                var updated = await Connection.ExecuteAsync(queryResult.GetSql(), instance, transaction) > 0;
-                return (updated, null);
+                var updatedP = await Connection.ExecuteAsync(queryResult.GetSql(), instance, transaction) > 0;
+                return (updatedP, null);
             }
 
+            var updated = await Connection.ExecuteAsync(queryResult.GetSql().Split(";")[0], instance, transaction) > 0;
             TEntity data =
                 (await Connection.QueryAsync<TEntity>(queryResult.GetSql(), queryResult.Param, transaction))
                 .FirstOrDefault();
-            return (true, data);
+            return (updated, data);
 
             //var sqlQuery = SqlGenerator.GetUpdate(instance);
             //var updated = await Connection.ExecuteAsync(sqlQuery.GetSql(), instance, transaction) > 0;
@@ -73,11 +75,12 @@ namespace Dapper.Repositories
             var sqlQuery = SqlGenerator.GetUpdate(predicate, instance);
             if (SqlGenerator.Config.SqlProvider == SqlProvider.PostgreSQL)
             {
-                var updated = Connection.Execute(sqlQuery.GetSql(), instance, transaction) > 0;
-                return (updated, null);
+                var updatedP = Connection.Execute(sqlQuery.GetSql(), instance, transaction) > 0;
+                return (updatedP, null);
             }
-            TEntity newEntity = Connection.Query<TEntity>(sqlQuery.GetSql(), sqlQuery.Param, transaction).FirstOrDefault();
-            return (true, newEntity);
+            var updated = Connection.Execute(sqlQuery.GetSql().Split(";")[0], instance, transaction) > 0;
+            TEntity newEntity = Connection.Query<TEntity>(sqlQuery.GetSql().Split(";")[1], sqlQuery.Param, transaction).FirstOrDefault();
+            return (updated, newEntity);
 
 
             //var updated = Connection.Execute(sqlQuery.GetSql(), instance, transaction) > 0;
@@ -97,14 +100,15 @@ namespace Dapper.Repositories
             var queryResult = SqlGenerator.GetUpdate(instance);
             if (SqlGenerator.Config.SqlProvider == SqlProvider.PostgreSQL)
             {
-                var updated = await Connection.ExecuteAsync(queryResult.GetSql(), instance, transaction) > 0;
-                return (updated, null);
+                var updatedP = await Connection.ExecuteAsync(queryResult.GetSql(), instance, transaction) > 0;
+                return (updatedP, null);
             }
 
+            var updated = await Connection.ExecuteAsync(queryResult.GetSql().Split(";")[0], instance, transaction) > 0;
             TEntity data =
                 (await Connection.QueryAsync<TEntity>(queryResult.GetSql(), queryResult.Param, transaction))
                 .FirstOrDefault();
-            return (true, data);
+            return (updated, data);
 
             //var sqlQuery = SqlGenerator.GetUpdate(predicate, instance);
             //var updated = await Connection.ExecuteAsync(sqlQuery.GetSql(), instance, transaction) > 0;

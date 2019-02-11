@@ -580,12 +580,12 @@ namespace Dapper.Repositories
         /// <summary>
         ///     Delete objects from DB
         /// </summary>
-        bool Delete(Expression<Func<TEntity, bool>> predicate, IDbTransaction transaction = null);
+        bool Delete(Expression<Func<TEntity, bool>> predicate, TEntity instance, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Delete objects from DB
         /// </summary>
-        Task<bool> DeleteAsync(Expression<Func<TEntity, bool>> predicate, IDbTransaction transaction = null);
+        Task<bool> DeleteAsync(Expression<Func<TEntity, bool>> predicate, TEntity instance, IDbTransaction transaction = null);
 
 
         /// <summary>

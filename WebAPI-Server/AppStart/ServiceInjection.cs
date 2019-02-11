@@ -24,6 +24,7 @@ namespace WebAPI_Server.AppStart
         {
 
             string connString = configuration.GetConnectionString("DefaultConnection");
+            //string connString = configuration.GetConnectionString("TicketSystem");
 
             services.Configure<DbOptions>(options =>
             {
@@ -98,9 +99,11 @@ namespace WebAPI_Server.AppStart
         {
             string connString = configuration.GetConnectionString("DefaultConnection");
 
-            // Register the ConfigurationBuilder instance of FacebookAuthSettings
-            services.Configure<FacebookAuthSettings>(configuration.GetSection(nameof(FacebookAuthSettings)));
-            services.Configure<SmtpConfig>(configuration.GetSection(nameof(SmtpConfig)));
+            if (configuration.GetSection(nameof(FacebookAuthSettings)).Value != null)
+                services.Configure<FacebookAuthSettings>(configuration.GetSection(nameof(FacebookAuthSettings)));
+
+            if (configuration.GetSection(nameof(SmtpConfig)).Value != null)
+                services.Configure<SmtpConfig>(configuration.GetSection(nameof(SmtpConfig)));
 
             SingletonServices(services);
 

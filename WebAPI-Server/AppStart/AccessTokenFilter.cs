@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
+using Serilog;
 
 namespace WebAPI_Server.AppStart
 {
@@ -14,6 +15,12 @@ namespace WebAPI_Server.AppStart
 
             Policy = useAccessToken ? "All" : "None";
         }
+
+        //public override void OnActionExecuting(ActionExecutingContext context)
+        //{
+        //    //Log.Information("Executing Action in Controller with Data");
+        //    base.OnActionExecuting(context);
+        //}
     }
 
     internal class AllowNoAccessToken : ActionFilterAttribute

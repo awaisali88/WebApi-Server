@@ -10,6 +10,6 @@ namespace Common.Exception
 
         object ErrorData { get; }
 
-        NameValueCollection MethodParams { get; }
+        //NameValueCollection MethodParams { get; }
     }
 }

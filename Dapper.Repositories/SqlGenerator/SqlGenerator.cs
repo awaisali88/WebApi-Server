@@ -260,7 +260,7 @@ namespace Dapper.Repositories.SqlGenerator
             var sqlQuery = new SqlQuery();
             var whereSql = " WHERE " + string.Join(" AND ", KeySqlProperties.Select(p => TableName + "." + p.ColumnName + " = @" + p.PropertyName));
             if (HasRowVersion)
-                whereSql += " AND " + KeySqlProperties.Where(p => p.RowVersionProp).Select(p => p.ColumnName + " = @" + p.PropertyName);
+                whereSql += " AND " + RowVersionPropertyMetadata.ColumnName + " = @" + RowVersionPropertyMetadata.PropertyName;
 
             if (!LogicalDelete)
             {
@@ -268,15 +268,16 @@ namespace Dapper.Repositories.SqlGenerator
             }
             else
             {
-                sqlQuery.SqlBuilder.Append("UPDATE " + TableName + " SET " + StatusPropertyName + " = " + LogicalDeleteValue);
-
-                if (HasUpdatedAt)
-                {
-                    UpdatedAtProperty.SetValue(entity, DateTime.UtcNow);
-                    sqlQuery.SqlBuilder.Append(", " + UpdatedAtPropertyMetadata.ColumnName + " = @" + UpdatedAtPropertyMetadata.PropertyName);
-                }
-
-                sqlQuery.SqlBuilder.Append(whereSql);
+                return GetUpdate(entity);
+                //sqlQuery.SqlBuilder.Append("UPDATE " + TableName + " SET " + StatusPropertyName + " = " + LogicalDeleteValue);
+                //
+                //if (HasUpdatedAt)
+                //{
+                //    UpdatedAtProperty.SetValue(entity, DateTime.UtcNow);
+                //    sqlQuery.SqlBuilder.Append(", " + UpdatedAtPropertyMetadata.ColumnName + " = @" + UpdatedAtPropertyMetadata.PropertyName);
+                //}
+                //
+                //sqlQuery.SqlBuilder.Append(whereSql);
             }
 
             sqlQuery.SetParam(entity);
@@ -286,7 +287,7 @@ namespace Dapper.Repositories.SqlGenerator
         }
 
         /// <inheritdoc />
-        public virtual SqlQuery GetDelete(Expression<Func<TEntity, bool>> predicate)
+        public virtual SqlQuery GetDelete(Expression<Func<TEntity, bool>> predicate, TEntity entity)
         {
             var sqlQuery = new SqlQuery();
 
@@ -296,15 +297,17 @@ namespace Dapper.Repositories.SqlGenerator
             }
             else
             {
-                sqlQuery.SqlBuilder.Append("UPDATE " + TableName + " SET " + StatusPropertyName + " = " + LogicalDeleteValue);
-                sqlQuery.SqlBuilder.Append(HasUpdatedAt
-                    ? ", " + UpdatedAtPropertyMetadata.ColumnName + " = @" + UpdatedAtPropertyMetadata.PropertyName + " "
-                    : " ");
+                return GetUpdate(predicate, entity);
+
+                //sqlQuery.SqlBuilder.Append("UPDATE " + TableName + " SET " + StatusPropertyName + " = " + LogicalDeleteValue);
+                //sqlQuery.SqlBuilder.Append(HasUpdatedAt
+                //    ? ", " + UpdatedAtPropertyMetadata.ColumnName + " = @" + UpdatedAtPropertyMetadata.PropertyName + " "
+                //    : " ");
             }
 
             AppendWherePredicateQuery(sqlQuery, predicate, QueryType.Delete);
             if (HasRowVersion)
-                sqlQuery.SqlBuilder.Append(" AND " + KeySqlProperties.Where(p => p.RowVersionProp).Select(p => p.ColumnName + " = @" + p.PropertyName));
+                sqlQuery.SqlBuilder.Append(" AND " + RowVersionPropertyMetadata.ColumnName + " = @" + RowVersionPropertyMetadata.PropertyName);
 
             LogSqlQuery(sqlQuery);
             return sqlQuery;
@@ -421,14 +424,13 @@ namespace Dapper.Repositories.SqlGenerator
                                             .Select(p => p.ColumnName + " = @" + p.PropertyName)));
 
             if (HasRowVersion)
-                query.SqlBuilder.Append(" AND " + KeySqlProperties.Where(p => p.RowVersionProp)
-                                            .Select(p => p.ColumnName + " = @" + p.PropertyName));
+                query.SqlBuilder.Append(" AND " + RowVersionPropertyMetadata.ColumnName + " = @" + RowVersionPropertyMetadata.PropertyName);
 
             switch (Config.SqlProvider)
             {
                 case SqlProvider.MSSQL:
                     //query.SqlBuilder.Append(" SELECT SCOPE_IDENTITY() AS " + IdentitySqlProperty.ColumnName);
-                    query.SqlBuilder.Append(" SELECT * FROM " + TableName + " WHERE " + string.Join(" AND ",
+                    query.SqlBuilder.Append("; SELECT * FROM " + TableName + " WHERE " + string.Join(" AND ",
                                                 KeySqlProperties.Where(p => !p.IgnoreUpdate && !p.RowVersionProp)
                                                     .Select(p => p.ColumnName + " = @" + p.PropertyName)));
                     break;
@@ -466,7 +468,7 @@ namespace Dapper.Repositories.SqlGenerator
             AppendWherePredicateQuery(query, predicate, QueryType.Update);
 
             if (HasRowVersion)
-                query.SqlBuilder.Append(" AND " + KeySqlProperties.Where(p => p.RowVersionProp).Select(p => p.ColumnName + " = @" + p.PropertyName));
+                query.SqlBuilder.Append(" AND " + RowVersionPropertyMetadata.ColumnName + " = @" + RowVersionPropertyMetadata.PropertyName);
 
             switch (Config.SqlProvider)
             {
@@ -523,7 +525,7 @@ namespace Dapper.Repositories.SqlGenerator
                                             KeySqlProperties.Where(p => !p.IgnoreUpdate && !p.RowVersionProp).Select(p => p.ColumnName + " = @" + p.PropertyName + i)));
 
                 if (HasRowVersion)
-                    query.SqlBuilder.Append(" AND " + KeySqlProperties.Where(p => p.RowVersionProp).Select(p => p.ColumnName + " = @" + p.PropertyName));
+                    query.SqlBuilder.Append(" AND " + RowVersionPropertyMetadata.ColumnName + " = @" + RowVersionPropertyMetadata.PropertyName);
 
                 // ReSharper disable PossibleNullReferenceException
                 foreach (var property in properties)

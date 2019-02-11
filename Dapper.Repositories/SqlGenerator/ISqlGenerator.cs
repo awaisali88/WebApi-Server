@@ -155,6 +155,6 @@ namespace Dapper.Repositories.SqlGenerator
         /// <summary>
         ///     Get SQL for DELETE Query
         /// </summary>
-        SqlQuery GetDelete(Expression<Func<TEntity, bool>> predicate);
+        SqlQuery GetDelete(Expression<Func<TEntity, bool>> predicate, TEntity entity);
     }
 }

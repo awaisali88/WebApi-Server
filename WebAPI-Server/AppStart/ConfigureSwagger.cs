@@ -37,6 +37,8 @@ namespace WebAPI_Server.AppStart
                     //}
                 });
 
+                c.DescribeAllEnumsAsStrings();
+
                 c.ExampleFilters();
 
                 c.OperationFilter<RequestCallbackUrlFilter>();

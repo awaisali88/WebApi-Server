@@ -19,6 +19,7 @@
   <ItemGroup>
     <Compile Remove="Middleware\CustomErrorLog.cs" />
     <Compile Remove="Middleware\CustomExceptionFilter.cs" />
+    <Compile Remove="Middleware\ProtectFolder.cs" />
   </ItemGroup>
 
   <ItemGroup>

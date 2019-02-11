@@ -14,7 +14,7 @@ namespace WebAPI_BAL
     {
         public static string UserValue(ClaimsPrincipal claim, string value = nameof(ApplicationUser.Id))
         {
-            return claim.Claims.Any() ? claim.Claims.Single(c => c.Type == value.ToLower()).Value : "";
+            return claim != null && claim.Claims.Any() ? claim.Claims.Single(c => c.Type == value.ToLower()).Value : "";
         }
 
         internal static void CheckRecord<TDefaultColumns>(TDefaultColumns data) where TDefaultColumns : IDefaultColumns
@@ -29,6 +29,7 @@ namespace WebAPI_BAL
 
         internal static TEntity GetInsertEntity<TEntity>(TEntity data, string userId) where TEntity : class, IDefaultColumns
         {
+            CheckRecord(data);
             data.CreatedBy = userId;
             data.ModifiedBy = userId;
             data.Status = true;
@@ -39,19 +40,22 @@ namespace WebAPI_BAL
 
         internal static IEnumerable<TEntity> GetBulkInsertEntity<TEntity>(IEnumerable<TEntity> data, string userId) where TEntity : class, IDefaultColumns
         {
-            foreach (var entity in data)
+            var bulkInsertEntity = data as TEntity[] ?? data.ToArray();
+            foreach (var entity in bulkInsertEntity)
             {
+                CheckRecord(entity);
                 entity.CreatedBy = userId;
                 entity.ModifiedBy = userId;
                 entity.Status = true;
                 entity.Trashed = false;
                 entity.RecordStatus = RecordStatus.NewMode;
             }
-            return data;
+            return bulkInsertEntity;
         }
 
         internal static TEntity GetUpdateEntity<TEntity>(TEntity data, string userId) where TEntity : class, IDefaultColumns
         {
+            CheckRecord(data);
             data.ModifiedBy = userId;
             data.RecordStatus = RecordStatus.EditMode;
             return data;
@@ -59,16 +63,19 @@ namespace WebAPI_BAL
 
         internal static IEnumerable<TEntity> GetBulkUpdateEntity<TEntity>(IEnumerable<TEntity> data, string userId) where TEntity : class, IDefaultColumns
         {
-            foreach (var entity in data)
+            var bulkUpdateEntity = data as TEntity[] ?? data.ToArray();
+            foreach (var entity in bulkUpdateEntity)
             {
+                CheckRecord(entity);
                 entity.ModifiedBy = userId;
                 entity.RecordStatus = RecordStatus.EditMode;
             }
-            return data;
+            return bulkUpdateEntity;
         }
 
         internal static TEntity GetDeleteEntity<TEntity>(TEntity data, string userId) where TEntity : class, IDefaultColumns
         {
+            CheckRecord(data);
             data.ModifiedBy = userId;
             data.Status = false;
             data.Trashed = true;

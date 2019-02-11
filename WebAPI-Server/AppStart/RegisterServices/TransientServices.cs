@@ -10,6 +10,7 @@ namespace WebAPI_Server.AppStart
         {
             //BAL
             services.TryAddTransient(typeof(ICommonBusinessLogic<,,>), typeof(CommonBusinessLogic<,,>));
+            services.TryAddTransient(typeof(ICommonStoreProcBusinessLogic<>), typeof(CommonStoreProcBusinessLogic<>));
         }
     }
 }

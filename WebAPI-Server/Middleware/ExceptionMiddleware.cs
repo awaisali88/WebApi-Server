@@ -6,6 +6,7 @@ using Common.Exception;
 using Common.Messages;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 using WebAPI_ViewModel.Response;
@@ -18,14 +19,16 @@ namespace WebAPI_Server.Middleware
     public class ExceptionMiddleware
     {
         private readonly RequestDelegate _next;
-
+        private readonly ILogger<ExceptionMiddleware> _logger;
         /// <summary>
         /// 
         /// </summary>
         /// <param name="next"></param>
-        public ExceptionMiddleware(RequestDelegate next)
+        /// <param name="logger"></param>
+        public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
         {
             _next = next;
+            _logger = logger;
         }
 
         /// <summary>
@@ -38,6 +41,7 @@ namespace WebAPI_Server.Middleware
         {
             try
             {
+                _logger.LogInformation("{@Path}", httpContext.Request.Path);
                 if (OpenUrls.Urls.Any(x => httpContext.Request.Path.StartsWithSegments(x)) && !OpenUrls.WebUrls.Any(x => httpContext.Request.Path.StartsWithSegments(x)))
                 {
                     AuthenticateResult result = await httpContext.AuthenticateAsync("Identity.Application");
@@ -78,14 +82,17 @@ namespace WebAPI_Server.Middleware
             }
             catch (ModelValidationException ex)
             {
+                _logger.LogError("{@Exception}", ex);
                 await HandleModelValidationExceptionAsync(httpContext, ex);
             }
             catch (WebApiApplicationException ex)
             {
+                _logger.LogError("{@Exception}", ex);
                 await HandleApiAppExceptionAsync(httpContext, ex);
             }
             catch (Exception ex)
-            {
+                {
+                _logger.LogCritical("{@Exception}", ex);
                 await HandleExceptionAsync(httpContext, ex);
             }
         }

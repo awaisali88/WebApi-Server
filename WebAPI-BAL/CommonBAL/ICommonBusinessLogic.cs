@@ -46,17 +46,31 @@ namespace WebAPI_BAL
         #endregion
 
         #region Store Procedure
-        IEnumerable<TData> ExecuteStoreProcedure<TData, TParams>(TParams spParam)
+
+        /// <summary>
+        /// Execute Store Procedure
+        /// </summary>
+        /// <typeparam name="TData">SP return Data model type</typeparam>
+        /// <typeparam name="TParams">SP param model type</typeparam>
+        /// <typeparam name="TDataViewModel">SP return Data view model type</typeparam>
+        /// <typeparam name="TParamsViewModel">SP param view model type</typeparam>
+        /// <param name="spParam">SP param view model</param>
+        /// <param name="transaction"></param>
+        /// <param name="manageTransaction"></param>
+        /// <returns></returns>
+        IEnumerable<TDataViewModel> ExecuteStoreProcedure<TData, TParams, TDataViewModel, TParamsViewModel>(
+            TParamsViewModel spParam, IDbTransaction transaction = null, bool manageTransaction = true)
             where TParams : class, ISProcParam;
 
-        Task<IEnumerable<TData>> ExecuteStoreProcedureAsync<TData, TParams>(TParams spParam)
+        Task<IEnumerable<TDataViewModel>> ExecuteStoreProcedureAsync<TData, TParams, TDataViewModel, TParamsViewModel>(
+            TParamsViewModel spParam, IDbTransaction transaction = null, bool manageTransaction = true)
             where TParams : class, ISProcParam;
         #endregion
-
+        
         #region Insert
-        /// <summary>
-        ///     Insert object to DB
-        /// </summary>
+            /// <summary>
+            ///     Insert object to DB
+            /// </summary>
         (bool, TEntityViewModel) Insert(ClaimsPrincipal claim, TEntityViewModel viewModelData, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
@@ -121,12 +135,12 @@ namespace WebAPI_BAL
         /// <summary>
         ///     Delete objects from DB
         /// </summary>
-        bool Delete(ClaimsPrincipal claim, Expression<Func<TEntityViewModel, bool>> where, IDbTransaction transaction = null, bool manageTransaction = true);
+        bool Delete(ClaimsPrincipal claim, Expression<Func<TEntityViewModel, bool>> where, TEntityViewModel viewModelData, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Delete objects from DB
         /// </summary>
-        Task<bool> DeleteAsync(ClaimsPrincipal claim, Expression<Func<TEntityViewModel, bool>> where, IDbTransaction transaction = null, bool manageTransaction = true);
+        Task<bool> DeleteAsync(ClaimsPrincipal claim, Expression<Func<TEntityViewModel, bool>> where, TEntityViewModel viewModelData, IDbTransaction transaction = null, bool manageTransaction = true);
         #endregion 
 
         #region Count
@@ -604,6 +618,44 @@ namespace WebAPI_BAL
             IDbTransaction transaction = null, bool manageTransaction = true);
 
         #endregion
+
+        #endregion
+    }
+
+    public interface ICommonStoreProcBusinessLogic<TDbContext>
+        where TDbContext : IDapperDbContext
+    {
+        #region Store Procedure
+
+        /// <summary>
+        /// Execute Store Procedure
+        /// </summary>
+        /// <typeparam name="TData">SP return Data model type</typeparam>
+        /// <typeparam name="TParams">SP param model type</typeparam>
+        /// <typeparam name="TDataViewModel">SP return Data view model type</typeparam>
+        /// <typeparam name="TParamsViewModel">SP param view model type</typeparam>
+        /// <param name="spParam">SP param view model</param>
+        /// <param name="transaction"></param>
+        /// <param name="manageTransaction"></param>
+        /// <returns></returns>
+        IEnumerable<TDataViewModel> ExecuteStoreProcedure<TData, TParams, TDataViewModel, TParamsViewModel>(
+            TParamsViewModel spParam, IDbTransaction transaction = null, bool manageTransaction = true)
+            where TParams : class, ISProcParam;
+
+        /// <summary>
+        /// Execute Store Procedure Async
+        /// </summary>
+        /// <typeparam name="TData">SP return Data model type</typeparam>
+        /// <typeparam name="TParams">SP param model type</typeparam>
+        /// <typeparam name="TDataViewModel">SP return Data view model type</typeparam>
+        /// <typeparam name="TParamsViewModel">SP param view model type</typeparam>
+        /// <param name="spParam">SP param view model</param>
+        /// <param name="transaction"></param>
+        /// <param name="manageTransaction"></param>
+        /// <returns></returns>
+        Task<IEnumerable<TDataViewModel>> ExecuteStoreProcedureAsync<TData, TParams, TDataViewModel, TParamsViewModel>(
+            TParamsViewModel spParam, IDbTransaction transaction = null, bool manageTransaction = true)
+            where TParams : class, ISProcParam;
 
         #endregion
     }

@@ -6,7 +6,8 @@
 
         public const string InActiveRecord = "The provided record is in-active";
         public const string TrashedRecord = "The provided record is deleted";
-        public const string RecordNotFound = "The provided record does not exist";
+        public const string RecordNotFound = "The provided record does not exist.";
+        public const string RecordNotFoundUpdate = "The record is updated by another user or record does not exist.";
 
         public const string ModelValidationFailed = "Provided data is invalid.";
 

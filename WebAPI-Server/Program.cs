@@ -23,17 +23,17 @@ namespace WebAPI_Server
         {
             var webHost = CreateWebHostBuilder(args).Build();
 
-            //var configuration = new ConfigurationBuilder()
-            //    .SetBasePath(Directory.GetCurrentDirectory())
-            //    .AddJsonFile("appsettings.json")
-            //    .AddJsonFile($"appsettings.{_environmentName}.json", optional: true, reloadOnChange: true)
-            //    .Build();
-            //
-            //Log.Logger = new LoggerConfiguration()
-            //    .ReadFrom.Configuration(configuration)
-            //    .Enrich.FromLogContext()
-            //    //.Enrich.WithAspnetcoreHttpcontext(webHost.Services, x=> x.HttpContext.Request)
-            //    .CreateLogger();
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json")
+                .AddJsonFile($"appsettings.{_environmentName}.json", optional: true, reloadOnChange: true)
+                .Build();
+            
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(configuration)
+                .Enrich.FromLogContext()
+                //.Enrich.WithAspnetcoreHttpcontext(webHost.Services, x=> x.HttpContext.Request)
+                .CreateLogger();
 
             try
             {
@@ -63,18 +63,19 @@ namespace WebAPI_Server
                     _environmentName = hostingContext.HostingEnvironment.EnvironmentName;
                 })
                 .UseStartup<Startup>()
-                .UseSerilog((provider, context, loggerConfiguration) =>
-                {
-                    var configuration = new ConfigurationBuilder()
-                        .SetBasePath(Directory.GetCurrentDirectory())
-                        .AddJsonFile("appsettings.json")
-                        .AddJsonFile($"appsettings.{_environmentName}.json", optional: true, reloadOnChange: true)
-                        .Build();
+                .UseSerilog();
+        //.UseSerilog((provider, context, loggerConfiguration) =>
+        //{
+        //    var configuration = new ConfigurationBuilder()
+        //        .SetBasePath(Directory.GetCurrentDirectory())
+        //        .AddJsonFile("appsettings.json")
+        //        .AddJsonFile($"appsettings.{_environmentName}.json", optional: true, reloadOnChange: true)
+        //        .Build();
 
-                    loggerConfiguration
-                        .ReadFrom.Configuration(configuration)
-                        .Enrich.FromLogContext()
-                        .Enrich.WithAspnetcoreHttpcontext(provider, x => x.HttpContext.Request);
-                });
+        //    loggerConfiguration
+        //        .ReadFrom.Configuration(configuration)
+        //        .Enrich.FromLogContext()
+        //        .Enrich.WithAspnetcoreHttpcontext(provider, x => x.HttpContext.Request);
+        //});
     }
 }

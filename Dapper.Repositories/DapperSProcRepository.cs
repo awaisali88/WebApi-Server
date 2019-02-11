@@ -22,10 +22,8 @@ namespace Dapper.Repositories
         /// <inheritdoc />
         public IDbConnection Connection { get; }
 
-        private DynamicParameters BuildProcedureQuery<TSpParam>(TSpParam spParameters, out string query) where TSpParam : class, ISProcParam
+        private (string, DynamicParameters) BuildProcedureQuery<TSpParam>(TSpParam spParameters) where TSpParam : class, ISProcParam
         {
-            StringBuilder queryString = new StringBuilder();
-            queryString.Append($"EXEC {spParameters.ProcedureName} ");
             DynamicParameters sParams = null;
             //parameters.Add("", null, DbType.Binary, ParameterDirection.Input, );
             var paramProperties = spParameters.GetType().GetProperties()
@@ -38,25 +36,22 @@ namespace Dapper.Repositories
                 foreach (var paramProperty in propertyInfos)
                 {
                     ProcedureParamAttribute attributeData = paramProperty.GetCustomAttribute<ProcedureParamAttribute>();
-                    queryString.Append($"{attributeData.ParameterName} ");
                     sParams.Add(attributeData.ParameterName, paramProperty.GetValue(spParameters), attributeData.SelectedDbType, attributeData.ParameterDirection);
                 }
             }
-
-            query = queryString.ToString();
-            return sParams;
+            return (spParameters.ProcedureName, sParams);
         }
 
         public IEnumerable<TSpModel> Execute<TSpModel, TSpParam>(TSpParam spParameters, IDbTransaction transaction = null) where TSpParam : class, ISProcParam
         {
-            var parameters = BuildProcedureQuery(spParameters, out var procedureQuery);
-            return Connection.Query<TSpModel>(procedureQuery, parameters, commandType: CommandType.StoredProcedure);
+            (string, DynamicParameters) parameters = BuildProcedureQuery(spParameters);
+            return Connection.Query<TSpModel>(parameters.Item1, parameters.Item2, commandType: CommandType.StoredProcedure, transaction:transaction);
         }
 
         public Task<IEnumerable<TSpModel>> ExecuteAsync<TSpModel, TSpParam>(TSpParam spParameters, IDbTransaction transaction = null) where TSpParam : class, ISProcParam
         {
-            var parameters = BuildProcedureQuery(spParameters, out var procedureQuery);
-            return Connection.QueryAsync<TSpModel>(procedureQuery, parameters, commandType: CommandType.StoredProcedure);
+            (string, DynamicParameters) parameters = BuildProcedureQuery(spParameters);
+            return Connection.QueryAsync<TSpModel>(parameters.Item1, parameters.Item2, commandType: CommandType.StoredProcedure, transaction:transaction);
         }
 
     }
