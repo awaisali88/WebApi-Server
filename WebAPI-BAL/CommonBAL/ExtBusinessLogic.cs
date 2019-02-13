@@ -17,10 +17,15 @@ namespace WebAPI_BAL
             return claim != null && claim.Claims.Any() ? claim.Claims.Single(c => c.Type == value.ToLower()).Value : "";
         }
 
-        internal static void CheckRecord<TDefaultColumns>(TDefaultColumns data) where TDefaultColumns : IDefaultColumns
+        internal static void CheckRecordForNull<TDefaultColumns>(TDefaultColumns data) where TDefaultColumns : IDefaultColumns
         {
             if (data == null)
                 throw new WebApiApplicationException(StatusCodes.Status404NotFound, ErrorMessages.RecordNotFound);
+        }
+
+        internal static void CheckRecord<TDefaultColumns>(TDefaultColumns data) where TDefaultColumns : IDefaultColumns
+        {
+            CheckRecordForNull(data);
             if (!data.Status)
                 throw new WebApiApplicationException(StatusCodes.Status403Forbidden, ErrorMessages.InActiveRecord);
             if (data.Trashed)
@@ -29,7 +34,7 @@ namespace WebAPI_BAL
 
         internal static TEntity GetInsertEntity<TEntity>(TEntity data, string userId) where TEntity : class, IDefaultColumns
         {
-            CheckRecord(data);
+            CheckRecordForNull(data);
             data.CreatedBy = userId;
             data.ModifiedBy = userId;
             data.Status = true;
@@ -43,7 +48,7 @@ namespace WebAPI_BAL
             var bulkInsertEntity = data as TEntity[] ?? data.ToArray();
             foreach (var entity in bulkInsertEntity)
             {
-                CheckRecord(entity);
+                CheckRecordForNull(entity);
                 entity.CreatedBy = userId;
                 entity.ModifiedBy = userId;
                 entity.Status = true;
@@ -55,7 +60,7 @@ namespace WebAPI_BAL
 
         internal static TEntity GetUpdateEntity<TEntity>(TEntity data, string userId) where TEntity : class, IDefaultColumns
         {
-            CheckRecord(data);
+            CheckRecordForNull(data);
             data.ModifiedBy = userId;
             data.RecordStatus = RecordStatus.EditMode;
             return data;
@@ -66,7 +71,7 @@ namespace WebAPI_BAL
             var bulkUpdateEntity = data as TEntity[] ?? data.ToArray();
             foreach (var entity in bulkUpdateEntity)
             {
-                CheckRecord(entity);
+                CheckRecordForNull(entity);
                 entity.ModifiedBy = userId;
                 entity.RecordStatus = RecordStatus.EditMode;
             }
@@ -75,7 +80,7 @@ namespace WebAPI_BAL
 
         internal static TEntity GetDeleteEntity<TEntity>(TEntity data, string userId) where TEntity : class, IDefaultColumns
         {
-            CheckRecord(data);
+            CheckRecordForNull(data);
             data.ModifiedBy = userId;
             data.Status = false;
             data.Trashed = true;

@@ -52,16 +52,16 @@ namespace WebAPI_Server.Middleware
                     }
                 }
 
-                if (!OpenUrls.Urls.Any(x => httpContext.Request.Path.StartsWithSegments(x)) &&
-                    !OpenUrls.WebUrls.Any(x => httpContext.Request.Path.StartsWithSegments(x)) &&
-                    httpContext.Request.Method != "OPTIONS")
-                {
-                    //Handle Invalid Api Key
-                    if (!(httpContext.Request.Headers.TryGetValue(HttpRequestHeaders.ApiKey,
-                              out StringValues apiKeyValues) &&
-                          (apiKeyValues.FirstOrDefault()?.Equals(HttpRequestHeaders.ApiKeyValue) ?? false)))
-                        throw new WebApiApplicationException(StatusCodes.Status412PreconditionFailed, ErrorMessages.InvalidApiKey);
-                }
+                //if (!OpenUrls.Urls.Any(x => httpContext.Request.Path.StartsWithSegments(x)) &&
+                //    !OpenUrls.WebUrls.Any(x => httpContext.Request.Path.StartsWithSegments(x)) &&
+                //    httpContext.Request.Method != "OPTIONS")
+                //{
+                //    //Handle Invalid Api Key
+                //    if (!(httpContext.Request.Headers.TryGetValue(HttpRequestHeaders.ApiKey,
+                //              out StringValues apiKeyValues) &&
+                //          (apiKeyValues.FirstOrDefault()?.Equals(HttpRequestHeaders.ApiKeyValue) ?? false)))
+                //        throw new WebApiApplicationException(StatusCodes.Status412PreconditionFailed, ErrorMessages.InvalidApiKey);
+                //}
 
                 await _next(httpContext);
 
@@ -105,7 +105,7 @@ namespace WebAPI_Server.Middleware
             //return context.Response.WriteAsync(JsonConvert.SerializeObject(new ApiResponse(false,
             //    "Internal Server Error. Please Contact your Administrator.", exception)));
             return context.Response.WriteAsync(JsonConvert.SerializeObject(new ApiResponse(false,
-                ErrorMessages.InternalServerError, exception.Message)));
+                ErrorMessages.InternalServerError, null, exception.Message)));
         }
 
         private static Task HandleModelValidationExceptionAsync(HttpContext context, ModelValidationException resultException)
@@ -114,7 +114,7 @@ namespace WebAPI_Server.Middleware
             context.Response.StatusCode = resultException.StatusCode;
 
             return context.Response.WriteAsync(JsonConvert.SerializeObject(new ApiResponse(false,
-                resultException.ErrorMessage, resultException.ErrorData)));
+                resultException.ErrorMessage, null, resultException.ErrorData)));
         }
 
         private static Task HandleApiAppExceptionAsync(HttpContext context, WebApiApplicationException resultException)
@@ -125,7 +125,7 @@ namespace WebAPI_Server.Middleware
             object exData = resultException.Data != null ? resultException.ErrorData : resultException;
 
             return context.Response.WriteAsync(JsonConvert.SerializeObject(new ApiResponse(false,
-                resultException.ErrorMessage, exData)));
+                resultException.ErrorMessage, null, exData)));
         }
 
         private static Task HandleUnauthorizedAsync(HttpContext context)
@@ -134,7 +134,7 @@ namespace WebAPI_Server.Middleware
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
 
             return context.Response.WriteAsync(JsonConvert.SerializeObject(new ApiResponse(false,
-                ErrorMessages.UnAuthorized, null)));
+                ErrorMessages.UnAuthorized)));
         }
 
         private static Task HandleNotFoundAsync(HttpContext context)
@@ -143,7 +143,7 @@ namespace WebAPI_Server.Middleware
             context.Response.StatusCode = StatusCodes.Status404NotFound;
 
             return context.Response.WriteAsync(JsonConvert.SerializeObject(new ApiResponse(false,
-                ErrorMessages.Page404, null)));
+                ErrorMessages.Page404)));
         }
 
         //private static HttpContext AddHeaders(HttpContext context)

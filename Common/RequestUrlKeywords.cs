@@ -45,6 +45,7 @@ namespace Common
     public class AppConstants
     {
         public const string RemoteIp = "rip";
+        public const string SessionErrorKey = "ApplicationError";
     }
 
     public class ApiVersionNumber

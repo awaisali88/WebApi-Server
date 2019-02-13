@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc.Filters;
+﻿using Common;
+using Common.Exception;
+using Common.Messages;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Serilog;
 
 namespace WebAPI_Server.AppStart
@@ -16,11 +20,14 @@ namespace WebAPI_Server.AppStart
             Policy = useAccessToken ? "All" : "None";
         }
 
-        //public override void OnActionExecuting(ActionExecutingContext context)
-        //{
-        //    //Log.Information("Executing Action in Controller with Data");
-        //    base.OnActionExecuting(context);
-        //}
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            if (!context.HttpContext.Request.Headers.ContainsKey(HttpRequestHeaders.ApiKey) ||
+                (context.HttpContext.Request.Headers.ContainsKey(HttpRequestHeaders.ApiKey) &&
+                 string.IsNullOrEmpty(context.HttpContext.Request.Headers[HttpRequestHeaders.ApiKey])))
+                throw new WebApiApplicationException(StatusCodes.Status412PreconditionFailed,
+                    ErrorMessages.InvalidApiKey);
+        }
     }
 
     internal class AllowNoAccessToken : ActionFilterAttribute

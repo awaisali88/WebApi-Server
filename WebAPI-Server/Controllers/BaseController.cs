@@ -20,7 +20,7 @@ namespace WebAPI_Server.Controllers
         [ApiExplorerSettings(IgnoreApi = true)]
         protected OkObjectResult Ok(object value, string msg)
         {
-            return base.Ok(new ApiResponse(true, msg, value));
+            return base.Ok(new ApiResponse(HttpContext, true, msg, value));
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace WebAPI_Server.Controllers
         [ApiExplorerSettings(IgnoreApi = true)]
         protected virtual ObjectResult StatusCodeResult(int statusCode, object value, string msg)
         {
-            return base.StatusCode(statusCode, JsonConvert.SerializeObject(new ApiResponse(false, msg, value)));
+            return base.StatusCode(statusCode, JsonConvert.SerializeObject(new ApiResponse(HttpContext, false, msg, value)));
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace WebAPI_Server.Controllers
         [ApiExplorerSettings(IgnoreApi = true)]
         public BadRequestObjectResult BadRequest(string msg)
         {
-            return base.BadRequest(new ApiResponse(false, msg, null));
+            return base.BadRequest(new ApiResponse(HttpContext, false, msg, null));
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace WebAPI_Server.Controllers
         [ApiExplorerSettings(IgnoreApi = true)]
         public BadRequestObjectResult BadRequest(string msg, object data)
         {
-            return base.BadRequest(new ApiResponse(false, msg, data));
+            return base.BadRequest(new ApiResponse(HttpContext, false, msg, data));
         }
     }
 }

@@ -118,6 +118,9 @@ namespace WebAPI_Server
             //});
             #endregion
 
+            services.AddSession(config =>
+                config.IdleTimeout = TimeSpan.FromMinutes(1)
+            );
             services.AddApiVersioning(config =>
             {
                 config.ReportApiVersions = true;
@@ -203,6 +206,7 @@ namespace WebAPI_Server
             #endregion
 
             app.UseCookiePolicy();
+            app.UseSession();
 
             app.UseAuthentication();
 

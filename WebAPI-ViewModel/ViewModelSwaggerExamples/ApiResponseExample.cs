@@ -8,7 +8,7 @@ namespace WebAPI_ViewModel.ViewModelSwaggerExamples
     {
         public ApiResponse GetExamples()
         {
-            return new ApiResponse(true, InfoMessages.CommonInfoMessage, null);
+            return new ApiResponse(true, InfoMessages.CommonInfoMessage);
         }
     }
 
@@ -24,7 +24,7 @@ namespace WebAPI_ViewModel.ViewModelSwaggerExamples
     {
         public object GetExamples()
         {
-            return new ApiResponse(false, ErrorMessages.UnAuthorized, null);
+            return new ApiResponse(false, ErrorMessages.UnAuthorized);
         }
     }
 
