@@ -60,6 +60,14 @@ namespace WebAPI_Server.AppStart
                     c.OperationFilter<CustomSecurityRequirementsOperationFilter>(description.GroupName, true, true);
                     // or use the generic method, e.g. c.OperationFilter<SecurityRequirementsOperationFilter<MyCustomAttribute>>();
 
+                    c.AddSecurityDefinition($"{HttpRequestHeaders.ApiKey}_{description.GroupName}", new ApiKeyScheme
+                    {
+                        Description = "Api Access Token",
+                        In = "header",
+                        Name = HttpRequestHeaders.ApiKey,
+                        Type = "apiKey"
+                    });
+
                     // if you're using the SecurityRequirementsOperationFilter, you also need to tell Swashbuckle you're using OAuth2
                     c.AddSecurityDefinition($"oauth2_{description.GroupName}", new ApiKeyScheme
                     {
@@ -70,14 +78,6 @@ namespace WebAPI_Server.AppStart
                         Type = "apiKey",
                     });
                     //c.OperationFilter<ApiKeySecurityRequirementsOperationFilter>();
-                    c.AddSecurityDefinition($"{HttpRequestHeaders.ApiKey}_{description.GroupName}", new ApiKeyScheme
-                    {
-                        Description = "Api Access Token",
-                        In = "header",
-                        Name = HttpRequestHeaders.ApiKey,
-                        Type = "apiKey"
-                    });
-
                     c.AddFluentValidationRules();
 
                     // Set the comments path for the Swagger JSON and UI.

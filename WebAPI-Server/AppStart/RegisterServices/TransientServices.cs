@@ -9,7 +9,7 @@ namespace WebAPI_Server.AppStart
         internal static void TransientServices(IServiceCollection services)
         {
             //BAL
-            services.TryAddTransient(typeof(ICommonBusinessLogic<,,>), typeof(CommonBusinessLogic<,,>));
+            //services.TryAddTransient(typeof(ICommonBusinessLogic<,,>), typeof(CommonBusinessLogic<,,>));
             services.TryAddTransient(typeof(ICommonStoreProcBusinessLogic<>), typeof(CommonStoreProcBusinessLogic<>));
         }
     }

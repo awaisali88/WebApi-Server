@@ -15,7 +15,7 @@ using Microsoft.Extensions.Logging;
 
 namespace WebAPI_BAL
 {
-    public class CommonBusinessLogic<TDbContext, TEntity, TEntityViewModel> :  ICommonBusinessLogic<TDbContext, TEntity, TEntityViewModel> 
+    public abstract class CommonBusinessLogic<TDbContext, TEntity, TEntityViewModel> :  ICommonBusinessLogic<TDbContext, TEntity, TEntityViewModel> 
         where TEntity : class, IDefaultColumns
         where TEntityViewModel : class 
         where TDbContext : IDapperDbContext

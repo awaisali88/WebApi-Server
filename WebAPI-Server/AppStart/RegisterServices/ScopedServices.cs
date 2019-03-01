@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using WebAPI_BAL.ApplicationBAL;
 using WebAPI_BAL.AuthLogic;
 using WebAPI_BAL.NotificationManager;
 using WebAPI_DataAccess.Context;
@@ -25,6 +26,10 @@ namespace WebAPI_Server.AppStart
 
             //DbContext
             services.TryAddTransient<IApplicationDbContext, ApplicationDbContext>();
+
+            //Business Logic
+            services.TryAddScoped<ITestRepoBal, TestRepoBal>();
+
 
             //Service
             services.TryAddScoped<IAuthenticationService, AuthenticationService>();

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using WebAPI_BAL;
+using WebAPI_BAL.ApplicationBAL;
 using WebAPI_DataAccess.Context;
 using WebAPI_Model;
 using WebAPI_Model.Test;
@@ -24,17 +25,17 @@ namespace WebAPI_Server.Controllers.v1
         private IHttpContextAccessor _httpContextAccessor;
         private static readonly HttpClient Client = new HttpClient();
 
-        private readonly ICommonBusinessLogic<IApplicationDbContext, TestRepo, TestRepoViewModel> _cBal;
+        private readonly ITestRepoBal _testRepoBal;
         private readonly ICommonStoreProcBusinessLogic<IApplicationDbContext> _cBalProc;
         private readonly ILogger<TestRepoController> _logger;
 
         /// <inheritdoc />
         public TestRepoController(IHttpContextAccessor httpContextAccessor,
-            ICommonBusinessLogic<IApplicationDbContext, TestRepo, TestRepoViewModel> cBal,
+            ITestRepoBal testRepoBal,
             ICommonStoreProcBusinessLogic<IApplicationDbContext> cBalProc,
             ILogger<TestRepoController> logger)
         {
-            _cBal = cBal;
+            _testRepoBal = testRepoBal;
             _cBalProc = cBalProc;
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
@@ -48,7 +49,7 @@ namespace WebAPI_Server.Controllers.v1
         [HttpPost("adddata")]
         public IActionResult AddData([FromBody] TestRepoViewModel data)
         {
-            (bool, TestRepoViewModel) result = _cBal.Insert(User, data);
+            (bool, TestRepoViewModel) result = _testRepoBal.Insert(User, data);
             return Ok(result.Item2, InfoMessages.CommonInfoMessage);
         }
 
@@ -60,7 +61,7 @@ namespace WebAPI_Server.Controllers.v1
         [HttpPut("updatedata")]
         public IActionResult UpdateData([FromBody] TestRepoViewModel data)
         {
-            (bool, TestRepoViewModel) result = _cBal.Update(User, data);
+            (bool, TestRepoViewModel) result = _testRepoBal.Update(User, data);
             if (result.Item1)
                 return Ok(result.Item2, InfoMessages.CommonInfoMessage);
 
@@ -79,10 +80,10 @@ namespace WebAPI_Server.Controllers.v1
         {
             //object dd = _cBal.HandleTransaction((IDbTransaction x) => { return null as object; });
 
-            bool result = _cBal.HandleTransaction((IDbTransaction trans) =>
+            bool result = _testRepoBal.HandleTransaction((IDbTransaction trans) =>
             {
-                TestRepoViewModel trData = _cBal.FindById(data.Id, transaction: trans);
-                return _cBal.Delete(User, trData, transaction: trans);
+                TestRepoViewModel trData = _testRepoBal.FindById(data.Id, transaction: trans);
+                return _testRepoBal.Delete(User, trData, transaction: trans);
             });
 
             //bool result = _cBal.Delete(User, x => x.Id == data.Id && x.RowVersion == data.RowVersion);
@@ -100,7 +101,7 @@ namespace WebAPI_Server.Controllers.v1
         [AllowAnonymous]
         public IActionResult CountData()
         {
-            int result = _cBal.Count();
+            int result = _testRepoBal.Count();
             return Ok(result, InfoMessages.CommonInfoMessage);
         }
 
@@ -112,7 +113,7 @@ namespace WebAPI_Server.Controllers.v1
         [AllowAnonymous]
         public IActionResult SelectAll()
         {
-            var result = _cBal.FindAll();
+            var result = _testRepoBal.FindAll();
             return Ok(result, InfoMessages.CommonInfoMessage);
         }
 
