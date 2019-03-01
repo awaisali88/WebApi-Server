@@ -24,7 +24,6 @@ namespace WebAPI_Server.AppStart
         {
 
             string connString = configuration.GetConnectionString("DefaultConnection");
-            //string connString = configuration.GetConnectionString("TicketSystem");
 
             services.Configure<DbOptions>(options =>
             {
@@ -112,7 +111,18 @@ namespace WebAPI_Server.AppStart
             services.AddTransient<TokenManagerMiddleware>();
             //services.AddTransient<AngularAntiforgeryCookieResultFilter>();
             services.AddTransient<ITokenManager, TokenManager>();
-            services.AddDistributedRedisCache(r => { r.Configuration = configuration["redis:connectionString"]; });
+            //services.AddDistributedRedisCache(r => { r.Configuration = configuration["redis:connectionString"]; });
+            services.AddDistributedRedisCache(r => {
+                r.ConfigurationOptions = new StackExchange.Redis.ConfigurationOptions()
+                {
+                    EndPoints = { configuration["redis:server"] },
+                    Password = configuration["redis:password"],
+                    DefaultDatabase = Convert.ToInt32(configuration["redis:db"]),
+                    AllowAdmin = true,
+                    ConnectTimeout = 5000,
+                    SyncTimeout = 5000,
+                };
+            });
 
             services.AddScoped<UserStore>();
             services.AddScoped<RoleStore>();
