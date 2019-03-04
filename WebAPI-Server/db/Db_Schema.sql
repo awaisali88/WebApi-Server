@@ -575,3 +575,186 @@ USE [master]
 GO
 ALTER DATABASE [WebApidb] SET  READ_WRITE 
 GO
+
+----------------------------------------------------------------------------------------------------
+-----Create Procedure for code creation
+----------------------------------------------------------------------------------------------------
+
+CREATE PROC [dbo].[CreateC#ModelFromTable] 
+@TableName sysname
+AS
+
+DECLARE @Result varchar(max) = '[Table("'+ @TableName +'")]'+ CHAR(10) +'public class ' + @TableName + 'Model : CommonColumns
+{'
+
+--SELECT @Result = @Result + '
+--	[Column("'+ ColumnName +'")]
+--    public ' + ColumnType + NullableSign + ' ' + ColumnName + ' { get; set; }
+--'
+SELECT @Result =
+	CASE 
+	WHEN t.IsPrimaryKey = 1 THEN 
+  @Result + '
+	[Identity, Key]
+    public ' + ColumnType + NullableSign + ' ' + ColumnName + ' { get; set; }
+'
+	WHEN t.ColumnName = 'Status' THEN 
+  @Result + '
+    public new ' + ColumnType + NullableSign + ' ' + ColumnName + ' { get; set; }
+'
+	ELSE 
+  @Result + '
+    public ' + ColumnType + NullableSign + ' ' + ColumnName + ' { get; set; }
+'
+end
+from
+(
+    select 
+        replace(col.name, ' ', '_') ColumnName,
+        column_id ColumnId,
+        case typ.name 
+            when 'bigint' then 'long'
+            when 'binary' then 'byte[]'
+            when 'bit' then 'bool'
+            when 'char' then 'string'
+            when 'date' then 'DateTime'
+            when 'datetime' then 'DateTime'
+            when 'datetime2' then 'DateTime'
+            when 'datetimeoffset' then 'DateTimeOffset'
+            when 'decimal' then 'decimal'
+            when 'float' then 'float'
+            when 'image' then 'byte[]'
+            when 'int' then 'int'
+            when 'money' then 'decimal'
+            when 'nchar' then 'char'
+            when 'ntext' then 'string'
+            when 'numeric' then 'decimal'
+            when 'nvarchar' then 'string'
+            when 'real' then 'double'
+            when 'smalldatetime' then 'DateTime'
+            when 'smallint' then 'short'
+            when 'smallmoney' then 'decimal'
+            when 'text' then 'string'
+            when 'time' then 'TimeSpan'
+            when 'timestamp' then 'DateTime'
+            when 'tinyint' then 'byte'
+            when 'uniqueidentifier' then 'Guid'
+            when 'varbinary' then 'byte[]'
+            when 'varchar' then 'string'
+            else 'UNKNOWN_' + typ.name
+        end ColumnType,
+        case 
+            when col.is_nullable = 1 and typ.name in ('bigint', 'bit', 'date', 'datetime', 'datetime2', 'datetimeoffset', 'decimal', 'float', 'int', 'money', 'numeric', 'real', 'smalldatetime', 'smallint', 'smallmoney', 'time', 'tinyint', 'uniqueidentifier') 
+            then '?' 
+            else '' 
+        end NullableSign,
+CASE 
+    WHEN EXISTS (
+	SELECT *
+	FROM
+		sys.indexes AS I 
+		INNER JOIN 
+		sys.index_columns AS IC 
+		ON IC.object_id = I.object_id 
+		AND IC.index_id = I.index_id
+	WHERE  
+		I.object_id = col.object_id
+		AND IC.object_id = col.object_id
+		AND I.is_primary_key = 1
+		AND IC.index_id = I.index_id 
+		AND IC.column_id = col.column_id
+	)  
+	THEN 1 
+    ELSE 0 
+    END AS IsPrimaryKey
+    from sys.columns col
+        join sys.types typ on
+            col.system_type_id = typ.system_type_id AND col.user_type_id = typ.user_type_id
+    where object_id = object_id(@TableName)
+) t
+order by ColumnId
+
+set @Result = @Result  + '
+}'
+
+print @Result
+
+GO
+
+----------------------------------------------------------------------------------------------------
+
+CREATE PROC [dbo].[CreateC#ViewModelFromTable] 
+@TableName sysname
+AS
+
+DECLARE @Result varchar(max) = 'public class ' + @TableName + 'ViewModel : DefaultViewModel
+{'
+SELECT @Result = 
+	CASE 
+	WHEN t.ColumnName = 'Status' THEN 
+  @Result + '
+    public new ' + ColumnType + NullableSign + ' ' + ColumnName + ' { get; set; }
+'
+	ELSE 
+  @Result + '
+    public ' + ColumnType + NullableSign + ' ' + ColumnName + ' { get; set; }
+'
+END
+
+FROM
+(
+    SELECT 
+        REPLACE(col.name, ' ', '_') ColumnName,
+        column_id ColumnId,
+        CASE typ.name 
+            WHEN 'bigint' THEN 'long'
+            WHEN 'binary' THEN 'byte[]'
+            WHEN 'bit' THEN 'bool'
+            WHEN 'char' THEN 'string'
+            WHEN 'date' THEN 'DateTime'
+            WHEN 'datetime' THEN 'DateTime'
+            WHEN 'datetime2' THEN 'DateTime'
+            WHEN 'datetimeoffset' THEN 'DateTimeOffset'
+            WHEN 'decimal' THEN 'decimal'
+            WHEN 'float' THEN 'float'
+            WHEN 'image' THEN 'byte[]'
+            WHEN 'int' THEN 'int'
+            WHEN 'money' THEN 'decimal'
+            WHEN 'nchar' THEN 'char'
+            WHEN 'ntext' THEN 'string'
+            WHEN 'numeric' THEN 'decimal'
+            WHEN 'nvarchar' THEN 'string'
+            WHEN 'real' THEN 'double'
+            WHEN 'smalldatetime' THEN 'DateTime'
+            WHEN 'smallint' THEN 'short'
+            WHEN 'smallmoney' THEN 'decimal'
+            WHEN 'text' THEN 'string'
+            WHEN 'time' THEN 'TimeSpan'
+            WHEN 'timestamp' THEN 'DateTime'
+            WHEN 'tinyint' THEN 'byte'
+            WHEN 'uniqueidentifier' THEN 'Guid'
+            WHEN 'varbinary' THEN 'byte[]'
+            WHEN 'varchar' THEN 'string'
+            ELSE 'UNKNOWN_' + typ.name
+        END ColumnType,
+        CASE 
+            WHEN col.is_nullable = 1 AND typ.name IN ('bigint', 'bit', 'date', 'datetime', 'datetime2', 'datetimeoffset', 'decimal', 'float', 'int', 'money', 'numeric', 'real', 'smalldatetime', 'smallint', 'smallmoney', 'time', 'tinyint', 'uniqueidentifier') 
+            THEN '?' 
+            ELSE '' 
+        END NullableSign
+    FROM sys.columns col
+        JOIN sys.types typ ON
+            col.system_type_id = typ.system_type_id AND col.user_type_id = typ.user_type_id
+    WHERE object_id = OBJECT_ID(@TableName)
+) t
+ORDER BY ColumnId
+
+SET @Result = @Result  + '
+}'
+
+PRINT @Result
+
+
+GO
+
+
