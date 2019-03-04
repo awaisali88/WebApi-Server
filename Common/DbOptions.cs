@@ -1,7 +1,7 @@
 ﻿
 namespace Common
 {
-    public class DbOptions
+    public abstract class DbOptions
     {
         public string ConnectionString { get; set; }
         public SqlProvider SqlProvider { get; set; }

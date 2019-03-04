@@ -1,7 +1,7 @@
 ﻿using Dapper.Repositories;
 using WebAPI_Model.Test;
 
-namespace WebAPI_DataAccess.Context
+namespace WebAPI_DataAccess.ApplicationContext
 {
     public partial class ApplicationDbContext
     {

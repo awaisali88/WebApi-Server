@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using WebAPI_BAL.IdentityManager;
 using WebAPI_BAL.JwtGenerator;
+using WebAPI_DataAccess;
 using WebAPI_Server.Middleware;
 using WebAPI_ViewModel.ConfigSettings;
 
@@ -25,7 +26,7 @@ namespace WebAPI_Server.AppStart
 
             string connString = configuration.GetConnectionString("DefaultConnection");
 
-            services.Configure<DbOptions>(options =>
+            services.Configure<ApplicationDbOptions>(options =>
             {
                 options.LogQuery = true;
                 options.ConnectionString = connString;

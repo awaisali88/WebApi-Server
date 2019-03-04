@@ -1,0 +1,69 @@
+
+
+Please follow these instructions in order to get the defaule columns to be handeld by the project architecture.
+
+"CreatedDate" is property/column where the creating date of record will be saved and will never change
+"CreatedBy" is property/column where the id of user who created the record will be saved and will never change
+"ModifiedDate" is property/column where the date when the record is last modified will be saved and will change upon every new update.
+"ModifiedBy" is property/column  where the id of user who modified the record will be saved and will change upon every new update.
+"Trashed" is property/column which is used for soft deleting of record.
+"RowVersion" is property/column which is used for maintaining the record version and will auto update on updating any column of the table. 
+"Status" is property/column which is used for maintaining the record status as "Active = true" or "In-Active = false".
+
+1. CreatedDate (Property in model/column in database) or column with same feature
+	You can change the column name as per database in [Column] Attribute.
+	Do not change the property name because it is linked with interface.
+	Code: 
+		[CreatedAt]
+        [IgnoreUpdate]
+        [Column("CreatedDate")]
+        public new DateTime? CreatedDate { get; set; }
+
+2. CreatedBy (Property in model/column in database) or column with same feature
+	You can change the column name as per database in [Column] Attribute.
+	Do not change the property name because it is linked with interface.
+	Code: 
+        [IgnoreUpdate]
+        [Column("CreatedBy")]
+        public new string CreatedBy { get; set; }
+
+3. ModifiedDate (Property in model/column in database) or column with same feature
+	You can change the column name as per database in [Column] Attribute.
+	Do not change the property name because it is linked with interface.
+	Code: 
+        [UpdatedAt]
+        [Column("ModifiedDate")]
+        public new DateTime? ModifiedDate { get; set; }
+
+4. ModifiedBy (Property in model/column in database) or column with same feature
+	You can change the column name as per database in [Column] Attribute.
+	Do not change the property name because it is linked with interface.
+	Code: 
+        [Column("ModifiedBy")]
+        public new string ModifiedBy { get; set; }
+
+5. Trashed (Property in model/column in database) or column with same feature
+	You can change the column name as per database in [Column] Attribute.
+	Do not change the property name because it is linked with interface.
+	Code: 
+        [Status, Deleted]
+        [Column("Trashed")]
+        public new bool Trashed { get; set; }
+
+6. RowVersion (Property in model/column in database) or column with same feature
+	You can change the column name as per database in [Column] Attribute.
+	Do not change the property name because it is linked with interface.
+	Code: 
+        [Timestamp]
+        [ConcurrencyCheck]
+        [RowVersion]
+        [Column("RowVersion")]
+        public new byte[] RowVersion { get; set; }
+
+6. Status (Property in model/column in database) or column with same feature
+	You can change the column name as per database in [Column] Attribute.
+	Do not change the property name because it is linked with interface.
+	Code: 
+        [Column("Status")]
+        public new bool Status { get; set; }
+

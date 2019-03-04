@@ -15,8 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Context\ApplicationDbContext_ModelCreating.cs" />
-    <Compile Remove="Context\IDbOptions.cs" />
+    <Compile Remove="ApplicationContext\ApplicationDbContext_ModelCreating.cs" />
+    <Compile Remove="ApplicationContext\IDbOptions.cs" />
   </ItemGroup>
 
   <ItemGroup>

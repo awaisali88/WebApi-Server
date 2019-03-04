@@ -1,0 +1,135 @@
+
+
+The purpose of this document is to create an easy and memorable steps for one of the most repeatable processes a developer 
+has to perform in any kind of project which is to create models, view models, business logic etc. from an already created database.
+
+
+For the scope of this document we are going to imagine a table name for which we have to create model, view model etc.
+
+Table name = "Customer"
+
+When creating a new model from sql table, following are the steps needed to perform in order to get the 
+most of pre build features of the project architecture. 
+
+
+1. Create a model class in WebAPI-Model(project).
+	The folder name should be the same as database name.
+	The Class name should be ended with "Model" word eg. "CustomerModel"
+	The namespace of the class should be "WebAPI_Model". We are not using inheridted namespaces for Database names.
+
+2. Exec "CreateC#ModelFromTable" procedure form the database and copy the code in the model class within namespace section.
+	eg. Exec CreateC#ModelFromTable 'Customer'
+	copy the code in CustomerModel class within namespace section of the file.
+	eg. 
+	namespace WebAPI_Model 
+	{
+		//Pasete code here
+	}
+	
+3. Create a view model class in WebAPI-ViewModel(project) > DTO (folder).
+	The child folder name should be the same as database name.
+	The Class name should be ended with "ViewModel" word eg. "CustomerViewModel"
+	The namespace of the class should be "WebAPI_ViewModel.DTO". We are not using inheridted namespaces for Database names.
+
+4. Exec "CreateC#ViewModelFromTable" procedure form the database and copy the code in the view model class within namespace section.
+	eg. Exec CreateC#ViewModelFromTable 'Customer'
+	copy the code in CustomerViewModel class within namespace section of the file.
+	eg. 
+	namespace WebAPI_ViewModel.DTO 
+	{
+		//Pasete code here
+	}
+
+Note: Please be aware of the followig columns. These columns need extra steps to perform after generating code from the procedures. 
+-> Check document "Code for default columns.txt".
+	1. CreatedDate or similar column feature
+	2. CreatedBy or similar column feature
+	3. ModifiedDate or similar column feature
+	4. ModifiedBy or similar column feature
+	5. Trashed or similar column feature (use for soft deleting of data)
+	6. RowVersion or similar column feature (use for maintaining of record version)
+	6. Status or similar column feature (use for maintaining of record status)
+
+5. Add mapper for the model and view model in WebAPI-Server > AppStart > MappingProfile.cs class
+	eg. CreateMap<CustomerModel, CustomerViewModel>().ReverseMap();
+
+6. Add Model repository in WebAPI-DataAccess(project) > "Database name"Context(folder) > "Database name class"
+	GreeterApp Database
+		IApplicationDbContext.cs, AppDbContext_Private.cs, AppDbContext_Public.cs
+	TicketSystem Database
+		ITicketSystemDbContext.cs, TS_DbContext_Private.cs, TS_DbContext_Public.cs
+
+	eg. (If Customer table is in GreeterApp Database)
+	1. Add this code in IApplicationDbContext ()
+		IDapperRepository<CustomerModel> CustomerRepo { get; }
+	2. Add this code in AppDbContext_Private.cs
+		private IDapperRepository<CustomerModel> _customerRepo;
+	3. Add this code in AppDbContext_Public.cs
+		public IDapperRepository<CustomerModel> CustomerRepo => _customerRepo ?? (_customerRepo = new DapperRepository<CustomerModel>(Connection, _config));
+
+	eg. (If Customer table is in TicketSystem Database)
+	1. Add this code in ITicketSystemDbContext ()
+		IDapperRepository<CustomerModel> CustomerRepo { get; }
+	2. Add this code in TS_DbContext_Private.cs
+		private IDapperRepository<CustomerModel> _customerRepo;
+	3. Add this code in TS_DbContext_Public.cs
+		public IDapperRepository<CustomerModel> CustomerRepo => _customerRepo ?? (_customerRepo = new DapperRepository<CustomerModel>(Connection, _config));
+
+
+7. Create business logic interface in WebAPI-BAL(project) > BLL(folder) > "Database name folder" > Interfaces(folder)
+	We are not using inheridted namespaces for Database names so the namespace should be "WebAPI_BAL.BLL" 
+	eg. 
+	namespace WebAPI_BAL.BLL
+	{
+		public interface ICustomerBal : ICommonBusinessLogic<IApplicationDbContext, CustomerModel, CustomerViewModel>
+		{
+		}
+	}
+	-> Remember to change "IApplicationDbContext" to the database Context interface class 
+
+8. Create business logic class with specified constructor in WebAPI-BAL(project) > BLL(folder) > "Database name folder"
+	We are not using inheridted namespaces for Database names so the namespace should be "WebAPI_BAL.BLL" 
+	eg. 
+	namespace WebAPI_BAL.BLL
+	{
+		public interface CustomerBal : CommonBusinessLogic<IApplicationDbContext, CustomerModel, CustomerViewModel>, ICustomerBal
+		{
+			private readonly ILogger<CustomerBal> _logger;
+
+			public CustomerBal(IApplicationDbContext db, IMapper mapper, IHostingEnvironment env,
+			    IHttpContextAccessor httpContextAccessor, ILogger<CustomerBal> logger,
+			    ILogger<CommonBusinessLogic<IApplicationDbContext, CustomerModel, CustomerViewModel>> baseLogger)
+			    : base(db, mapper, env, httpContextAccessor, baseLogger)
+			{
+			    _logger = logger;
+			}
+		}
+	}
+	-> Remember to change "IApplicationDbContext" to the database Context interface class 
+
+9. Finally add service injection code into one of the files in "WebAPI-Server(project) > AppStart(folder) > RegisterServices(folder)"
+	Only add this code in one file, do not add in all three files.
+	
+	By default the BAL class and interface which we created above (ICustomerBal and ICustomerBal) should be added in ScopedServices.cs
+
+	TransientServices.cs
+		Transient objects are always different; a new instance is provided to every controller and every service.
+		eg;	services.TryAddTransient<ICustomerBal, CustomerBal>();
+
+	ScopedServices.cs
+		Scoped objects are the same within a request, but different across different requests.
+		eg;	services.TryAddScoped<ICustomerBal, CustomerBal>();
+
+	SingletonServices.cs
+		Singleton objects are the same for every object and every request. These objects are initilized only once in the application.
+		eg;	services.AddSingleton<ICustomerBal, CustomerBal>();
+
+
+=======================================================================
+
+These are all the steps needed to to add a model class and its business logic with error free code.
+
+
+
+
+
