@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using WebAPI_BAL.ApplicationBAL;
 using WebAPI_BAL.AuthLogic;
 using WebAPI_BAL.NotificationManager;
-using WebAPI_DataAccess.Context;
+using WebAPI_DataAccess.ApplicationContext;
 using WebAPI_Service.Service;
 
 namespace WebAPI_Server.AppStart

@@ -5,7 +5,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using WebAPI_DataAccess.Context;
+using WebAPI_DataAccess.ApplicationContext;
 using WebAPI_Model.Test;
 using WebAPI_ViewModel.DTO;
 
