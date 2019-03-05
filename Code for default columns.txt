@@ -67,3 +67,38 @@ Please follow these instructions in order to get the defaule columns to be hande
         [Column("Status")]
         public new bool Status { get; set; }
 
+=====================================================================================
+
+Add following attributes to get the data from the linked tables. Find/FindAll functions will automatically add joins in select query.
+
+[LeftJoin]
+[InnerJoin]
+[RightJoin]
+
+
+example: for User Model
+
+[Table("Users")]
+public class User
+{
+    [Key, Identity]
+    public int Id { get; set; }
+
+    public string ReadOnly => "test"; // because don't have set
+
+    public string Name { get; set; }
+
+    public int AddressId { get; set; }
+
+    [LeftJoin("Cars", "Id", "UserId")] //UserId is property in Cars model
+    public List<Car> Cars { get; set; }
+
+    [LeftJoin("Addresses", "AddressId", "Id")] // Id is Primary key in Address model
+    public Address Address { get; set; }
+
+    [Status, Deleted]
+    public bool Deleted { get; set; }
+
+    [UpdatedAt]
+    public DateTime? UpdatedAt { get; set; }
+}
