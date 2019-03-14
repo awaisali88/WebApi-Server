@@ -26,6 +26,7 @@ namespace Dapper.Repositories
         [Column("CreatedDate")]
         public virtual DateTime? CreatedDate { get; set; }
 
+        [MandatoryUpdate]
         [UpdatedAt]
         [Column("ModifiedDate")]
         public virtual DateTime? ModifiedDate { get; set; }
@@ -34,9 +35,11 @@ namespace Dapper.Repositories
         [Column("CreatedBy")]
         public virtual string CreatedBy { get; set; }
 
+        [MandatoryUpdate]
         [Column("ModifiedBy")]
         public virtual string ModifiedBy { get; set; }
 
+        [MandatoryUpdate]
         [Column("RecordStatus")]
         public virtual int RecordStatusCode
         {

@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Dapper.Repositories
@@ -11,30 +13,30 @@ namespace Dapper.Repositories
         where TEntity : class
     {
         /// <inheritdoc />
-        public bool BulkUpdate(IEnumerable<TEntity> instances)
+        public bool BulkUpdate(IEnumerable<TEntity> instances, Expression<Func<TEntity, object>> propertiesToUpdate)
         {
-            return BulkUpdate(instances, null);
+            return BulkUpdate(instances, propertiesToUpdate, null);
         }
 
         /// <inheritdoc />
-        public bool BulkUpdate(IEnumerable<TEntity> instances, IDbTransaction transaction)
+        public bool BulkUpdate(IEnumerable<TEntity> instances, Expression<Func<TEntity, object>> propertiesToUpdate, IDbTransaction transaction)
         {
-            var queryResult = SqlGenerator.GetBulkUpdate(instances);
+            var queryResult = SqlGenerator.GetBulkUpdate(instances, propertiesToUpdate);
             var result = Connection.Execute(queryResult.GetSql(), queryResult.Param, transaction) > 0;
             return result;
         }
 
         /// <inheritdoc />
-        public Task<bool> BulkUpdateAsync(IEnumerable<TEntity> instances)
+        public Task<bool> BulkUpdateAsync(IEnumerable<TEntity> instances, Expression<Func<TEntity, object>> propertiesToUpdate)
         {
-            return BulkUpdateAsync(instances, null);
+            return BulkUpdateAsync(instances, propertiesToUpdate, null);
         }
 
         /// <inheritdoc />
-        public async Task<bool> BulkUpdateAsync(IEnumerable<TEntity> instances, IDbTransaction transaction)
+        public async Task<bool> BulkUpdateAsync(IEnumerable<TEntity> instances, Expression<Func<TEntity, object>> propertiesToUpdate, IDbTransaction transaction)
         {
-            var queryResult = SqlGenerator.GetBulkUpdate(instances);
-            var result = await Connection.ExecuteAsync(queryResult.GetSql(), queryResult.Param, transaction) > 0;
+            var queryResult = SqlGenerator.GetBulkUpdate(instances, propertiesToUpdate);
+            var result = await Connection.ExecuteAsync(queryResult.GetSql(), queryResult.Param, transaction).ConfigureAwait(false) > 0;
             return result;
         }
     }

@@ -21,6 +21,21 @@ namespace Dapper.Repositories.SqlGenerator
         bool HasUpdatedAt { get; }
 
         /// <summary>
+        ///     Has Date of Creation
+        /// </summary>
+        bool HasCreatedAt { get; }
+
+        /// <summary>
+        ///     Has Row Version
+        /// </summary>
+        bool HasRowVersion { get; }
+
+        /// <summary>
+        ///     Has mandatory update property
+        /// </summary>
+        bool HasMandatoryProp { get; }
+        
+        /// <summary>
         ///     Date of Changed Property
         /// </summary>
         PropertyInfo UpdatedAtProperty { get; }
@@ -30,10 +45,29 @@ namespace Dapper.Repositories.SqlGenerator
         /// </summary>
         PropertyInfo CreatedAtProperty { get; }
 
+        PropertyInfo RowVersionProperty { get; }
+
+        PropertyInfo[] MandatoryUpdateProperty { get; }
+        
         /// <summary>
         ///     Date of Changed Metadata Property
         /// </summary>
         SqlPropertyMetadata UpdatedAtPropertyMetadata { get; }
+
+        /// <summary>
+        ///     Date of Creation Metadata Property
+        /// </summary>
+        SqlPropertyMetadata CreatedAtPropertyMetadata { get; }
+
+        /// <summary>
+        ///     Row version Metadata Property
+        /// </summary>
+        SqlPropertyMetadata RowVersionPropertyMetadata { get; }
+
+        /// <summary>
+        ///     Mandatory update Metadata Property
+        /// </summary>
+        SqlPropertyMetadata[] ManUpdatePropertyMetadata { get; }
 
         /// <summary>
         ///     Is Autoincrement table
@@ -115,22 +149,22 @@ namespace Dapper.Repositories.SqlGenerator
         /// <summary>
         ///     Get SQL for UPDATE Query
         /// </summary>
-        SqlQuery GetUpdate(TEntity entity);
+        SqlQuery GetUpdate(TEntity entity, Expression<Func<TEntity, object>> propertiesToUpdate);
 
         /// <summary>
         ///     Get SQL for UPDATE Query
         /// </summary>
-        SqlQuery GetUpdate(Expression<Func<TEntity, bool>> predicate, TEntity entity);
+        SqlQuery GetUpdate(Expression<Func<TEntity, bool>> predicate, TEntity entity, Expression<Func<TEntity, object>> propertiesToUpdate);
 
         /// <summary>
         ///     Get SQL for bulk UPDATE Query
         /// </summary>
-        SqlQuery GetBulkUpdate(IEnumerable<TEntity> entities);
+        SqlQuery GetBulkUpdate(IEnumerable<TEntity> entities, Expression<Func<TEntity, object>> propertiesToUpdate);
 
         /// <summary>
         ///     Get SQL for SELECT Query by Id
         /// </summary>
-        SqlQuery  GetSelectById(object id, bool includeLogicalDeleted, params Expression<Func<TEntity, object>>[] includes);
+        SqlQuery GetSelectById(object id, bool includeLogicalDeleted, params Expression<Func<TEntity, object>>[] includes);
 
         /// <summary>
         ///     Get SQL for SELECT Query

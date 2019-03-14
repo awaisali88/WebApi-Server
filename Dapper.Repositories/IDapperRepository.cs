@@ -26,7 +26,7 @@ namespace Dapper.Repositories
         ///     Get number of rows
         /// </summary>
         int Count(bool includeLogicalDeleted);
-        
+
         /// <summary>
         ///     Get number of rows
         /// </summary>
@@ -36,7 +36,7 @@ namespace Dapper.Repositories
         ///     Get number of rows with WHERE clause
         /// </summary>
         int Count(Expression<Func<TEntity, bool>> predicate, bool includeLogicalDeleted);
-        
+
         /// <summary>
         ///     Get number of rows with WHERE clause
         /// </summary>
@@ -46,7 +46,7 @@ namespace Dapper.Repositories
         ///     Get number of rows with DISTINCT clause
         /// </summary>
         int Count(Expression<Func<TEntity, object>> distinctField, bool includeLogicalDeleted);
-        
+
         /// <summary>
         ///     Get number of rows with DISTINCT clause
         /// </summary>
@@ -56,7 +56,7 @@ namespace Dapper.Repositories
         ///     Get number of rows with DISTINCT and WHERE clause
         /// </summary>
         int Count(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, object>> distinctField, bool includeLogicalDeleted);
-        
+
         /// <summary>
         ///     Get number of rows with DISTINCT and WHERE clause
         /// </summary>
@@ -66,7 +66,7 @@ namespace Dapper.Repositories
         ///     Get number of rows
         /// </summary>
         Task<int> CountAsync(bool includeLogicalDeleted);
-        
+
         /// <summary>
         ///     Get number of rows
         /// </summary>
@@ -76,7 +76,7 @@ namespace Dapper.Repositories
         ///     Get number of rows with WHERE clause
         /// </summary>
         Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate, bool includeLogicalDeleted);
-        
+
         /// <summary>
         ///     Get number of rows with WHERE clause
         /// </summary>
@@ -86,7 +86,7 @@ namespace Dapper.Repositories
         ///     Get number of rows with DISTINCT clause
         /// </summary>
         Task<int> CountAsync(Expression<Func<TEntity, object>> distinctField, bool includeLogicalDeleted);
-        
+
         /// <summary>
         ///     Get number of rows with DISTINCT clause
         /// </summary>
@@ -96,7 +96,7 @@ namespace Dapper.Repositories
         ///     Get number of rows with DISTINCT and WHERE clause
         /// </summary>
         Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, object>> distinctField, bool includeLogicalDeleted);
-        
+
         /// <summary>
         ///     Get number of rows with DISTINCT and WHERE clause
         /// </summary>
@@ -591,65 +591,65 @@ namespace Dapper.Repositories
         /// <summary>
         ///     Update object in DB
         /// </summary>
-        (bool, TEntity) Update(TEntity instance);
+        (bool, TEntity) Update(TEntity instance, Expression<Func<TEntity, object>> propertiesToUpdate);
 
         /// <summary>
         ///     Update object in DB
         /// </summary>
-        (bool, TEntity) Update(TEntity instance, IDbTransaction transaction);
-
-
-        /// <summary>
-        ///     Update object in DB
-        /// </summary>
-        Task<(bool, TEntity)> UpdateAsync(TEntity instance);
-
-        /// <summary>
-        ///     Update object in DB
-        /// </summary>
-        Task<(bool, TEntity)> UpdateAsync(TEntity instance, IDbTransaction transaction);
-
-        /// <summary>
-        ///     Update object in DB
-        /// </summary>
-        (bool, TEntity) Update(Expression<Func<TEntity, bool>> predicate, TEntity instance);
+        (bool, TEntity) Update(TEntity instance, Expression<Func<TEntity, object>> propertiesToUpdate, IDbTransaction transaction);
 
 
         /// <summary>
         ///     Update object in DB
         /// </summary>
-        (bool, TEntity) Update(Expression<Func<TEntity, bool>> predicate, TEntity instance, IDbTransaction transaction);
+        Task<(bool, TEntity)> UpdateAsync(TEntity instance, Expression<Func<TEntity, object>> propertiesToUpdate);
 
         /// <summary>
         ///     Update object in DB
         /// </summary>
-        Task<(bool, TEntity)> UpdateAsync(Expression<Func<TEntity, bool>> predicate, TEntity instance);
+        Task<(bool, TEntity)> UpdateAsync(TEntity instance, Expression<Func<TEntity, object>> propertiesToUpdate, IDbTransaction transaction);
 
         /// <summary>
         ///     Update object in DB
         /// </summary>
-        Task<(bool, TEntity)> UpdateAsync(Expression<Func<TEntity, bool>> predicate, TEntity instance, IDbTransaction transaction);
+        (bool, TEntity) Update(Expression<Func<TEntity, bool>> predicate, TEntity instance, Expression<Func<TEntity, object>> propertiesToUpdate);
+
+
+        /// <summary>
+        ///     Update object in DB
+        /// </summary>
+        (bool, TEntity) Update(Expression<Func<TEntity, bool>> predicate, TEntity instance, Expression<Func<TEntity, object>> propertiesToUpdate, IDbTransaction transaction);
+
+        /// <summary>
+        ///     Update object in DB
+        /// </summary>
+        Task<(bool, TEntity)> UpdateAsync(Expression<Func<TEntity, bool>> predicate, TEntity instance, Expression<Func<TEntity, object>> propertiesToUpdate);
+
+        /// <summary>
+        ///     Update object in DB
+        /// </summary>
+        Task<(bool, TEntity)> UpdateAsync(Expression<Func<TEntity, bool>> predicate, TEntity instance, Expression<Func<TEntity, object>> propertiesToUpdate, IDbTransaction transaction);
 
 
         /// <summary>
         ///     Bulk Update objects in DB
         /// </summary>
-        Task<bool> BulkUpdateAsync(IEnumerable<TEntity> instances);
+        Task<bool> BulkUpdateAsync(IEnumerable<TEntity> instances, Expression<Func<TEntity, object>> propertiesToUpdate);
 
         /// <summary>
         ///     Bulk Update objects in DB
         /// </summary>
-        Task<bool> BulkUpdateAsync(IEnumerable<TEntity> instances, IDbTransaction transaction);
+        Task<bool> BulkUpdateAsync(IEnumerable<TEntity> instances, Expression<Func<TEntity, object>> propertiesToUpdate, IDbTransaction transaction);
 
         /// <summary>
         ///     Bulk Update objects in DB
         /// </summary>
-        bool BulkUpdate(IEnumerable<TEntity> instances);
+        bool BulkUpdate(IEnumerable<TEntity> instances, Expression<Func<TEntity, object>> propertiesToUpdate);
 
         /// <summary>
         ///     Bulk Update objects in DB
         /// </summary>
-        bool BulkUpdate(IEnumerable<TEntity> instances, IDbTransaction transaction);
+        bool BulkUpdate(IEnumerable<TEntity> instances, Expression<Func<TEntity, object>> propertiesToUpdate, IDbTransaction transaction);
 
 
         /// <summary>

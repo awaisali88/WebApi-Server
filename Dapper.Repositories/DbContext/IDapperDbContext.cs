@@ -19,8 +19,23 @@ namespace Dapper.Repositories.DbContext
         void OpenConnection();
 
         /// <summary>
+        ///     Get opened DB Connection
+        /// </summary>
+        IDbConnection ConnectionWithoutMultipleActiveResultSets { get; }
+
+        /// <summary>
+        ///     Open DB connection
+        /// </summary>
+        void OpenConnectionWithoutMultipleActiveResultSets();
+
+        /// <summary>
+        ///     Close DB connection
+        /// </summary>
+        void CloseConnection();
+
+        /// <summary>
         ///     Open DB connection and Begin transaction
         /// </summary>
-        IDbTransaction BeginTransaction();
+        IDbTransaction BeginTransaction(bool closeConnection = true);
     }
 }

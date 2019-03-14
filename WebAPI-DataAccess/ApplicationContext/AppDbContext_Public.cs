@@ -14,7 +14,7 @@ namespace WebAPI_DataAccess.ApplicationContext
         //public IDapperRepository<Phone> Phones => _phones ?? (_phones = new DapperRepository<Phone>(Connection, _config));
 
         public IDapperSProcRepository StoreProcedureRepo => _spRepo ?? (_spRepo = new DapperSProcRepository(Connection));
-        public IDapperRepository<TestRepo> TestRepo => _testRepo ?? (_testRepo = new DapperRepository<TestRepo>(Connection, _config));
+        public IDapperRepository<TestRepo> TestRepo => _testRepo ?? (_testRepo = new DapperRepository<TestRepo>(Connection, _mapper, _config));
         #endregion
 
     }

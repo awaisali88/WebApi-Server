@@ -36,6 +36,10 @@ namespace Dapper.Repositories.SqlGenerator
             var rowVersion = PropertyInfo.GetCustomAttribute<RowVersionAttribute>();
             if (rowVersion != null)
                 RowVersionProp = true;
+
+            var mandatoryUpdate = PropertyInfo.GetCustomAttribute<MandatoryUpdateAttribute>();
+            if (mandatoryUpdate != null)
+                MandatoryUpdateProp = true;
         }
 
         /// <summary>
@@ -64,9 +68,14 @@ namespace Dapper.Repositories.SqlGenerator
         public bool IgnoreUpdate { get; set; }
 
         /// <summary>
-        ///     Exclude property from update
+        ///     Row version property
         /// </summary>
         public bool RowVersionProp { get; set; }
+
+        /// <summary>
+        ///     Mandatory property for update
+        /// </summary>
+        public bool MandatoryUpdateProp { get; set; }
 
         /// <summary>
         ///     PropertyName

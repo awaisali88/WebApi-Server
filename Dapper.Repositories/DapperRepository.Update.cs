@@ -14,15 +14,15 @@ namespace Dapper.Repositories
         where TEntity : class
     {
         /// <inheritdoc />
-        public virtual (bool, TEntity) Update(TEntity instance)
+        public virtual (bool, TEntity) Update(TEntity instance, Expression<Func<TEntity, object>> propertiesToUpdate)
         {
-            return Update(instance, null);
+            return Update(instance, propertiesToUpdate, null);
         }
 
         /// <inheritdoc />
-        public virtual (bool,TEntity) Update(TEntity instance, IDbTransaction transaction)
+        public virtual (bool, TEntity) Update(TEntity instance, Expression<Func<TEntity, object>> propertiesToUpdate, IDbTransaction transaction)
         {
-            var sqlQuery = SqlGenerator.GetUpdate(instance);
+            var sqlQuery = SqlGenerator.GetUpdate(instance, propertiesToUpdate);
             if (SqlGenerator.Config.SqlProvider == SqlProvider.PostgreSQL)
             {
                 var updatedPostgreSQL = Connection.Execute(sqlQuery.GetSql(), instance, transaction) > 0;
@@ -37,24 +37,24 @@ namespace Dapper.Repositories
         }
 
         /// <inheritdoc />
-        public virtual Task<(bool, TEntity)> UpdateAsync(TEntity instance)
+        public virtual Task<(bool, TEntity)> UpdateAsync(TEntity instance, Expression<Func<TEntity, object>> propertiesToUpdate)
         {
-            return UpdateAsync(instance, null);
+            return UpdateAsync(instance, propertiesToUpdate, null);
         }
 
         /// <inheritdoc />
-        public virtual async Task<(bool, TEntity)> UpdateAsync(TEntity instance, IDbTransaction transaction)
+        public virtual async Task<(bool, TEntity)> UpdateAsync(TEntity instance, Expression<Func<TEntity, object>> propertiesToUpdate, IDbTransaction transaction)
         {
-            var queryResult = SqlGenerator.GetUpdate(instance);
+            var queryResult = SqlGenerator.GetUpdate(instance, propertiesToUpdate);
             if (SqlGenerator.Config.SqlProvider == SqlProvider.PostgreSQL)
             {
-                var updatedP = await Connection.ExecuteAsync(queryResult.GetSql(), instance, transaction) > 0;
+                var updatedP = await Connection.ExecuteAsync(queryResult.GetSql(), instance, transaction).ConfigureAwait(false) > 0;
                 return (updatedP, null);
             }
 
-            var updated = await Connection.ExecuteAsync(queryResult.GetSql().Split(";")[0], instance, transaction) > 0;
+            var updated = await Connection.ExecuteAsync(queryResult.GetSql().Split(";")[0], instance, transaction).ConfigureAwait(false) > 0;
             TEntity data =
-                (await Connection.QueryAsync<TEntity>(queryResult.GetSql(), queryResult.Param, transaction))
+                (await Connection.QueryAsync<TEntity>(queryResult.GetSql(), queryResult.Param, transaction).ConfigureAwait(false))
                 .FirstOrDefault();
             return (updated, data);
 
@@ -64,15 +64,15 @@ namespace Dapper.Repositories
         }
 
         /// <inheritdoc />
-        public virtual (bool, TEntity) Update(Expression<Func<TEntity, bool>> predicate, TEntity instance)
+        public virtual (bool, TEntity) Update(Expression<Func<TEntity, bool>> predicate, TEntity instance, Expression<Func<TEntity, object>> propertiesToUpdate)
         {
-            return Update(predicate, instance, null);
+            return Update(predicate, instance, propertiesToUpdate, null);
         }
 
         /// <inheritdoc />
-        public virtual (bool, TEntity) Update(Expression<Func<TEntity, bool>> predicate, TEntity instance, IDbTransaction transaction)
+        public virtual (bool, TEntity) Update(Expression<Func<TEntity, bool>> predicate, TEntity instance, Expression<Func<TEntity, object>> propertiesToUpdate, IDbTransaction transaction)
         {
-            var sqlQuery = SqlGenerator.GetUpdate(predicate, instance);
+            var sqlQuery = SqlGenerator.GetUpdate(predicate, instance, propertiesToUpdate);
             if (SqlGenerator.Config.SqlProvider == SqlProvider.PostgreSQL)
             {
                 var updatedP = Connection.Execute(sqlQuery.GetSql(), instance, transaction) > 0;
@@ -88,25 +88,24 @@ namespace Dapper.Repositories
         }
 
         /// <inheritdoc />
-        public virtual Task<(bool, TEntity)> UpdateAsync(Expression<Func<TEntity, bool>> predicate, TEntity instance)
+        public virtual Task<(bool, TEntity)> UpdateAsync(Expression<Func<TEntity, bool>> predicate, TEntity instance, Expression<Func<TEntity, object>> propertiesToUpdate)
         {
-            return UpdateAsync(predicate, instance, null);
+            return UpdateAsync(predicate, instance, propertiesToUpdate, null);
         }
 
         /// <inheritdoc />
-        public virtual async Task<(bool, TEntity)> UpdateAsync(Expression<Func<TEntity, bool>> predicate, TEntity instance, IDbTransaction transaction)
+        public virtual async Task<(bool, TEntity)> UpdateAsync(Expression<Func<TEntity, bool>> predicate, TEntity instance, Expression<Func<TEntity, object>> propertiesToUpdate, IDbTransaction transaction)
         {
-            var sqlQuery = SqlGenerator.GetUpdate(predicate, instance);
-            var queryResult = SqlGenerator.GetUpdate(instance);
+            var queryResult = SqlGenerator.GetUpdate(predicate, instance, propertiesToUpdate);
             if (SqlGenerator.Config.SqlProvider == SqlProvider.PostgreSQL)
             {
-                var updatedP = await Connection.ExecuteAsync(queryResult.GetSql(), instance, transaction) > 0;
+                var updatedP = await Connection.ExecuteAsync(queryResult.GetSql(), instance, transaction).ConfigureAwait(false) > 0;
                 return (updatedP, null);
             }
 
-            var updated = await Connection.ExecuteAsync(queryResult.GetSql().Split(";")[0], instance, transaction) > 0;
+            var updated = await Connection.ExecuteAsync(queryResult.GetSql().Split(";")[0], instance, transaction).ConfigureAwait(false) > 0;
             TEntity data =
-                (await Connection.QueryAsync<TEntity>(queryResult.GetSql(), queryResult.Param, transaction))
+                (await Connection.QueryAsync<TEntity>(queryResult.GetSql(), queryResult.Param, transaction).ConfigureAwait(false))
                 .FirstOrDefault();
             return (updated, data);
 

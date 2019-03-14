@@ -66,6 +66,13 @@ namespace Dapper.Repositories.SqlGenerator
                 RowVersionProperty = props.FirstOrDefault(p => p.GetCustomAttributes<RowVersionAttribute>().Any());
                 RowVersionPropertyMetadata = new SqlPropertyMetadata(RowVersionProperty);
             }
+
+            var manUpdateProperty = props.Where(p => p.GetCustomAttributes<MandatoryUpdateAttribute>().Any());
+            if (manUpdateProperty.Any())
+            {
+                MandatoryUpdateProperty = props.Where(p => p.GetCustomAttributes<MandatoryUpdateAttribute>().Any() && !p.GetCustomAttributes<NotMappedAttribute>().Any()).ToArray();
+                ManUpdatePropertyMetadata = MandatoryUpdateProperty.Select(x => new SqlPropertyMetadata(x)).ToArray();
+            }
         }
     }
 }

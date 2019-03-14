@@ -1,4 +1,5 @@
 ﻿using System.Data.SqlClient;
+using AutoMapper;
 using Common;
 using Dapper.Repositories.DbContext;
 using Dapper.Repositories.SqlGenerator;
@@ -8,7 +9,7 @@ namespace WebAPI_DataAccess.ApplicationContext
 {
     public partial class ApplicationDbContext : DapperDbContext, IApplicationDbContext
     {
-        public ApplicationDbContext(IOptions<ApplicationDbOptions> dbOptions)
+        public ApplicationDbContext(IOptions<ApplicationDbOptions> dbOptions, IMapper mapper)
             : base(new SqlConnection(dbOptions.Value.ConnectionString))
         {
             _config = new SqlGeneratorConfig()
@@ -17,8 +18,10 @@ namespace WebAPI_DataAccess.ApplicationContext
                 UseQuotationMarks = dbOptions.Value.UseQuotationMarks,
                 LogQuery = dbOptions.Value.LogQuery
             };
+            _mapper = mapper;
         }
 
         private readonly SqlGeneratorConfig _config;
+        private readonly IMapper _mapper;
     }
 }

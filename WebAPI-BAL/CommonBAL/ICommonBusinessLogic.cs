@@ -71,11 +71,11 @@ namespace WebAPI_BAL
             TParamsViewModel spParam, IDbTransaction transaction = null, bool manageTransaction = true)
             where TParams : class, ISProcParam;
         #endregion
-        
+
         #region Insert
-            /// <summary>
-            ///     Insert object to DB
-            /// </summary>
+        /// <summary>
+        ///     Insert object to DB
+        /// </summary>
         (bool, TEntityViewModel) Insert(ClaimsPrincipal claim, TEntityViewModel viewModelData, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
@@ -103,7 +103,17 @@ namespace WebAPI_BAL
         /// <summary>
         ///     Update object in DB
         /// </summary>
+        (bool, TEntityViewModel) Update(ClaimsPrincipal claim, Expression<Func<TEntityViewModel, object>> propertiesToUpdate, TEntityViewModel viewModelData, IDbTransaction transaction = null, bool manageTransaction = true);
+
+        /// <summary>
+        ///     Update object in DB
+        /// </summary>
         Task<(bool, TEntityViewModel)> UpdateAsync(ClaimsPrincipal claim, TEntityViewModel viewModelData, IDbTransaction transaction = null, bool manageTransaction = true);
+
+        /// <summary>
+        ///     Update object in DB
+        /// </summary>
+        Task<(bool, TEntityViewModel)> UpdateAsync(ClaimsPrincipal claim, Expression<Func<TEntityViewModel, object>> propertiesToUpdate, TEntityViewModel viewModelData, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Update object in DB
@@ -113,7 +123,17 @@ namespace WebAPI_BAL
         /// <summary>
         ///     Update object in DB
         /// </summary>
+        (bool, TEntityViewModel) Update(ClaimsPrincipal claim, Expression<Func<TEntityViewModel, bool>> where, Expression<Func<TEntityViewModel, object>> propertiesToUpdate, TEntityViewModel viewModelData, IDbTransaction transaction = null, bool manageTransaction = true);
+
+        /// <summary>
+        ///     Update object in DB
+        /// </summary>
         Task<(bool, TEntityViewModel)> UpdateAsync(ClaimsPrincipal claim, Expression<Func<TEntityViewModel, bool>> where, TEntityViewModel viewModelData, IDbTransaction transaction = null, bool manageTransaction = true);
+
+        /// <summary>
+        ///     Update object in DB
+        /// </summary>
+        Task<(bool, TEntityViewModel)> UpdateAsync(ClaimsPrincipal claim, Expression<Func<TEntityViewModel, bool>> where, Expression<Func<TEntityViewModel, object>> propertiesToUpdate, TEntityViewModel viewModelData, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Bulk Update objects in DB
@@ -123,7 +143,17 @@ namespace WebAPI_BAL
         /// <summary>
         ///     Bulk Update objects in DB
         /// </summary>
+        Task<bool> BulkUpdateAsync(ClaimsPrincipal claim, Expression<Func<TEntityViewModel, object>> propertiesToUpdate, IEnumerable<TEntityViewModel> viewModelData, IDbTransaction transaction = null, bool manageTransaction = true);
+
+        /// <summary>
+        ///     Bulk Update objects in DB
+        /// </summary>
         bool BulkUpdate(ClaimsPrincipal claim, IEnumerable<TEntityViewModel> viewModelData, IDbTransaction transaction = null, bool manageTransaction = true);
+
+        /// <summary>
+        ///     Bulk Update objects in DB
+        /// </summary>
+        bool BulkUpdate(ClaimsPrincipal claim, Expression<Func<TEntityViewModel, object>> propertiesToUpdate, IEnumerable<TEntityViewModel> viewModelData, IDbTransaction transaction = null, bool manageTransaction = true);
         #endregion 
 
         #region Delete

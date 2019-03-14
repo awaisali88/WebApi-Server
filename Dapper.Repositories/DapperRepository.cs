@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using AutoMapper;
 using Common;
 using Dapper.Repositories.SqlGenerator;
 
@@ -13,37 +14,41 @@ namespace Dapper.Repositories
         /// <summary>
         ///     Constructor
         /// </summary>
-        public DapperRepository(IDbConnection connection, bool logQuery = false)
+        public DapperRepository(IDbConnection connection, IMapper mapper, bool logQuery = false)
         {
             Connection = connection;
             SqlGenerator = new SqlGenerator<TEntity>(SqlProvider.MSSQL, logQuery: logQuery);
+            _mapper = mapper;
         }
 
         /// <summary>
         ///     Constructor
         /// </summary>
-        public DapperRepository(IDbConnection connection, SqlProvider sqlProvider, bool logQuery = false)
+        public DapperRepository(IDbConnection connection, IMapper mapper, SqlProvider sqlProvider, bool logQuery = false)
         {
             Connection = connection;
-            SqlGenerator = new SqlGenerator<TEntity>(sqlProvider, logQuery:logQuery);
+            SqlGenerator = new SqlGenerator<TEntity>(sqlProvider, logQuery: logQuery);
+            _mapper = mapper;
         }
 
         /// <summary>
         ///     Constructor
         /// </summary>
-        public DapperRepository(IDbConnection connection, ISqlGenerator<TEntity> sqlGenerator)
+        public DapperRepository(IDbConnection connection, IMapper mapper, ISqlGenerator<TEntity> sqlGenerator)
         {
             Connection = connection;
             SqlGenerator = sqlGenerator;
+            _mapper = mapper;
         }
 
         /// <summary>
         ///     Constructor
         /// </summary>
-        public DapperRepository(IDbConnection connection, SqlGeneratorConfig config)
+        public DapperRepository(IDbConnection connection, IMapper mapper, SqlGeneratorConfig config)
         {
             Connection = connection;
             SqlGenerator = new SqlGenerator<TEntity>(config);
+            _mapper = mapper;
         }
 
         /// <inheritdoc />
@@ -51,6 +56,7 @@ namespace Dapper.Repositories
 
         /// <inheritdoc />
         public ISqlGenerator<TEntity> SqlGenerator { get; }
-        
+
+        public static IMapper _mapper;
     }
 }

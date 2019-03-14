@@ -73,6 +73,9 @@ namespace Dapper.Repositories.SqlGenerator
         public bool HasRowVersion => RowVersionProperty != null;
 
         /// <inheritdoc />
+        public bool HasMandatoryProp => MandatoryUpdateProperty != null && MandatoryUpdateProperty.Any();
+
+        /// <inheritdoc />
         public PropertyInfo UpdatedAtProperty { get; protected set; }
 
         /// <inheritdoc />
@@ -82,6 +85,9 @@ namespace Dapper.Repositories.SqlGenerator
         public PropertyInfo RowVersionProperty { get; protected set; }
 
         /// <inheritdoc />
+        public PropertyInfo[] MandatoryUpdateProperty { get; protected set; }
+
+        /// <inheritdoc />
         public SqlPropertyMetadata UpdatedAtPropertyMetadata { get; protected set; }
 
         /// <inheritdoc />
@@ -89,6 +95,9 @@ namespace Dapper.Repositories.SqlGenerator
 
         /// <inheritdoc />
         public SqlPropertyMetadata RowVersionPropertyMetadata { get; protected set; }
+
+        /// <inheritdoc />
+        public SqlPropertyMetadata[] ManUpdatePropertyMetadata { get; protected set; }
 
         /// <inheritdoc />
         public bool IsIdentity => IdentitySqlProperty != null;
@@ -268,7 +277,7 @@ namespace Dapper.Repositories.SqlGenerator
             }
             else
             {
-                return GetUpdate(entity);
+                return GetUpdate(entity, null);
                 //sqlQuery.SqlBuilder.Append("UPDATE " + TableName + " SET " + StatusPropertyName + " = " + LogicalDeleteValue);
                 //
                 //if (HasUpdatedAt)
@@ -297,7 +306,7 @@ namespace Dapper.Repositories.SqlGenerator
             }
             else
             {
-                return GetUpdate(predicate, entity);
+                return GetUpdate(predicate, entity, null);
 
                 //sqlQuery.SqlBuilder.Append("UPDATE " + TableName + " SET " + StatusPropertyName + " = " + LogicalDeleteValue);
                 //sqlQuery.SqlBuilder.Append(HasUpdatedAt
@@ -405,11 +414,26 @@ namespace Dapper.Repositories.SqlGenerator
         }
 
         /// <inheritdoc />
-        public virtual SqlQuery GetUpdate(TEntity entity)
+        public virtual SqlQuery GetUpdate(TEntity entity, Expression<Func<TEntity, object>> propertiesToUpdate)
         {
             var properties = SqlProperties.Where(p =>
                 !KeySqlProperties.Any(k => k.PropertyName.Equals(p.PropertyName, StringComparison.OrdinalIgnoreCase)) &&
                 !p.IgnoreUpdate && !p.RowVersionProp).ToArray();
+
+            if (propertiesToUpdate != null)
+            {
+                string[] updateProperties = ExpressionHelper.GetMemberName(propertiesToUpdate);
+                if (HasMandatoryProp)
+                    properties = properties.Where(x =>
+                            updateProperties.Contains(x.PropertyName) ||
+                            MandatoryUpdateProperty.Select(y => y.Name).Contains(x.PropertyName))
+                        .ToArray();
+                else
+                    properties = properties.Where(x =>
+                            updateProperties.Contains(x.PropertyName))
+                        .ToArray();
+            }
+
             if (!properties.Any())
                 throw new ArgumentException("Can't update without [Key]");
 
@@ -455,10 +479,24 @@ namespace Dapper.Repositories.SqlGenerator
 
 
         /// <inheritdoc />
-        public virtual SqlQuery GetUpdate(Expression<Func<TEntity, bool>> predicate, TEntity entity)
+        public virtual SqlQuery GetUpdate(Expression<Func<TEntity, bool>> predicate, TEntity entity, Expression<Func<TEntity, object>> propertiesToUpdate)
         {
             var properties = SqlProperties.Where(p =>
                 !KeySqlProperties.Any(k => k.PropertyName.Equals(p.PropertyName, StringComparison.OrdinalIgnoreCase)) && !p.IgnoreUpdate && !p.RowVersionProp);
+
+            if (propertiesToUpdate != null)
+            {
+                string[] updateProperties = ExpressionHelper.GetMemberName(propertiesToUpdate);
+                if (HasMandatoryProp)
+                    properties = properties.Where(x =>
+                            updateProperties.Contains(x.PropertyName) ||
+                            MandatoryUpdateProperty.Select(y => y.Name).Contains(x.PropertyName))
+                        .ToArray();
+                else
+                    properties = properties.Where(x =>
+                            updateProperties.Contains(x.PropertyName))
+                        .ToArray();
+            }
 
             if (HasUpdatedAt)
                 UpdatedAtProperty.SetValue(entity, DateTime.UtcNow);
@@ -497,7 +535,7 @@ namespace Dapper.Repositories.SqlGenerator
 
 
         /// <inheritdoc />
-        public virtual SqlQuery GetBulkUpdate(IEnumerable<TEntity> entities)
+        public virtual SqlQuery GetBulkUpdate(IEnumerable<TEntity> entities, Expression<Func<TEntity, object>> propertiesToUpdate)
         {
             var entitiesArray = entities as TEntity[] ?? entities.ToArray();
             if (!entitiesArray.Any())
@@ -507,6 +545,20 @@ namespace Dapper.Repositories.SqlGenerator
 
             var properties = SqlProperties.Where(p =>
                 !KeySqlProperties.Any(k => k.PropertyName.Equals(p.PropertyName, StringComparison.OrdinalIgnoreCase)) && !p.IgnoreUpdate && !p.RowVersionProp).ToArray();
+
+            if (propertiesToUpdate != null)
+            {
+                string[] updateProperties = ExpressionHelper.GetMemberName(propertiesToUpdate);
+                if (HasMandatoryProp)
+                    properties = properties.Where(x =>
+                            updateProperties.Contains(x.PropertyName) ||
+                            MandatoryUpdateProperty.Select(y => y.Name).Contains(x.PropertyName))
+                        .ToArray();
+                else
+                    properties = properties.Where(x =>
+                            updateProperties.Contains(x.PropertyName))
+                        .ToArray();
+            }
 
             var query = new SqlQuery();
 
@@ -805,29 +857,60 @@ namespace Dapper.Repositories.SqlGenerator
             {
                 var innerBody = body;
                 var methodName = innerBody.Method.Name;
-                switch (methodName)
+                if (innerBody.Object != null && innerBody.Object.Type == typeof(string))
                 {
-                    case "Contains":
-                        {
-                            var propertyName = ExpressionHelper.GetPropertyNamePath(innerBody, out var isNested);
+                    switch (methodName)
+                    {
+                        case "Contains":
+                        case "StartsWith":
+                        case "EndsWith":
+                            {
+                                //var propertyName =
+                                //    (innerBody.Object.GetType().GetProperty("Member")
+                                //        .GetValue(innerBody.Object) as PropertyInfo)?.Name;
 
-                            if (!SqlProperties.Select(x => x.PropertyName).Contains(propertyName) &&
-                                !SqlJoinProperties.Select(x => x.PropertyName).Contains(propertyName))
-                                throw new NotSupportedException("predicate can't parse");
+                                var propertyName = ExpressionHelper.GetPropertyNamePath(innerBody.Object, out var isNested);
+                                var checkValue = innerBody.Arguments.Any()
+                                    ? ExpressionHelper.GetValue(innerBody.Arguments[0])
+                                    : null;
+                                var propertyValue = methodName == "Contains" ? $"%{checkValue}%" :
+                                    methodName == "StartsWith" ? $"{checkValue}%" :
+                                    methodName == "EndsWith" ? $"%{checkValue}" : $"{checkValue}";
+                                var opr = "LIKE";
+                                var link = ExpressionHelper.GetSqlOperator(linkingType);
+                                queryProperties.Add(new QueryParameter(link, propertyName, propertyValue, opr, isNested));
+                                break;
+                            }
+                        default:
+                            throw new NotSupportedException($"'{methodName}' method is not supported");
+                    }
+                }
+                else
+                {
+                    switch (methodName)
+                    {
+                        case "Contains":
+                            {
+                                var propertyName = ExpressionHelper.GetPropertyNamePath(innerBody, out var isNested);
 
-                            var propertyValue = ExpressionHelper.GetValuesFromCollection(innerBody);
-                            var opr = ExpressionHelper.GetMethodCallSqlOperator(methodName);
-                            var link = ExpressionHelper.GetSqlOperator(linkingType);
-                            queryProperties.Add(new QueryParameter(link, propertyName, propertyValue, opr, isNested));
-                            break;
-                        }
-                    default:
-                        throw new NotSupportedException($"'{methodName}' method is not supported");
+                                if (!SqlProperties.Select(x => x.PropertyName).Contains(propertyName) &&
+                                    !SqlJoinProperties.Select(x => x.PropertyName).Contains(propertyName))
+                                    throw new NotSupportedException("predicate can't parse");
+
+                                var propertyValue = ExpressionHelper.GetValuesFromCollection(innerBody);
+                                var opr = ExpressionHelper.GetMethodCallSqlOperator(methodName);
+                                var link = ExpressionHelper.GetSqlOperator(linkingType);
+                                queryProperties.Add(new QueryParameter(link, propertyName, propertyValue, opr, isNested));
+                                break;
+                            }
+                        default:
+                            throw new NotSupportedException($"'{methodName}' method is not supported");
+                    }
                 }
             }
             else if (expr is BinaryExpression)
             {
-                var innerbody = (BinaryExpression) expr;
+                var innerbody = (BinaryExpression)expr;
                 if (innerbody.NodeType != ExpressionType.AndAlso && innerbody.NodeType != ExpressionType.OrElse)
                 {
                     var propertyName = ExpressionHelper.GetPropertyNamePath(innerbody, out var isNested);

@@ -12,6 +12,7 @@ using WebAPI_BAL.ApplicationBAL;
 using WebAPI_DataAccess.ApplicationContext;
 using WebAPI_Model;
 using WebAPI_Model.Test;
+using WebAPI_Server.AppStart;
 using WebAPI_ViewModel.DTO;
 
 namespace WebAPI_Server.Controllers.v1
@@ -61,7 +62,7 @@ namespace WebAPI_Server.Controllers.v1
         [HttpPut("updatedata")]
         public IActionResult UpdateData([FromBody] TestRepoViewModel data)
         {
-            (bool, TestRepoViewModel) result = _testRepoBal.Update(User, data);
+            (bool, TestRepoViewModel) result = _testRepoBal.Update(User, x => new {x.FirstName, x.LastName }, data);
             if (result.Item1)
                 return Ok(result.Item2, InfoMessages.CommonInfoMessage);
 
