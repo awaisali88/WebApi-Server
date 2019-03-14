@@ -107,7 +107,7 @@ namespace WebAPI_Server.Controllers.v1
             //var data = _testRepoBal.Update(User, x => x.FirstName == "Update With In Query", x => x.FirstName,
             //    new TestRepoViewModel() { FirstName = "Update With In Query 123", RowVersion = rowVersion });
 
-            //Not Working
+            //Working
             var data = _testRepoBal.Update(User, x => testId.Contains(x.Id), x => x.FirstName,
                 new TestRepoViewModel() { FirstName = "Update With In Query 456" });
 
