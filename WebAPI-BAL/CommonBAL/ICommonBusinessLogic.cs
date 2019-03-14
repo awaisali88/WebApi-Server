@@ -118,22 +118,22 @@ namespace WebAPI_BAL
         /// <summary>
         ///     Update object in DB
         /// </summary>
-        (bool, TEntityViewModel) Update(ClaimsPrincipal claim, Expression<Func<TEntityViewModel, bool>> where, TEntityViewModel viewModelData, IDbTransaction transaction = null, bool manageTransaction = true);
+        (bool, IEnumerable<TEntityViewModel>) Update(ClaimsPrincipal claim, Expression<Func<TEntityViewModel, bool>> where, TEntityViewModel viewModelData, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Update object in DB
         /// </summary>
-        (bool, TEntityViewModel) Update(ClaimsPrincipal claim, Expression<Func<TEntityViewModel, bool>> where, Expression<Func<TEntityViewModel, object>> propertiesToUpdate, TEntityViewModel viewModelData, IDbTransaction transaction = null, bool manageTransaction = true);
+        (bool, IEnumerable<TEntityViewModel>) Update(ClaimsPrincipal claim, Expression<Func<TEntityViewModel, bool>> where, Expression<Func<TEntityViewModel, object>> propertiesToUpdate, TEntityViewModel viewModelData, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Update object in DB
         /// </summary>
-        Task<(bool, TEntityViewModel)> UpdateAsync(ClaimsPrincipal claim, Expression<Func<TEntityViewModel, bool>> where, TEntityViewModel viewModelData, IDbTransaction transaction = null, bool manageTransaction = true);
+        Task<(bool, IEnumerable<TEntityViewModel>)> UpdateAsync(ClaimsPrincipal claim, Expression<Func<TEntityViewModel, bool>> where, TEntityViewModel viewModelData, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Update object in DB
         /// </summary>
-        Task<(bool, TEntityViewModel)> UpdateAsync(ClaimsPrincipal claim, Expression<Func<TEntityViewModel, bool>> where, Expression<Func<TEntityViewModel, object>> propertiesToUpdate, TEntityViewModel viewModelData, IDbTransaction transaction = null, bool manageTransaction = true);
+        Task<(bool, IEnumerable<TEntityViewModel>)> UpdateAsync(ClaimsPrincipal claim, Expression<Func<TEntityViewModel, bool>> where, Expression<Func<TEntityViewModel, object>> propertiesToUpdate, TEntityViewModel viewModelData, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Bulk Update objects in DB

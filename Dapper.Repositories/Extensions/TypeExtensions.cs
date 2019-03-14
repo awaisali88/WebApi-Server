@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Reflection;
 
@@ -20,6 +22,58 @@ namespace Dapper.Repositories.Extensions
 
             return result;
         }
+
+        public static dynamic ToDynamic(this IDictionary<string, object> dictionary)
+        {
+            var expandoObj = new ExpandoObject();
+            var expandoObjCollection = (ICollection<KeyValuePair<string, object>>)expandoObj;
+
+            foreach (var keyValuePair in dictionary)
+            {
+                expandoObjCollection.Add(keyValuePair);
+            }
+            dynamic eoDynamic = expandoObj;
+            return eoDynamic;
+        }
+
+        public static T ToObject<T>(this IDictionary<string, object> source)
+            where T : class
+        {
+            var someObject = Activator.CreateInstance<T>();
+            var someObjectType = someObject.GetType();
+
+            foreach (var item in source)
+            {
+                someObjectType
+                    .GetProperty(item.Key)
+                    .SetValue(someObject, item.Value, null);
+            }
+
+            return someObject;
+        }
+
+        public static T ToObject<T>(this IDictionary<string, object> source, T destination)
+            where T : class
+        {
+            var destObjectType = destination.GetType();
+
+            foreach (var item in source)
+            {
+                destObjectType
+                    .GetProperty(item.Key)
+                    .SetValue(destination, item.Value, null);
+            }
+
+            return destination;
+        }
+
+        public static IDictionary<string, object> ToDictionary<T>(this T data) where T: class 
+        {
+            return data.GetType()
+                .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                .ToDictionary(prop => prop.Name, prop => prop.GetValue(data));
+        }
+
 
 
         public static bool IsGenericType(this Type type)

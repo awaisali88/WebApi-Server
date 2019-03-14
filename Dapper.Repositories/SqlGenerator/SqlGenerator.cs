@@ -512,19 +512,27 @@ namespace Dapper.Repositories.SqlGenerator
             {
                 case SqlProvider.MSSQL:
                     //query.SqlBuilder.Append(" SELECT SCOPE_IDENTITY() AS " + IdentitySqlProperty.ColumnName);
-                    query.SqlBuilder.Append(" SELECT * FROM " + TableName + " WHERE " + string.Join(" AND ",
-                                                KeySqlProperties.Where(p => !p.IgnoreUpdate && !p.RowVersionProp).Select(p => p.ColumnName + " = @" + p.PropertyName)));
+                    //query.SqlBuilder.Append("; SELECT * FROM " + TableName + " WHERE " + string.Join(" AND ",
+                    //                            KeySqlProperties.Where(p => !p.IgnoreUpdate && !p.RowVersionProp).Select(p => p.ColumnName + " = @" + p.PropertyName)));
+                    query.SqlBuilder.Append("; SELECT * FROM " + TableName + " ");
+                    AppendWherePredicateQuery(query, predicate, QueryType.Update);
+                    if (HasRowVersion)
+                        query.SqlBuilder.Append(" AND " + RowVersionPropertyMetadata.ColumnName + " = @" + RowVersionPropertyMetadata.PropertyName);
                     break;
-
+            
                 case SqlProvider.MySQL:
                     //query.SqlBuilder.Append("; SELECT CONVERT(LAST_INSERT_ID(), SIGNED INTEGER) AS " + IdentitySqlProperty.ColumnName);
-                    query.SqlBuilder.Append("; SELECT * FROM " + TableName + " WHERE " + string.Join(" AND ",
-                                                KeySqlProperties.Where(p => !p.IgnoreUpdate && !p.RowVersionProp).Select(p => p.ColumnName + " = @" + p.PropertyName)));
+                    //query.SqlBuilder.Append("; SELECT * FROM " + TableName + " WHERE " + string.Join(" AND ",
+                    //                            KeySqlProperties.Where(p => !p.IgnoreUpdate && !p.RowVersionProp).Select(p => p.ColumnName + " = @" + p.PropertyName)));
+                    query.SqlBuilder.Append("; SELECT * FROM " + TableName + " ");
+                    AppendWherePredicateQuery(query, predicate, QueryType.Update);
+                    if (HasRowVersion)
+                        query.SqlBuilder.Append(" AND " + RowVersionPropertyMetadata.ColumnName + " = @" + RowVersionPropertyMetadata.PropertyName);
                     break;
-
+            
                 case SqlProvider.PostgreSQL:
                     throw new ArgumentOutOfRangeException();
-
+            
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -616,13 +624,13 @@ namespace Dapper.Repositories.SqlGenerator
                     string columnName;
                     if (item.NestedProperty)
                     {
-                        var joinProperty = SqlJoinProperties.First(x => x.PropertyName == item.PropertyName);
+                        var joinProperty = SqlJoinProperties.First(x => x.PropertyName == item.PropertyName.Replace("_where",""));
                         tableName = joinProperty.TableAlias;
                         columnName = joinProperty.ColumnName;
                     }
                     else
                     {
-                        columnName = SqlProperties.First(x => x.PropertyName == item.PropertyName).ColumnName;
+                        columnName = SqlProperties.First(x => x.PropertyName == item.PropertyName.Replace("_where", "")).ColumnName;
                     }
 
                     if (!string.IsNullOrEmpty(item.LinkingOperator) && i > 0)
@@ -878,7 +886,7 @@ namespace Dapper.Repositories.SqlGenerator
                                     methodName == "EndsWith" ? $"%{checkValue}" : $"{checkValue}";
                                 var opr = "LIKE";
                                 var link = ExpressionHelper.GetSqlOperator(linkingType);
-                                queryProperties.Add(new QueryParameter(link, propertyName, propertyValue, opr, isNested));
+                                queryProperties.Add(new QueryParameter(link, propertyName + "_where", propertyValue, opr, isNested));
                                 break;
                             }
                         default:
@@ -887,9 +895,24 @@ namespace Dapper.Repositories.SqlGenerator
                 }
                 else
                 {
-                    switch (methodName)
-                    {
-                        case "Contains":
+                    //if (innerBody.Method.ReflectedType == typeof(System.Linq.Enumerable) && methodName == "Contains" && innerBody.Arguments.Count == 2)
+                    //{
+                    //    string expProp = ExpressionHelper.GetMemberName(ExpressionHelper.GetMemberExpression(innerBody.Arguments[1]));
+                    //    var propertyName = !string.IsNullOrEmpty(expProp) ? expProp : "";
+                    //
+                    //    if (!SqlProperties.Select(x => x.PropertyName).Contains(propertyName) &&
+                    //        !SqlJoinProperties.Select(x => x.PropertyName).Contains(propertyName))
+                    //        throw new NotSupportedException("predicate can't parse");
+                    //
+                    //    var propertyValue = ExpressionHelper.GetValue(innerBody.Arguments[0]);
+                    //    var opr = ExpressionHelper.GetMethodCallSqlOperator(methodName);
+                    //    var link = ExpressionHelper.GetSqlOperator(linkingType);
+                    //    queryProperties.Add(new QueryParameter(link, propertyName, propertyValue, opr, false));
+                    //}
+                    //else
+                        switch (methodName)
+                        {
+                            case "Contains":
                             {
                                 var propertyName = ExpressionHelper.GetPropertyNamePath(innerBody, out var isNested);
 
@@ -900,12 +923,12 @@ namespace Dapper.Repositories.SqlGenerator
                                 var propertyValue = ExpressionHelper.GetValuesFromCollection(innerBody);
                                 var opr = ExpressionHelper.GetMethodCallSqlOperator(methodName);
                                 var link = ExpressionHelper.GetSqlOperator(linkingType);
-                                queryProperties.Add(new QueryParameter(link, propertyName, propertyValue, opr, isNested));
+                                queryProperties.Add(new QueryParameter(link, propertyName + "_where", propertyValue, opr, isNested));
                                 break;
                             }
-                        default:
-                            throw new NotSupportedException($"'{methodName}' method is not supported");
-                    }
+                            default:
+                                throw new NotSupportedException($"'{methodName}' method is not supported");
+                        }
                 }
             }
             else if (expr is BinaryExpression)
@@ -923,7 +946,7 @@ namespace Dapper.Repositories.SqlGenerator
                     var opr = ExpressionHelper.GetSqlOperator(innerbody.NodeType);
                     var link = ExpressionHelper.GetSqlOperator(linkingType);
 
-                    queryProperties.Add(new QueryParameter(link, propertyName, propertyValue, opr, isNested));
+                    queryProperties.Add(new QueryParameter(link, propertyName + "_where", propertyValue, opr, isNested));
                 }
                 else
                 {

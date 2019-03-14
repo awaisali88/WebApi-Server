@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using Dapper.Repositories.Extensions;
+using Serilog;
 
 namespace Dapper.Repositories.SqlGenerator
 {
@@ -205,6 +206,26 @@ namespace Dapper.Repositories.SqlGenerator
             }
 
             return GetMemberName(expression.Body);
+        }
+
+        public static string GetMemberName(
+            MemberExpression expression)
+        {
+            if (expression == null)
+            {
+                throw new ArgumentException(
+                    "The expression cannot be null.");
+            }
+
+            try
+            {
+                return expression.Member.Name;
+            }
+            catch (Exception e)
+            {
+                Log.Fatal(e, e.Message);
+                return "";
+            }
         }
 
         public static string[] GetMemberName<T>(

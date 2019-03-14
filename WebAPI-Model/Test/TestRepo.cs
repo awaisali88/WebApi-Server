@@ -16,5 +16,8 @@ namespace WebAPI_Model.Test
         public string LastName { get; set; }
 
         public string EmailAddress { get; set; }
+
+        [NotMapped]
+        public override byte[] RowVersion { get => base.RowVersion; set => base.RowVersion = value; }
     }
 }

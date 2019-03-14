@@ -1,8 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Net.Http;
+using System.Text;
 using Common;
 using Common.Messages;
+using MicroElements.Swashbuckle.FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -69,6 +73,49 @@ namespace WebAPI_Server.Controllers.v1
             //return StatusCodeResult(StatusCodes.Status400BadRequest, result.Item2, ErrorMessages.RecordNotFoundUpdate);
 
             return BadRequest(ErrorMessages.RecordNotFoundUpdate, result.Item2);
+        }
+
+
+        /// <summary>
+        /// Test API for repository
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        [HttpPut("updatetestdata")]
+        [AllowAnonymous]
+        [AllowNoAccessToken]
+        public IActionResult UpdateTestData()
+        {
+            //var ids = new List<int> { 33, 34 };
+            List<int> testId = new List<int> { 38, 39, 40 };
+
+            //(bool, TestRepoViewModel) result = _testRepoBal.Update(User, x=> x.FirstName.StartsWith("asd"), 
+            //    x => new { x.FirstName, x.LastName },
+            //    new TestRepoViewModel(){FirstName = "Update With In Query",LastName = "Last Name IN Q"});
+            //if (result.Item1)
+            //    return Ok(result.Item2, InfoMessages.CommonInfoMessage);
+
+            var allData = _testRepoBal.FindAll();
+
+            //Working
+            //var rowVersion = allData.FirstOrDefault(x => x.Id == 33).RowVersion;
+            //var data = _testRepoBal.Update(User, x => x.Id == 33, x => x.FirstName,
+            //    new TestRepoViewModel() {FirstName = "Update With In Query 123465", RowVersion = rowVersion });
+
+            //Not Working
+            //var rowVersion = allData.FirstOrDefault(x => x.FirstName == "Update With In Query").RowVersion;
+            //var data = _testRepoBal.Update(User, x => x.FirstName == "Update With In Query", x => x.FirstName,
+            //    new TestRepoViewModel() { FirstName = "Update With In Query 123", RowVersion = rowVersion });
+
+            //Not Working
+            var data = _testRepoBal.Update(User, x => testId.Contains(x.Id), x => x.FirstName,
+                new TestRepoViewModel() { FirstName = "Update With In Query 456" });
+
+            return Ok(data, InfoMessages.CommonInfoMessage);
+
+            //return StatusCodeResult(StatusCodes.Status400BadRequest, result.Item2, ErrorMessages.RecordNotFoundUpdate);
+
+            //return BadRequest(ErrorMessages.RecordNotFoundUpdate, result.Item2);
         }
 
         /// <summary>

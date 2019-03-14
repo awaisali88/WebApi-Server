@@ -612,23 +612,23 @@ namespace Dapper.Repositories
         /// <summary>
         ///     Update object in DB
         /// </summary>
-        (bool, TEntity) Update(Expression<Func<TEntity, bool>> predicate, TEntity instance, Expression<Func<TEntity, object>> propertiesToUpdate);
+        (bool, IEnumerable<TEntity>) Update(Expression<Func<TEntity, bool>> predicate, TEntity instance, Expression<Func<TEntity, object>> propertiesToUpdate);
 
 
         /// <summary>
         ///     Update object in DB
         /// </summary>
-        (bool, TEntity) Update(Expression<Func<TEntity, bool>> predicate, TEntity instance, Expression<Func<TEntity, object>> propertiesToUpdate, IDbTransaction transaction);
+        (bool, IEnumerable<TEntity>) Update(Expression<Func<TEntity, bool>> predicate, TEntity instance, Expression<Func<TEntity, object>> propertiesToUpdate, IDbTransaction transaction);
 
         /// <summary>
         ///     Update object in DB
         /// </summary>
-        Task<(bool, TEntity)> UpdateAsync(Expression<Func<TEntity, bool>> predicate, TEntity instance, Expression<Func<TEntity, object>> propertiesToUpdate);
+        Task<(bool, IEnumerable<TEntity>)> UpdateAsync(Expression<Func<TEntity, bool>> predicate, TEntity instance, Expression<Func<TEntity, object>> propertiesToUpdate);
 
         /// <summary>
         ///     Update object in DB
         /// </summary>
-        Task<(bool, TEntity)> UpdateAsync(Expression<Func<TEntity, bool>> predicate, TEntity instance, Expression<Func<TEntity, object>> propertiesToUpdate, IDbTransaction transaction);
+        Task<(bool, IEnumerable<TEntity>)> UpdateAsync(Expression<Func<TEntity, bool>> predicate, TEntity instance, Expression<Func<TEntity, object>> propertiesToUpdate, IDbTransaction transaction);
 
 
         /// <summary>

@@ -8,7 +8,7 @@ namespace Dapper.Repositories
     /// <summary>
     ///     Base Repository
     /// </summary>
-    public partial class DapperRepository<TEntity> : IDapperRepository<TEntity>
+    public partial class DapperRepository<TEntity> : IDapperRepository<TEntity> 
         where TEntity : class
     {
         /// <summary>

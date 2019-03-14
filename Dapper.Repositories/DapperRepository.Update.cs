@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Common;
+using Dapper.Repositories.Extensions;
 
 namespace Dapper.Repositories
 {
@@ -54,7 +56,7 @@ namespace Dapper.Repositories
 
             var updated = await Connection.ExecuteAsync(queryResult.GetSql().Split(";")[0], instance, transaction).ConfigureAwait(false) > 0;
             TEntity data =
-                (await Connection.QueryAsync<TEntity>(queryResult.GetSql(), queryResult.Param, transaction).ConfigureAwait(false))
+                (await Connection.QueryAsync<TEntity>(queryResult.GetSql().Split(";")[1], queryResult.Param, transaction).ConfigureAwait(false))
                 .FirstOrDefault();
             return (updated, data);
 
@@ -64,13 +66,13 @@ namespace Dapper.Repositories
         }
 
         /// <inheritdoc />
-        public virtual (bool, TEntity) Update(Expression<Func<TEntity, bool>> predicate, TEntity instance, Expression<Func<TEntity, object>> propertiesToUpdate)
+        public virtual (bool, IEnumerable<TEntity>) Update(Expression<Func<TEntity, bool>> predicate, TEntity instance, Expression<Func<TEntity, object>> propertiesToUpdate)
         {
             return Update(predicate, instance, propertiesToUpdate, null);
         }
 
         /// <inheritdoc />
-        public virtual (bool, TEntity) Update(Expression<Func<TEntity, bool>> predicate, TEntity instance, Expression<Func<TEntity, object>> propertiesToUpdate, IDbTransaction transaction)
+        public virtual (bool, IEnumerable<TEntity>) Update(Expression<Func<TEntity, bool>> predicate, TEntity instance, Expression<Func<TEntity, object>> propertiesToUpdate, IDbTransaction transaction)
         {
             var sqlQuery = SqlGenerator.GetUpdate(predicate, instance, propertiesToUpdate);
             if (SqlGenerator.Config.SqlProvider == SqlProvider.PostgreSQL)
@@ -78,8 +80,23 @@ namespace Dapper.Repositories
                 var updatedP = Connection.Execute(sqlQuery.GetSql(), instance, transaction) > 0;
                 return (updatedP, null);
             }
-            var updated = Connection.Execute(sqlQuery.GetSql().Split(";")[0], instance, transaction) > 0;
-            TEntity newEntity = Connection.Query<TEntity>(sqlQuery.GetSql().Split(";")[1], sqlQuery.Param, transaction).FirstOrDefault();
+
+            object sqlGeneratedParam;
+            if (sqlQuery.Param is Dictionary<string, object> qParams)
+            {
+                var entityData = instance.ToDictionary();
+                foreach (var qParam in qParams)
+                    entityData.Add(qParam.Key, qParam.Value);
+                sqlGeneratedParam = entityData;
+            }
+            else
+                sqlGeneratedParam = instance;
+            //
+            //object paramResult = TypeMerger.Merge(instance, sqlGeneratedParam);
+            //object paramResult = _mapper.Map(instance, sqlGeneratedParam);
+
+            var updated = Connection.Execute(sqlQuery.GetSql().Split(";")[0], sqlGeneratedParam, transaction) > 0;
+            IEnumerable<TEntity> newEntity = Connection.Query<TEntity>(sqlQuery.GetSql().Split(";")[1], sqlGeneratedParam, transaction);
             return (updated, newEntity);
 
 
@@ -88,13 +105,13 @@ namespace Dapper.Repositories
         }
 
         /// <inheritdoc />
-        public virtual Task<(bool, TEntity)> UpdateAsync(Expression<Func<TEntity, bool>> predicate, TEntity instance, Expression<Func<TEntity, object>> propertiesToUpdate)
+        public virtual Task<(bool, IEnumerable<TEntity>)> UpdateAsync(Expression<Func<TEntity, bool>> predicate, TEntity instance, Expression<Func<TEntity, object>> propertiesToUpdate)
         {
             return UpdateAsync(predicate, instance, propertiesToUpdate, null);
         }
 
         /// <inheritdoc />
-        public virtual async Task<(bool, TEntity)> UpdateAsync(Expression<Func<TEntity, bool>> predicate, TEntity instance, Expression<Func<TEntity, object>> propertiesToUpdate, IDbTransaction transaction)
+        public virtual async Task<(bool, IEnumerable<TEntity>)> UpdateAsync(Expression<Func<TEntity, bool>> predicate, TEntity instance, Expression<Func<TEntity, object>> propertiesToUpdate, IDbTransaction transaction)
         {
             var queryResult = SqlGenerator.GetUpdate(predicate, instance, propertiesToUpdate);
             if (SqlGenerator.Config.SqlProvider == SqlProvider.PostgreSQL)
@@ -103,10 +120,20 @@ namespace Dapper.Repositories
                 return (updatedP, null);
             }
 
-            var updated = await Connection.ExecuteAsync(queryResult.GetSql().Split(";")[0], instance, transaction).ConfigureAwait(false) > 0;
-            TEntity data =
-                (await Connection.QueryAsync<TEntity>(queryResult.GetSql(), queryResult.Param, transaction).ConfigureAwait(false))
-                .FirstOrDefault();
+            object sqlGeneratedParam;
+            if (queryResult.Param is Dictionary<string, object> qParams)
+            {
+                var entityData = instance.ToDictionary();
+                foreach (var qParam in qParams)
+                    entityData.Add(qParam.Key, qParam.Value);
+                sqlGeneratedParam = entityData;
+            }
+            else
+                sqlGeneratedParam = instance;
+
+            var updated = await Connection.ExecuteAsync(queryResult.GetSql().Split(";")[0], sqlGeneratedParam, transaction).ConfigureAwait(false) > 0;
+            IEnumerable<TEntity> data =
+                (await Connection.QueryAsync<TEntity>(queryResult.GetSql().Split(";")[1], sqlGeneratedParam, transaction).ConfigureAwait(false));
             return (updated, data);
 
             //var sqlQuery = SqlGenerator.GetUpdate(predicate, instance);

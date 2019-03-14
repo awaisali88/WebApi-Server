@@ -511,7 +511,7 @@ namespace WebAPI_BAL
             return (data.Item1, _mapper.Map<TEntityViewModel>(data.Item2));
         }
 
-        public virtual (bool, TEntityViewModel) Update(ClaimsPrincipal claim, Expression<Func<TEntityViewModel, bool>> where, TEntityViewModel viewModelData, IDbTransaction transaction = null,
+        public virtual (bool, IEnumerable<TEntityViewModel>) Update(ClaimsPrincipal claim, Expression<Func<TEntityViewModel, bool>> where, TEntityViewModel viewModelData, IDbTransaction transaction = null,
             bool manageTransaction = true)
         {
             TEntity entityData = _mapper.Map<TEntity>(viewModelData);
@@ -519,12 +519,12 @@ namespace WebAPI_BAL
 
             entityData = ExtBusinessLogic.GetUpdateEntity(entityData, ExtBusinessLogic.UserValue(claim));
 
-            (bool, TEntity) data = ManageOrHandleTransaction(_repo.Update, entityPredicate, entityData, (Expression<Func<TEntity, object>>)null, transaction, manageTransaction);
+            (bool, IEnumerable<TEntity>) data = ManageOrHandleTransaction(_repo.Update, entityPredicate, entityData, (Expression<Func<TEntity, object>>)null, transaction, manageTransaction);
 
-            return (data.Item1, _mapper.Map<TEntityViewModel>(data.Item2));
+            return (data.Item1, _mapper.Map<IEnumerable<TEntityViewModel>>(data.Item2));
         }
 
-        public virtual (bool, TEntityViewModel) Update(ClaimsPrincipal claim, Expression<Func<TEntityViewModel, bool>> where, Expression<Func<TEntityViewModel, object>> propertiesToUpdate, TEntityViewModel viewModelData, IDbTransaction transaction = null,
+        public virtual (bool, IEnumerable<TEntityViewModel>) Update(ClaimsPrincipal claim, Expression<Func<TEntityViewModel, bool>> where, Expression<Func<TEntityViewModel, object>> propertiesToUpdate, TEntityViewModel viewModelData, IDbTransaction transaction = null,
             bool manageTransaction = true)
         {
             TEntity entityData = _mapper.Map<TEntity>(viewModelData);
@@ -533,12 +533,12 @@ namespace WebAPI_BAL
 
             entityData = ExtBusinessLogic.GetUpdateEntity(entityData, ExtBusinessLogic.UserValue(claim));
 
-            (bool, TEntity) data = ManageOrHandleTransaction(_repo.Update, entityPredicate, entityData, updateProperties, transaction, manageTransaction);
+            (bool, IEnumerable<TEntity>) data = ManageOrHandleTransaction(_repo.Update, entityPredicate, entityData, updateProperties, transaction, manageTransaction);
 
-            return (data.Item1, _mapper.Map<TEntityViewModel>(data.Item2));
+            return (data.Item1, _mapper.Map<IEnumerable<TEntityViewModel>>(data.Item2));
         }
 
-        public virtual async Task<(bool, TEntityViewModel)> UpdateAsync(ClaimsPrincipal claim, Expression<Func<TEntityViewModel, bool>> where, TEntityViewModel viewModelData, IDbTransaction transaction = null,
+        public virtual async Task<(bool, IEnumerable<TEntityViewModel>)> UpdateAsync(ClaimsPrincipal claim, Expression<Func<TEntityViewModel, bool>> where, TEntityViewModel viewModelData, IDbTransaction transaction = null,
             bool manageTransaction = true)
         {
             TEntity entityData = _mapper.Map<TEntity>(viewModelData);
@@ -546,13 +546,13 @@ namespace WebAPI_BAL
 
             entityData = ExtBusinessLogic.GetUpdateEntity(entityData, ExtBusinessLogic.UserValue(claim));
 
-            Task<(bool, TEntity)> dataAsync = ManageOrHandleTransaction(_repo.UpdateAsync, entityPredicate, entityData, (Expression<Func<TEntity, object>>)null, transaction, manageTransaction);
-            (bool, TEntity) data = await dataAsync;
+            Task<(bool, IEnumerable<TEntity>)> dataAsync = ManageOrHandleTransaction(_repo.UpdateAsync, entityPredicate, entityData, (Expression<Func<TEntity, object>>)null, transaction, manageTransaction);
+            (bool, IEnumerable<TEntity>) data = await dataAsync;
 
-            return (data.Item1, _mapper.Map<TEntityViewModel>(data.Item2));
+            return (data.Item1, _mapper.Map<IEnumerable<TEntityViewModel>>(data.Item2));
         }
 
-        public virtual async Task<(bool, TEntityViewModel)> UpdateAsync(ClaimsPrincipal claim, Expression<Func<TEntityViewModel, bool>> where, Expression<Func<TEntityViewModel, object>> propertiesToUpdate, TEntityViewModel viewModelData, IDbTransaction transaction = null,
+        public virtual async Task<(bool, IEnumerable<TEntityViewModel>)> UpdateAsync(ClaimsPrincipal claim, Expression<Func<TEntityViewModel, bool>> where, Expression<Func<TEntityViewModel, object>> propertiesToUpdate, TEntityViewModel viewModelData, IDbTransaction transaction = null,
             bool manageTransaction = true)
         {
             TEntity entityData = _mapper.Map<TEntity>(viewModelData);
@@ -561,10 +561,10 @@ namespace WebAPI_BAL
 
             entityData = ExtBusinessLogic.GetUpdateEntity(entityData, ExtBusinessLogic.UserValue(claim));
 
-            Task<(bool, TEntity)> dataAsync = ManageOrHandleTransaction(_repo.UpdateAsync, entityPredicate, entityData, updateProperties, transaction, manageTransaction);
-            (bool, TEntity) data = await dataAsync;
+            Task<(bool, IEnumerable<TEntity>)> dataAsync = ManageOrHandleTransaction(_repo.UpdateAsync, entityPredicate, entityData, updateProperties, transaction, manageTransaction);
+            (bool, IEnumerable<TEntity>) data = await dataAsync;
 
-            return (data.Item1, _mapper.Map<TEntityViewModel>(data.Item2));
+            return (data.Item1, _mapper.Map<IEnumerable<TEntityViewModel>>(data.Item2));
         }
 
         public virtual Task<bool> BulkUpdateAsync(ClaimsPrincipal claim, IEnumerable<TEntityViewModel> viewModelData, IDbTransaction transaction = null, bool manageTransaction = true)

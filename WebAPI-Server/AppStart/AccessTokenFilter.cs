@@ -1,8 +1,10 @@
-﻿using Common;
+﻿using System.Linq;
+using Common;
 using Common.Exception;
 using Common.Messages;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.EntityFrameworkCore.Internal;
 using Serilog;
 
 namespace WebAPI_Server.AppStart
@@ -22,11 +24,14 @@ namespace WebAPI_Server.AppStart
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            if (!context.HttpContext.Request.Headers.ContainsKey(HttpRequestHeaders.ApiKey) ||
-                (context.HttpContext.Request.Headers.ContainsKey(HttpRequestHeaders.ApiKey) &&
-                 string.IsNullOrEmpty(context.HttpContext.Request.Headers[HttpRequestHeaders.ApiKey])))
-                throw new WebApiApplicationException(StatusCodes.Status412PreconditionFailed,
-                    ErrorMessages.InvalidApiKey);
+            if (context.Filters.All(x => x.GetType() != typeof(AllowNoAccessToken)))
+            {
+                if (!context.HttpContext.Request.Headers.ContainsKey(HttpRequestHeaders.ApiKey) ||
+                    (context.HttpContext.Request.Headers.ContainsKey(HttpRequestHeaders.ApiKey) &&
+                     string.IsNullOrEmpty(context.HttpContext.Request.Headers[HttpRequestHeaders.ApiKey])))
+                    throw new WebApiApplicationException(StatusCodes.Status412PreconditionFailed,
+                        ErrorMessages.InvalidApiKey);
+            }
         }
     }
 
