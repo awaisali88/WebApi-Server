@@ -5,11 +5,11 @@ using Dapper.Repositories.DbContext;
 using Dapper.Repositories.SqlGenerator;
 using Microsoft.Extensions.Options;
 
-namespace WebAPI_DataAccess.ApplicationContext
+namespace WebAPI_DataAccess.NorthwindContext
 {
-    public partial class ApplicationDbContext : DapperDbContext, IApplicationDbContext
+    public partial class NorthwindDbContext : DapperDbContext, INorthwindDbContext
     {
-        public ApplicationDbContext(IOptions<ApplicationDbOptions> dbOptions, IMapper mapper)
+        public NorthwindDbContext(IOptions<NorthwindDbOptions> dbOptions, IMapper mapper)
             : base(new SqlConnection(dbOptions.Value.ConnectionString))
         {
             _config = new SqlGeneratorConfig()

@@ -42,7 +42,7 @@ namespace Dapper.Repositories
             {
                 var childType = property.PropertyType.IsGenericType() ? property.PropertyType.GenericTypeArguments[0] : property.PropertyType;
                 var properties = childType.FindClassProperties().Where(ExpressionHelper.GetPrimitivePropertiesPredicate());
-                childKeyProperties.AddRange(properties.Where(p => p.GetCustomAttributes<KeyAttribute>().Any()));
+                childKeyProperties.AddRange(properties.Where(p => p.GetCustomAttributes<KeyAttribute>().Any() && keyProperties.Any(x => x.Name != p.Name)));
             }
 
             if (!childKeyProperties.Any())

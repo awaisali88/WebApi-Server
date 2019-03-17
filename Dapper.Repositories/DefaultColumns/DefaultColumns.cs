@@ -1,6 +1,9 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using Common;
 using Dapper.Repositories.Attributes;
 using Dapper.Repositories.Attributes.LogicalDelete;
@@ -49,5 +52,49 @@ namespace Dapper.Repositories
 
         [NotMapped]
         public virtual RecordStatus RecordStatus { get; set; }
+
+        public static string TableName()
+        {
+            Type classType = MethodBase.GetCurrentMethod().DeclaringType;
+            var tableAttribute = classType.GetCustomAttributes(typeof(TableAttribute), true);
+            if (tableAttribute != null && tableAttribute.Any())
+                return ((TableAttribute) tableAttribute.FirstOrDefault())?.Name;
+
+            return classType.Name;
+        }
+
+        public static string ColumnName(string propertyName)
+        {
+            Type classType = MethodBase.GetCurrentMethod().DeclaringType;
+            PropertyInfo property = classType.GetProperty(propertyName);
+            if (property != null)
+            {
+                var columnAttribute = property.GetCustomAttributes(typeof(ColumnAttribute), true);
+                if (columnAttribute != null && columnAttribute.Any())
+                    return ((ColumnAttribute) columnAttribute.FirstOrDefault())?.Name;
+            }
+            return propertyName;
+        }
+
+        public string GetTableName()
+        {
+            var tableAttribute = GetType().GetCustomAttributes(typeof(TableAttribute), true);
+            if (tableAttribute != null && tableAttribute.Any())
+                return ((TableAttribute) tableAttribute.FirstOrDefault())?.Name;
+
+            return GetType().Name;
+        }
+
+        public string GetColumnName(string propertyName)
+        {
+            PropertyInfo property = GetType().GetProperty(propertyName);
+            if (property != null)
+            {
+                var columnAttribute = property.GetCustomAttributes(typeof(ColumnAttribute), true);
+                if (columnAttribute != null && columnAttribute.Any())
+                    return ((ColumnAttribute) columnAttribute.FirstOrDefault())?.Name;
+            }
+            return propertyName;
+        }
     }
 }

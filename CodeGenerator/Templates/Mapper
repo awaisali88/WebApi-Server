@@ -1,0 +1,3 @@
+﻿CreateMap<[MODEL]Model, [MODEL]ViewModel>().ReverseMap();
+services.TryAddScoped<I[MODEL]Bal, [MODEL]Bal>();
+services.TryAddScoped<I[SERVICENAME]Service, [SERVICENAME]Service>();

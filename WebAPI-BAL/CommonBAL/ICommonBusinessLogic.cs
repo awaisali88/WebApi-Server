@@ -15,6 +15,8 @@ namespace WebAPI_BAL
         where TEntityViewModel : class
         where TDbContext : IDapperDbContext
     {
+        IDbConnection Conn { get; }
+
         #region Handle Transaction
         TReturn HandleTransaction<TReturn>(Func<IDbTransaction, TReturn> repoFunc);
 
@@ -660,6 +662,8 @@ namespace WebAPI_BAL
     public interface ICommonStoreProcBusinessLogic<TDbContext>
         where TDbContext : IDapperDbContext
     {
+        IDbConnection Conn { get; }
+
         #region Store Procedure
 
         /// <summary>

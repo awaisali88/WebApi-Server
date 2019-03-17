@@ -24,16 +24,24 @@ namespace WebAPI_Server.AppStart
         internal static void ConfigureDatabase(this IServiceCollection services, IConfiguration configuration, IHostingEnvironment env)
         {
 
-            string connString = configuration.GetConnectionString("DefaultConnection");
+            string webApiConnString = configuration.GetConnectionString("WebApiConnection");
+            string northWindConnString = configuration.GetConnectionString("NorthWindConnection");
 
-            services.Configure<ApplicationDbOptions>(options =>
+            services.Configure<WebApiDbOptions>(options =>
             {
                 options.LogQuery = true;
-                options.ConnectionString = connString;
+                options.ConnectionString = webApiConnString;
                 options.SqlProvider = SqlProvider.MSSQL;
                 options.UseQuotationMarks = true;
             });
 
+            services.Configure<NorthwindDbOptions>(options =>
+            {
+                options.LogQuery = true;
+                options.ConnectionString = northWindConnString;
+                options.SqlProvider = SqlProvider.MSSQL;
+                options.UseQuotationMarks = true;
+            });
         }
 
         internal static void ConfigureJwt(this IServiceCollection services, IConfiguration configuration, IHostingEnvironment env)
@@ -97,7 +105,7 @@ namespace WebAPI_Server.AppStart
 
         internal static void ConfigureDependencyServices(this IServiceCollection services, IConfiguration configuration, IHostingEnvironment env)
         {
-            string connString = configuration.GetConnectionString("DefaultConnection");
+            string connString = configuration.GetConnectionString("WebApiConnection");
 
             if (configuration.GetSection(nameof(FacebookAuthSettings)).Value != null)
                 services.Configure<FacebookAuthSettings>(configuration.GetSection(nameof(FacebookAuthSettings)));
@@ -155,7 +163,7 @@ namespace WebAPI_Server.AppStart
 
         public static void ConfigureElmah(this IServiceCollection services, IConfiguration configuration, IHostingEnvironment env)
         {
-            string connString = configuration.GetConnectionString("DefaultConnection");
+            string connString = configuration.GetConnectionString("WebApiConnection");
 
             //services.AddElmah();
             //services.AddElmah(options =>

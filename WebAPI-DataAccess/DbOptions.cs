@@ -5,7 +5,11 @@ using Common;
 
 namespace WebAPI_DataAccess
 {
-    public class ApplicationDbOptions : DbOptions
+    public class WebApiDbOptions : DbOptions
+    {
+    }
+
+    public class NorthwindDbOptions : DbOptions
     {
     }
 }

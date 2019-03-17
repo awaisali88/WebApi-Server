@@ -1,0 +1,3 @@
+﻿IDapperRepository<[MODEL]Model> [MODEL]Repo { get; }
+private IDapperRepository<[MODEL]Model> _[MODELCC]Repo;
+public IDapperRepository<[MODEL]Model> [MODEL]Repo => _[MODELCC]Repo ?? (_[MODELCC]Repo = new DapperRepository<[MODEL]Model>(Connection, _mapper, _config));

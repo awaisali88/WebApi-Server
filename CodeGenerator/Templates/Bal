@@ -1,0 +1,23 @@
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+using WebAPI_DataAccess.[DATABASE]Context;
+using WebAPI_Model;
+using WebAPI_ViewModel.DTO;
+
+namespace WebAPI_BAL.BLL
+{
+    public class [MODEL]Bal : CommonBusinessLogic<I[DATABASE]DbContext, [MODEL]Model, [MODEL]ViewModel>, I[MODEL]Bal
+    {
+        private readonly ILogger<[MODEL]Bal> _logger;
+
+        public [MODEL]Bal(I[DATABASE]DbContext db, IMapper mapper, IHostingEnvironment env,
+            IHttpContextAccessor httpContextAccessor, ILogger<[MODEL]Bal> logger,
+            ILogger<CommonBusinessLogic<I[DATABASE]DbContext, [MODEL]Model, [MODEL]ViewModel>> baseLogger)
+            : base(db, mapper, env, httpContextAccessor, baseLogger)
+        {
+            _logger = logger;
+        }
+    }
+}

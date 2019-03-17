@@ -29,14 +29,18 @@ namespace WebAPI_BAL
         protected readonly IDapperRepository<TEntity> _repo;
         protected readonly IDapperSProcRepository _spRepo;
 
-        public CommonBusinessLogic(TDbContext db, IMapper mapper, IHostingEnvironment env, IHttpContextAccessor httpContextAccessor, ILogger<CommonBusinessLogic<TDbContext, TEntity, TEntityViewModel>> logger)
+        protected readonly IDbConnection _dbConn;
+        public IDbConnection Conn => _dbConn;
+
+        protected CommonBusinessLogic(TDbContext db, IMapper mapper, IHostingEnvironment env, IHttpContextAccessor httpContextAccessor, ILogger<CommonBusinessLogic<TDbContext, TEntity, TEntityViewModel>> logger)
         {
             _db = db;
+            _dbConn = _db.Connection;
             _mapper = mapper;
             _env = env;
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
-
+            
             var repoProperty = _db.GetType().GetProperties().FirstOrDefault(x => x.PropertyType == typeof(IDapperRepository<TEntity>));
             var spRepoProperty = _db.GetType().GetProperties().FirstOrDefault(x => x.PropertyType == typeof(IDapperSProcRepository));
 
@@ -1319,11 +1323,15 @@ namespace WebAPI_BAL
         private readonly ILogger<CommonStoreProcBusinessLogic<TDbContext>> _logger;
         private readonly IDapperSProcRepository _spRepo;
 
+        protected readonly IDbConnection _dbConn;
+        public IDbConnection Conn => _dbConn;
+
         public CommonStoreProcBusinessLogic(TDbContext db, IMapper mapper, IHostingEnvironment env,
             IHttpContextAccessor httpContextAccessor,
             ILogger<CommonStoreProcBusinessLogic<TDbContext>> logger)
         {
             _db = db;
+            _dbConn = db.Connection;
             _mapper = mapper;
             _logger = logger;
 

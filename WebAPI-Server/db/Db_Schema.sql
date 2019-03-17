@@ -768,3 +768,84 @@ print @Result
   SELECT @Result AS ModelClass
   
 GO
+
+
+Create FUNCTION [dbo].[SplitByCommas](@MYSTR VARCHAR(MAX), @DELIMITER CHAR(1))
+RETURNS @MYTBL  TABLE (value varchar(MAX))
+AS 
+BEGIN
+ DECLARE @RET VARCHAR(500)
+ DECLARE @INDEX INT
+ DECLARE @COUNTER smallint
+ 
+ --Get the first position of delimiter in the main string
+ SET @INDEX = CHARINDEX(@DELIMITER,@MYSTR)
+ SET @COUNTER = 0
+ 
+ --Loop if delimiter exists in the main string
+ WHILE @INDEX > 0
+ BEGIN
+  --extract the result substring before the delimiter found
+  SET @RET = SUBSTRING(@MYSTR,1, @INDEX-1 )
+  --set mainstring right part after the delimiter found
+  SET @MYSTR = SUBSTRING(@MYSTR,@INDEX+1 , LEN(@MYSTR) - @INDEX )
+  --increase the counter
+  SET @COUNTER = @COUNTER  + 1 
+  --add the result substring to the table
+  INSERT INTO @MYTBL (value)
+  VALUES ( @RET)
+  --Get the next position of delimiter in the main string
+  SET @INDEX = CHARINDEX(@DELIMITER,@MYSTR)
+ END
+ 
+ --if no delimiter is found then simply add the mainstring to the table
+ IF @INDEX = 0 
+ BEGIN
+  SET @COUNTER = @COUNTER  + 1
+  INSERT INTO @MYTBL ( value)
+  VALUES ( @MYSTR)
+ END 
+ RETURN   
+END
+ 
+ 
+GO
+
+ALTER PROCEDURE AddDefaultColumns
+@tableName sysname
+AS
+  DECLARE @schema VARCHAR(30), @table VARCHAR(100);  
+  SELECT TOP 1 @schema =  value FROM dbo.SplitByCommas(@tableName,'.')  
+  SELECT @table = value FROM(SELECT TOP 2 * FROM dbo.SplitByCommas(@tableName,'.') EXCEPT SELECT TOP 1 * FROM dbo.SplitByCommas(@tableName,'.')) tn  
+  
+  DECLARE @sqlCommand nvarchar(max)
+SET @sqlCommand = N'
+ALTER TABLE '+@tableName+'
+ADD [Status] [bit] NOT NULL DEFAULT (1)
+
+ALTER TABLE '+@tableName+'
+ADD [Trashed] [bit] NOT NULL DEFAULT (0)
+
+ALTER TABLE '+@tableName+'
+ADD [RowVersion] [timestamp] NULL
+
+ALTER TABLE '+@tableName+'
+ADD [CreatedDate] [datetime2](7) NOT NULL DEFAULT (GETDATE())
+
+ALTER TABLE '+@tableName+'
+ADD [ModifiedDate] [datetime2](7) NULL
+CONSTRAINT '+@table+'_ModifiedDate_Default_Values DEFAULT (GETDATE())
+WITH VALUES
+
+ALTER TABLE '+@tableName+'
+ADD [CreatedBy] [nvarchar](max) NULL
+
+ALTER TABLE '+@tableName+'
+ADD [ModifiedBy] [nvarchar](max) NULL
+
+ALTER TABLE '+@tableName+'
+ADD [RecordStatus] [int] NOT NULL DEFAULT (2)
+';
+EXEC (@sqlCommand)
+
+GO

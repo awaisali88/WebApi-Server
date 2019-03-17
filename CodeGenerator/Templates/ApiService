@@ -1,0 +1,25 @@
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+using WebAPI_Model;
+using WebAPI_ViewModel.DTO;
+
+namespace WebAPI_Service.[SERVICEDIR]
+{
+    public class [SERVICENAME]Service : I[SERVICENAME]Service
+    {
+        private readonly ILogger<[SERVICENAME]Service> _logger;
+		private readonly IHostingEnvironment _env;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+[BALDIINIT]
+        public [SERVICENAME]Service(IHostingEnvironment env, IHttpContextAccessor httpContextAccessor, ILogger<[SERVICENAME]Service> logger
+			[BALDICTOR])
+        {
+			_env = env;
+            _logger = logger;
+            _httpContextAccessor = httpContextAccessor;
+[BALDILINK]
+        }
+    }
+}

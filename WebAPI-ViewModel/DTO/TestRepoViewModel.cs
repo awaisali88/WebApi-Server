@@ -9,5 +9,7 @@
         public string LastName { get; set; }
 
         public string EmailAddress { get; set; }
+
+        public int CheckAddC { get; set; }
     }
 }

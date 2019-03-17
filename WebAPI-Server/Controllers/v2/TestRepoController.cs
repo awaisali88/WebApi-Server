@@ -9,9 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using WebAPI_BAL;
 using WebAPI_BAL.ApplicationBAL;
-using WebAPI_DataAccess.ApplicationContext;
+using WebAPI_DataAccess.WebApiContext;
 using WebAPI_Model;
-using WebAPI_Model.Test;
 using WebAPI_ViewModel.DTO;
 
 namespace WebAPI_Server.Controllers.v2
@@ -26,13 +25,13 @@ namespace WebAPI_Server.Controllers.v2
         private static readonly HttpClient Client = new HttpClient();
 
         private readonly ITestRepoBal _cBal;
-        private readonly ICommonStoreProcBusinessLogic<IApplicationDbContext> _cBalProc;
+        private readonly ICommonStoreProcBusinessLogic<IWebApiDbContext> _cBalProc;
         private readonly ILogger<TestRepoController> _logger;
 
         /// <inheritdoc />
         public TestRepoController(IHttpContextAccessor httpContextAccessor,
             ITestRepoBal cBal,
-            ICommonStoreProcBusinessLogic<IApplicationDbContext> cBalProc,
+            ICommonStoreProcBusinessLogic<IWebApiDbContext> cBalProc,
             ILogger<TestRepoController> logger)
         {
             _cBal = cBal;

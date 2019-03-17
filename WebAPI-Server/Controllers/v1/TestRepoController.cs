@@ -6,14 +6,17 @@ using System.Net.Http;
 using System.Text;
 using Common;
 using Common.Messages;
+using Dapper;
 using MicroElements.Swashbuckle.FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using StackExchange.Redis;
 using WebAPI_BAL;
 using WebAPI_BAL.ApplicationBAL;
-using WebAPI_DataAccess.ApplicationContext;
+using WebAPI_BAL.BLL;
+using WebAPI_DataAccess.WebApiContext;
 using WebAPI_Model;
 using WebAPI_Model.Test;
 using WebAPI_Server.AppStart;
@@ -31,19 +34,26 @@ namespace WebAPI_Server.Controllers.v1
         private static readonly HttpClient Client = new HttpClient();
 
         private readonly ITestRepoBal _testRepoBal;
-        private readonly ICommonStoreProcBusinessLogic<IApplicationDbContext> _cBalProc;
+        private readonly ICommonStoreProcBusinessLogic<IWebApiDbContext> _cBalProc;
         private readonly ILogger<TestRepoController> _logger;
+        private readonly IOrdersBal _ordersBal;
+        private readonly IOrderDetailsBal _orderDetailsBal;
+        private readonly ICustomersBal _customersBal;
 
         /// <inheritdoc />
         public TestRepoController(IHttpContextAccessor httpContextAccessor,
             ITestRepoBal testRepoBal,
-            ICommonStoreProcBusinessLogic<IApplicationDbContext> cBalProc,
-            ILogger<TestRepoController> logger)
+            ICommonStoreProcBusinessLogic<IWebApiDbContext> cBalProc,
+            ILogger<TestRepoController> logger, IOrdersBal ordersBal, IOrderDetailsBal orderDetailsBal, ICustomersBal customersBal)
         {
             _testRepoBal = testRepoBal;
             _cBalProc = cBalProc;
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
+
+            _ordersBal = ordersBal;
+            _orderDetailsBal = orderDetailsBal;
+            _customersBal = customersBal;
         }
 
         /// <summary>
@@ -179,5 +189,73 @@ namespace WebAPI_Server.Controllers.v1
 
             return Ok(result, InfoMessages.CommonInfoMessage);
         }
+
+        /// <summary>
+        /// Select all Orders
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("selectorders")]
+        [AllowAnonymous]
+        [AllowNoAccessToken]
+        public IActionResult SelectOrders()
+        {
+            //Working
+            //var result = _ordersBal
+            //    .FindAll<CustomersModel, EmployeesModel, ShippersModel>(
+            //        x => x.ShipVia == 2 && x.Customers.Country == "Germany", x => x.Customers, x => x.Employees,
+            //        x => x.Shippers).FirstOrDefault();
+
+            //Not Working (Use Db Query from Dapper) (Where clause on Level 2 join)
+            //var result = _orderDetailsBal.FindAll<OrdersModel, CustomersModel>(x => x.Orders.Customers.Country == "Germany", 
+            //    x => x.Orders, x => x.Orders.Customers);
+
+            //Working (Composite primary key columns issue, Worked with split on different key column from linked Foreign key)
+            //var result = _ordersBal.FindAll<CustomersModel, OrderDetailsModel>(x => x.Customers.Country == "Germany",
+            //    x => x.Customers, x => x.OrderDetails);
+
+
+            //Working (List of child objects from join)
+            //var result1 = _customersBal.FindAll<OrdersModel>(x => x.CustomerID == "VINET",
+            //    x => x.OrdersModel);
+
+
+            //Working (Composite primary key columns issue, Worked with split on different key column from linked Foreign key)
+            //var result = _ordersBal.FindAll<OrderDetailsModel>(x => x.OrderID == 10248, x => x.OrderDetails);
+
+            //Working (Composite primary key columns issue, Worked with split on different key column from linked Foreign key)
+            //string sqlQuery =
+            //    "SELECT [dbo].[Orders].[OrderID], [dbo].[Orders].[CustomerID], [dbo].[Orders].[EmployeeID], [dbo].[Orders].[OrderDate], [dbo].[Orders].[RequiredDate], [dbo].[Orders].[ShippedDate], [dbo].[Orders].[ShipVia], [dbo].[Orders].[Freight], [dbo].[Orders].[ShipName], [dbo].[Orders].[ShipAddress], [dbo].[Orders].[ShipCity], [dbo].[Orders].[ShipRegion], [dbo].[Orders].[ShipPostalCode], [dbo].[Orders].[ShipCountry], [dbo].[Orders].[Status] AS Status, [dbo].[Orders].[Trashed] AS Trashed, [dbo].[Orders].[RowVersion], [dbo].[Orders].[CreatedDate] AS CreatedDate, [dbo].[Orders].[ModifiedDate] AS ModifiedDate, [dbo].[Orders].[CreatedBy] AS CreatedBy, [dbo].[Orders].[ModifiedBy] AS ModifiedBy, [dbo].[Orders].[RecordStatus] AS RecordStatusCode, [OrderDetails_OrderID].[OrderID], [OrderDetails_OrderID].[ProductID], [OrderDetails_OrderID].[UnitPrice], [OrderDetails_OrderID].[Quantity], [OrderDetails_OrderID].[Discount], [OrderDetails_OrderID].[Status] AS Status, [OrderDetails_OrderID].[Trashed] AS Trashed, [OrderDetails_OrderID].[RowVersion], [OrderDetails_OrderID].[CreatedDate] AS CreatedDate, [OrderDetails_OrderID].[ModifiedDate] AS ModifiedDate, [OrderDetails_OrderID].[CreatedBy] AS CreatedBy, [OrderDetails_OrderID].[ModifiedBy] AS ModifiedBy, [OrderDetails_OrderID].[RecordStatus] AS RecordStatusCode FROM [dbo].[Orders] LEFT JOIN [dbo].[OrderDetails] AS [OrderDetails_OrderID] ON [Orders].[OrderID] = [OrderDetails_OrderID].[OrderID] WHERE [dbo].[Orders].[OrderID] = @OrderId_where AND [dbo].[Orders].[Trashed] != 1";
+            //
+            //List<OrdersModel> orderData;
+            //using (var conn = _ordersBal.Conn)
+            //{
+            //    var orderDictionary = new Dictionary<int, OrdersModel>();
+            //    orderData = conn.Query<OrdersModel, OrderDetailsModel, OrdersModel>(
+            //            sqlQuery,
+            //            (order, orderDetail) =>
+            //            {
+            //                OrdersModel orderEntry;
+            //
+            //                if (!orderDictionary.TryGetValue(order.OrderID, out orderEntry))
+            //                {
+            //                    orderEntry = order;
+            //                    orderEntry.OrderDetails = new List<OrderDetailsModel>();
+            //                    orderDictionary.Add(orderEntry.OrderID, orderEntry);
+            //                }
+            //
+            //                orderEntry.OrderDetails.Add(orderDetail);
+            //                return orderEntry;
+            //            },
+            //            splitOn: "OrderID", param: new{ ORderId_where = 10248 })
+            //        .Distinct()
+            //        .ToList();
+            //}
+
+
+
+            bool r = false;
+            return Ok(r, InfoMessages.CommonInfoMessage);
+        }
+
     }
 }
