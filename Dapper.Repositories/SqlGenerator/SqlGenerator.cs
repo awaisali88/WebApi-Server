@@ -638,6 +638,20 @@ namespace Dapper.Repositories.SqlGenerator
 
                     if (item.PropertyValue == null)
                         sqlQuery.SqlBuilder.Append(tableName + "." + columnName + " " + (item.QueryOperator == "=" ? "IS" : "IS NOT") + " NULL ");
+                    else if (item.PropertyValue is string &&
+                             Convert.ToString(item.PropertyValue).Contains("_[COLUMN]"))
+                    {
+                        string pColumn = Convert.ToString(item.PropertyValue).Split(' ')
+                            .FirstOrDefault(x => x.Contains("_[COLUMN]"));
+
+                        if (item.NestedRightProperty)
+                            pColumn = SqlJoinProperties.First(x => x.PropertyName == pColumn.Replace("_[COLUMN]", "")).ColumnName;
+                        else
+                            pColumn = SqlProperties.First(x => x.PropertyName == pColumn.Replace("_[COLUMN]", "")).ColumnName;
+
+                        sqlQuery.SqlBuilder.Append(tableName + "." + columnName + " " + item.QueryOperator + " " +
+                                                   tableName + "." + pColumn + " ");
+                    }
                     else
                         sqlQuery.SqlBuilder.Append(tableName + "." + columnName + " " + item.QueryOperator + " @" + item.PropertyName + " ");
 
@@ -886,7 +900,7 @@ namespace Dapper.Repositories.SqlGenerator
                                     methodName == "EndsWith" ? $"%{checkValue}" : $"{checkValue}";
                                 var opr = "LIKE";
                                 var link = ExpressionHelper.GetSqlOperator(linkingType);
-                                queryProperties.Add(new QueryParameter(link, propertyName + "_where", propertyValue, opr, isNested));
+                                queryProperties.Add(new QueryParameter(link, propertyName + "_where", propertyValue, opr, isNested, false));
                                 break;
                             }
                         default:
@@ -923,7 +937,7 @@ namespace Dapper.Repositories.SqlGenerator
                                 var propertyValue = ExpressionHelper.GetValuesFromCollection(innerBody);
                                 var opr = ExpressionHelper.GetMethodCallSqlOperator(methodName);
                                 var link = ExpressionHelper.GetSqlOperator(linkingType);
-                                queryProperties.Add(new QueryParameter(link, propertyName + "_where", propertyValue, opr, isNested));
+                                queryProperties.Add(new QueryParameter(link, propertyName + "_where", propertyValue, opr, isNested, false));
                                 break;
                             }
                             default:
@@ -942,11 +956,17 @@ namespace Dapper.Repositories.SqlGenerator
                         !SqlJoinProperties.Select(x => x.PropertyName).Contains(propertyName))
                         throw new NotSupportedException("predicate can't parse");
 
-                    var propertyValue = ExpressionHelper.GetValue(innerbody.Right);
+                    bool nestedRightProperty = false;
+                    object propertyValue = null;
+                    if (innerbody.Right.NodeType == ExpressionType.MemberAccess)
+                        propertyValue = ExpressionHelper.GetPropertyNamePath(innerbody.Right, out nestedRightProperty) + "_[COLUMN]";
+                    else
+                        propertyValue = ExpressionHelper.GetValue(innerbody.Right);
+
                     var opr = ExpressionHelper.GetSqlOperator(innerbody.NodeType);
                     var link = ExpressionHelper.GetSqlOperator(linkingType);
 
-                    queryProperties.Add(new QueryParameter(link, propertyName + "_where", propertyValue, opr, isNested));
+                    queryProperties.Add(new QueryParameter(link, propertyName + "_where", propertyValue, opr, isNested, nestedRightProperty));
                 }
                 else
                 {

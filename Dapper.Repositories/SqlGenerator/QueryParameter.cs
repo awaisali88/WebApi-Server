@@ -13,13 +13,14 @@
         /// <param name="propertyValue">The property value.</param>
         /// <param name="queryOperator">The query operator.</param>
         /// <param name="nestedProperty">Signilize if it is nested property.</param>
-        internal QueryParameter(string linkingOperator, string propertyName, object propertyValue, string queryOperator, bool nestedProperty)
+        internal QueryParameter(string linkingOperator, string propertyName, object propertyValue, string queryOperator, bool nestedProperty, bool nestedRightProperty)
         {
             LinkingOperator = linkingOperator;
             PropertyName = propertyName;
             PropertyValue = propertyValue;
             QueryOperator = queryOperator;
             NestedProperty = nestedProperty;
+            NestedRightProperty = nestedRightProperty;
         }
 
         public string LinkingOperator { get; set; }
@@ -27,5 +28,6 @@
         public object PropertyValue { get; set; }
         public string QueryOperator { get; set; }
         public bool NestedProperty { get; set; }
+        public bool NestedRightProperty { get; set; }
     }
 }

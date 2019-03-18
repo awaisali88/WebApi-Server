@@ -168,6 +168,7 @@ namespace WebAPI_Server.Controllers.v1
         /// <returns></returns>
         [HttpGet("selectall")]
         [AllowAnonymous]
+        [AllowNoAccessToken]
         public IActionResult SelectAll()
         {
             var result = _testRepoBal.FindAll();
@@ -203,6 +204,11 @@ namespace WebAPI_Server.Controllers.v1
             //    .FindAll<CustomersModel, EmployeesModel, ShippersModel>(
             //        x => x.ShipVia == 2 && x.Customers.Country == "Germany", x => x.Customers, x => x.Employees,
             //        x => x.Shippers).FirstOrDefault();
+
+            var result = _ordersBal
+                .FindAll<CustomersModel, EmployeesModel, ShippersModel>(
+                    x => x.ShipVia == 2 && x.Customers.Country == x.Customers.Country, x => x.Customers, x => x.Employees,
+                    x => x.Shippers).FirstOrDefault();
 
             //Not Working (Use Db Query from Dapper) (Where clause on Level 2 join)
             //var result = _orderDetailsBal.FindAll<OrdersModel, CustomersModel>(x => x.Orders.Customers.Country == "Germany", 
