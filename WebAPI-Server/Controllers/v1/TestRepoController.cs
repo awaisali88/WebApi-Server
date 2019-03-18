@@ -14,7 +14,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using WebAPI_BAL;
-using WebAPI_BAL.ApplicationBAL;
 using WebAPI_BAL.BLL;
 using WebAPI_DataAccess.WebApiContext;
 using WebAPI_Model;

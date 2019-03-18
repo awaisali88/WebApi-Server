@@ -235,7 +235,7 @@ namespace CodeGenerator
                         string apiServiceFolderName = Console.ReadLine();
                         Console.Write("Enter Api service name:\t");
                         string apiServiceName = Console.ReadLine();
-                        Console.Write("Enter  one or multiple BAL Interfaces eg. IUserBal,ICustomerBal...:\t");
+                        Console.Write("Enter  one or multiple BAL Interfaces eg. IUserBal,ICustomerBal,...:\t");
                         string balClasses = Console.ReadLine();
                         Console.WriteLine("======================================");
 

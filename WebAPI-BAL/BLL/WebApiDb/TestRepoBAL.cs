@@ -9,7 +9,7 @@ using WebAPI_DataAccess.WebApiContext;
 using WebAPI_Model.Test;
 using WebAPI_ViewModel.DTO;
 
-namespace WebAPI_BAL.ApplicationBAL
+namespace WebAPI_BAL.BLL
 {
     public class TestRepoBal : CommonBusinessLogic<IWebApiDbContext, TestRepo, TestRepoViewModel>, ITestRepoBal
     {

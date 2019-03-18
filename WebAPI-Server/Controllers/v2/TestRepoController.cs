@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using WebAPI_BAL;
-using WebAPI_BAL.ApplicationBAL;
+using WebAPI_BAL.BLL;
 using WebAPI_DataAccess.WebApiContext;
 using WebAPI_Model;
 using WebAPI_ViewModel.DTO;

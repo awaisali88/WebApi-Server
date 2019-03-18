@@ -2,13 +2,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using WebAPI_BAL.ApplicationBAL;
 using WebAPI_BAL.AuthLogic;
 using WebAPI_BAL.BLL;
 using WebAPI_BAL.NotificationManager;
 using WebAPI_DataAccess.NorthwindContext;
 using WebAPI_DataAccess.WebApiContext;
+using WebAPI_Service.Northwind;
 using WebAPI_Service.Service;
+using WebAPI_Service.WebApi;
 
 namespace WebAPI_Server.AppStart
 {
@@ -33,15 +34,19 @@ namespace WebAPI_Server.AppStart
 
             #region Api Services [Auto Generated Code. Don't Delete or Modify this section]
             services.TryAddScoped<IAuthenticationService, AuthenticationService>();
+			services.TryAddScoped<IWebApiCustomQueryService, WebApiCustomQueryService>();
+			services.TryAddScoped<INorthwindCustomQueryService, NorthwindCustomQueryService>();
 			//[AUTO_GENERATED_SCOPED_ApiServices]
             #endregion
 
             #region Auto Generated Code. Don't Delete or Modify this section
             #region WebApiDb Bal AG
             services.TryAddScoped<ITestRepoBal, TestRepoBal>();
+            services.TryAddScoped<IWebApiCustomQueryBal, WebApiCustomQueryBal>();
             //[AUTO_GENERATED_SCOPED_SERVICES_WebApiDb]
             #endregion
             #region Northwind Bal AG
+            services.TryAddScoped<INorthwindCustomQueryBal, NorthwindCustomQueryBal>();
             services.TryAddScoped<ICategoriesBal, CategoriesBal>();
 			services.TryAddScoped<IEmployeesBal, EmployeesBal>();
 			services.TryAddScoped<IShippersBal, ShippersBal>();

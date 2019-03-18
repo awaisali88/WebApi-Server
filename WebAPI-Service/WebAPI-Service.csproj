@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
+    <ProjectReference Include="..\WebAPI-BAL\WebAPI-BAL.csproj" />
     <ProjectReference Include="..\WebAPI-ViewModel\WebAPI-ViewModel.csproj" />
   </ItemGroup>
 
