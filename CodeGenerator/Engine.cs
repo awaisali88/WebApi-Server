@@ -84,6 +84,16 @@ namespace CodeGenerator
                     return ReadFile(Constants.ApiServiceTemplate);
                 case TemplateType.IApiService:
                     return ReadFile(Constants.IApiServiceTemplate);
+
+                case TemplateType.SpParamModel:
+                    return ReadFile(Constants.SpParamModelTemplate);
+                case TemplateType.SpParamViewModel:
+                    return ReadFile(Constants.SpParamViewModelTemplate);
+                case TemplateType.SpReturnModel:
+                    return ReadFile(Constants.SpReturnModelTemplate);
+                case TemplateType.SpReturnViewModel:
+                    return ReadFile(Constants.SpReturnViewModelTemplate);
+
                 default:
                     return "";
             }
@@ -151,6 +161,51 @@ namespace CodeGenerator
 
             return data[0].ModelClass;
         }
+
+        public string GetGeneratedSpParamModelClass(string databaseName, string spName, string modelName, ServiceProvider serviceProvider)
+        {
+            dynamic spBal = GetCommonBusinessLogic(databaseName, serviceProvider);
+            List<GeneratedModelClassViewModel> data = ((IEnumerable<GeneratedModelClassViewModel>)spBal
+                .ExecuteStoreProcedure<GeneratedModelClass, GetSpParamModelClassParam, GeneratedModelClassViewModel,
+                    GetSpModelClassParamViewModel>(new GetSpModelClassParamViewModel()
+                    { SpName = spName, ModelName = modelName })).ToList();
+
+            return data[0].ModelClass;
+        }
+
+        public string GetGeneratedSpParamViewModelClass(string databaseName, string spName, string modelName, ServiceProvider serviceProvider)
+        {
+            dynamic spBal = GetCommonBusinessLogic(databaseName, serviceProvider);
+            List<GeneratedModelClassViewModel> data = ((IEnumerable<GeneratedModelClassViewModel>)spBal
+                .ExecuteStoreProcedure<GeneratedModelClass, GetSpParamViewModelClassParam, GeneratedModelClassViewModel,
+                    GetSpModelClassParamViewModel>(new GetSpModelClassParamViewModel()
+                    { SpName = spName, ModelName = modelName })).ToList();
+
+            return data[0].ModelClass;
+        }
+
+        public string GetGeneratedSpReturnModelClass(string databaseName, string spName, string modelName, ServiceProvider serviceProvider)
+        {
+            dynamic spBal = GetCommonBusinessLogic(databaseName, serviceProvider);
+            List<GeneratedModelClassViewModel> data = ((IEnumerable<GeneratedModelClassViewModel>)spBal
+                .ExecuteStoreProcedure<GeneratedModelClass, GetSpReturnModelClassParam, GeneratedModelClassViewModel,
+                    GetSpModelClassParamViewModel>(new GetSpModelClassParamViewModel()
+                    { SpName = spName, ModelName = modelName })).ToList();
+
+            return data[0].ModelClass;
+        }
+
+        public string GetGeneratedSpReturnViewModelClass(string databaseName, string spName, string modelName, ServiceProvider serviceProvider)
+        {
+            dynamic spBal = GetCommonBusinessLogic(databaseName, serviceProvider);
+            List<GeneratedModelClassViewModel> data = ((IEnumerable<GeneratedModelClassViewModel>)spBal
+                .ExecuteStoreProcedure<GeneratedModelClass, GetSpReturnViewModelClassParam, GeneratedModelClassViewModel,
+                    GetSpModelClassParamViewModel>(new GetSpModelClassParamViewModel()
+                    { SpName = spName, ModelName = modelName })).ToList();
+
+            return data[0].ModelClass;
+        }
+
 
         private dynamic GetCommonBusinessLogic(string databaseName, ServiceProvider serviceProvider)
         {

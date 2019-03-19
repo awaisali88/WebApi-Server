@@ -849,3 +849,238 @@ ADD [RecordStatus] [int] NOT NULL DEFAULT (2)
 EXEC (@sqlCommand)
 
 GO
+
+----------------------------------------------------------------------------------------------------
+-----Create Procedure for Store procedure code creation
+----------------------------------------------------------------------------------------------------
+
+
+
+
+CREATE FUNCTION dbo.GetC#ValueType(@sqlDataType varchar(15))
+RETURNS varchar(15)
+AS
+BEGIN
+SELECT @sqlDataType = CASE WHEN @sqlDataType LIKE '%(%' THEN SUBSTRING(@sqlDataType,1,CHARINDEX('(',@sqlDataType)-1) else @sqlDataType END
+DECLARE @returnData VARCHAR(15) = '';
+SELECT @returnData = CASE typeName
+            when 'bigint' then 'long'    
+            when 'binary' then 'byte[]'    
+            when 'bit' then 'bool'    
+            when 'char' then 'string'    
+            when 'date' then 'DateTime'    
+            when 'datetime' then 'DateTime'    
+            when 'datetime2' then 'DateTime'    
+            when 'datetimeoffset' then 'DateTimeOffset'    
+            when 'decimal' then 'decimal'    
+            when 'float' then 'float'    
+            when 'image' then 'byte[]'    
+            when 'int' then 'int'    
+            when 'money' then 'decimal'    
+            when 'nchar' then 'char'    
+            when 'ntext' then 'string'    
+            when 'numeric' then 'decimal'    
+            when 'nvarchar' then 'string'    
+            when 'real' then 'double'    
+            when 'smalldatetime' then 'DateTime'    
+            when 'smallint' then 'short'    
+            when 'smallmoney' then 'decimal'    
+            when 'text' then 'string'    
+            when 'time' then 'TimeSpan'    
+            when 'timestamp' then 'DateTime'    
+            when 'tinyint' then 'byte'    
+            when 'uniqueidentifier' then 'Guid'    
+            when 'varbinary' then 'byte[]'    
+            when 'varchar' then 'string'    
+            else 'UNKNOWN_' + typeName
+        end 
+		FROM (VALUES (@sqlDataType)) t(typeName)
+		RETURN @returnData;
+END
+
+GO
+
+CREATE FUNCTION dbo.GetC#NullType(@sqlDataType varchar(15), @isNullable bit)
+RETURNS varchar(15)
+AS
+BEGIN
+SELECT @sqlDataType = CASE WHEN @sqlDataType LIKE '%(%' THEN SUBSTRING(@sqlDataType,1,CHARINDEX('(',@sqlDataType)-1) else @sqlDataType END
+DECLARE @returnData VARCHAR(15) = '';
+SELECT @returnData = CASE 
+            when nullable = 1 and typeName in ('bigint', 'bit', 'date', 'datetime', 'datetime2', 'datetimeoffset', 'decimal', 'float', 'int', 'money', 'numeric', 'real', 'smalldatetime', 'smallint', 'smallmoney', 'time', 'tinyint', 'uniqueidentifier')     
+            then '?'     
+            else ''
+			END
+		FROM (VALUES (@sqlDataType, @isNullable)) t(typeName, nullable)
+RETURN @returnData;
+END
+
+GO
+
+CREATE PROC CreateC#SpParamModel
+@spFullName sysname,
+@modelName varchar(50)
+AS    
+    
+  DECLARE @schema VARCHAR(30), @spName VARCHAR(100);  
+  SELECT TOP 1 @schema =  value FROM dbo.SplitByCommas(@spFullName,'.')  
+  SELECT @spName = value FROM(SELECT TOP 2 * FROM dbo.SplitByCommas(@spFullName,'.') EXCEPT SELECT TOP 1 * FROM dbo.SplitByCommas(@spFullName,'.')) tn  
+  
+  
+DECLARE @Result varchar(max) = '    public class ' + @modelName + 'Param : ISProcParam
+    {'    
+
+SET @Result = @Result + '
+		public string ProcedureName => StoreProcedureNames.'+@modelName+'SpName;'
+
+SELECT @Result =    
+  @Result + '    
+
+        [ProcedureParam("'+Parameter_name+'", typeof('+dbo.GetC#ValueType([Type])+dbo.GetC#NullType([Type],isNullable)+'))]
+        public ' + dbo.GetC#ValueType([Type]) + dbo.GetC#NullType([Type],isNullable) + ' ' + REPLACE(Parameter_name , '@', '')+ ' { get; set; }'
+from    
+(    
+select  
+   'Parameter_name' = name,  
+   'Type'   = type_name(user_type_id),  
+   'Length'   = max_length,  
+   'Prec'   = case when type_name(system_type_id) = 'uniqueidentifier' 
+              then precision  
+              else OdbcPrec(system_type_id, max_length, precision) end,  
+   'Scale'   = OdbcScale(system_type_id, scale),  
+   'isNullable'  = is_nullable,
+   'isOutput'	= Is_output,
+   'Param_order'  = parameter_id,  
+   'Collation'   = convert(sysname, 
+                   case when system_type_id in (35, 99, 167, 175, 231, 239)  
+                   then ServerProperty('collation') end)
+  from sys.parameters where object_id = object_id(@spFullName)
+) t   
+ORDER BY param_order 
+    
+set @Result = @Result  + '    
+    }'    
+    
+PRINT @Result    
+select @Result  AS ModelClass  
+
+GO
+
+CREATE PROC CreateC#SpParamViewModel
+@spFullName sysname,
+@modelName varchar(50)
+AS    
+    
+  DECLARE @schema VARCHAR(30), @spName VARCHAR(100);  
+  SELECT TOP 1 @schema =  value FROM dbo.SplitByCommas(@spFullName,'.')  
+  SELECT @spName = value FROM(SELECT TOP 2 * FROM dbo.SplitByCommas(@spFullName,'.') EXCEPT SELECT TOP 1 * FROM dbo.SplitByCommas(@spFullName,'.')) tn  
+  
+  
+DECLARE @Result varchar(max) = '    public class ' + @modelName + 'ParamViewModel
+    {'    
+
+SELECT @Result =    
+  @Result + '
+        public ' + dbo.GetC#ValueType([Type]) + dbo.GetC#NullType([Type],isNullable) + ' ' + REPLACE(Parameter_name , '@', '')+ ' { get; set; }
+'
+from    
+(    
+select  
+   'Parameter_name' = name,  
+   'Type'   = type_name(user_type_id),  
+   'Length'   = max_length,  
+   'Prec'   = case when type_name(system_type_id) = 'uniqueidentifier' 
+              then precision  
+              else OdbcPrec(system_type_id, max_length, precision) end,  
+   'Scale'   = OdbcScale(system_type_id, scale),  
+   'isNullable'  = is_nullable,
+   'isOutput'	= Is_output,
+   'Param_order'  = parameter_id,  
+   'Collation'   = convert(sysname, 
+                   case when system_type_id in (35, 99, 167, 175, 231, 239)  
+                   then ServerProperty('collation') end)
+  from sys.parameters where object_id = object_id(@spFullName)
+) t   
+ORDER BY param_order 
+    
+set @Result = @Result  + '	}'    
+    
+PRINT @Result    
+select @Result  AS ModelClass  
+
+GO
+
+CREATE PROC CreateC#SpReturnViewModel
+@spFullName sysname,
+@modelName varchar(50)
+AS
+    
+DECLARE @schema VARCHAR(30), @spName VARCHAR(100);  
+SELECT TOP 1 @schema =  value FROM dbo.SplitByCommas(@spFullName,'.')  
+SELECT @spName = value FROM(SELECT TOP 2 * FROM dbo.SplitByCommas(@spFullName,'.') EXCEPT SELECT TOP 1 * FROM dbo.SplitByCommas(@spFullName,'.')) tn  
+
+DECLARE @temptable TABLE (is_hidden bit, column_ordinal int, [NAME] varchar(50), is_nullable bit, system_type_id int, system_type_name varchar(50), max_length INT,
+[precision] INT, [scale] INT, collation_name VARCHAR(200) NULL, user_type_id VARCHAR(200) NULL, user_type_database VARCHAR(200) NULL, user_type_schema VARCHAR(200) NULL, 
+user_type_name VARCHAR(200) NULL, assembly_qualified_type_name VARCHAR(200) NULL, xml_collection_id VARCHAR(200) NULL, xml_collection_database VARCHAR(200) NULL, 
+xml_collection_schema VARCHAR(200) NULL, xml_collection_name VARCHAR(200) NULL, is_xml_document VARCHAR(200) NULL, is_case_sensitive VARCHAR(200) NULL, is_fixed_length_clr_type VARCHAR(200) NULL, source_server VARCHAR(200) NULL, source_database VARCHAR(200) NULL, source_schema VARCHAR(200) NULL, source_table VARCHAR(200) NULL, source_column VARCHAR(200) NULL, is_identity_column VARCHAR(200) NULL, is_part_of_unique_key VARCHAR(200) NULL, is_updateable VARCHAR(200) NULL, is_computed_column VARCHAR(200) NULL, is_sparse_column_set VARCHAR(200) NULL, ordinal_in_order_by_list VARCHAR(200) NULL, order_by_is_descending VARCHAR(200) NULL, order_by_list_length VARCHAR(200) NULL, tds_type_id VARCHAR(200) NULL, tds_length VARCHAR(200) NULL, tds_collation_id VARCHAR(200) NULL, tds_collation_sort_id VARCHAR(200) NULL)
+
+INSERT INTO @temptable
+EXEC sp_describe_first_result_set @spFullName
+
+DECLARE @Result varchar(max) = '    public class ' + @modelName + 'ViewModel
+    {'    
+
+SELECT @Result =    
+  @Result + '
+        public ' + dbo.GetC#ValueType(t.system_type_name) + dbo.GetC#NullType(t.system_type_name,t.is_nullable) + ' ' + t.NAME + ' { get; set; }
+'
+from    
+(    
+SELECT * FROM @temptable
+) t   
+ORDER BY t.column_ordinal
+    
+set @Result = @Result  + '	}'    
+    
+PRINT @Result    
+select @Result  AS ModelClass  
+
+GO
+
+CREATE PROC CreateC#SpReturnModel
+@spFullName sysname,
+@modelName varchar(50)
+AS
+    
+DECLARE @schema VARCHAR(30), @spName VARCHAR(100);  
+SELECT TOP 1 @schema =  value FROM dbo.SplitByCommas(@spFullName,'.')  
+SELECT @spName = value FROM(SELECT TOP 2 * FROM dbo.SplitByCommas(@spFullName,'.') EXCEPT SELECT TOP 1 * FROM dbo.SplitByCommas(@spFullName,'.')) tn  
+
+DECLARE @temptable TABLE (is_hidden bit, column_ordinal int, [NAME] varchar(50), is_nullable bit, system_type_id int, system_type_name varchar(50), max_length INT,
+[precision] INT, [scale] INT, collation_name VARCHAR(200) NULL, user_type_id VARCHAR(200) NULL, user_type_database VARCHAR(200) NULL, user_type_schema VARCHAR(200) NULL, 
+user_type_name VARCHAR(200) NULL, assembly_qualified_type_name VARCHAR(200) NULL, xml_collection_id VARCHAR(200) NULL, xml_collection_database VARCHAR(200) NULL, 
+xml_collection_schema VARCHAR(200) NULL, xml_collection_name VARCHAR(200) NULL, is_xml_document VARCHAR(200) NULL, is_case_sensitive VARCHAR(200) NULL, is_fixed_length_clr_type VARCHAR(200) NULL, source_server VARCHAR(200) NULL, source_database VARCHAR(200) NULL, source_schema VARCHAR(200) NULL, source_table VARCHAR(200) NULL, source_column VARCHAR(200) NULL, is_identity_column VARCHAR(200) NULL, is_part_of_unique_key VARCHAR(200) NULL, is_updateable VARCHAR(200) NULL, is_computed_column VARCHAR(200) NULL, is_sparse_column_set VARCHAR(200) NULL, ordinal_in_order_by_list VARCHAR(200) NULL, order_by_is_descending VARCHAR(200) NULL, order_by_list_length VARCHAR(200) NULL, tds_type_id VARCHAR(200) NULL, tds_length VARCHAR(200) NULL, tds_collation_id VARCHAR(200) NULL, tds_collation_sort_id VARCHAR(200) NULL)
+
+INSERT INTO @temptable
+EXEC sp_describe_first_result_set @spFullName
+
+DECLARE @Result varchar(max) = '    public class ' + @modelName + 'Model
+    {'    
+
+SELECT @Result =    
+  @Result + '
+        public ' + dbo.GetC#ValueType(t.system_type_name) + dbo.GetC#NullType(t.system_type_name,t.is_nullable) + ' ' + t.NAME + ' { get; set; }
+'
+from    
+(    
+SELECT * FROM @temptable
+) t   
+ORDER BY t.column_ordinal
+    
+set @Result = @Result  + '	}'    
+    
+PRINT @Result    
+select @Result  AS ModelClass  
+
+GO
+

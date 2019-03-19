@@ -115,20 +115,5 @@ namespace WebAPI_Server.Controllers.v2
             var result = _cBal.FindAll(true);
             return Ok(result, InfoMessages.CommonInfoMessage);
         }
-
-        /// <summary>
-        /// Test API for repository
-        /// </summary>
-        /// <returns></returns>
-        [HttpPost("runproc")]
-        [AllowAnonymous]
-        public IActionResult CallProcedure([FromBody] TestTicketCustomProcedureParamViewModel paramData)
-        {
-            IEnumerable<PROC_Ticket_Custom_Search_ViewModel> result =
-                _cBalProc.ExecuteStoreProcedure<PROC_Ticket_Custom_Search_Model, TestTicketCustomProcedureParam,
-                    PROC_Ticket_Custom_Search_ViewModel, TestTicketCustomProcedureParamViewModel>(paramData);
-
-            return Ok(result, InfoMessages.CommonInfoMessage);
-        }
     }
 }

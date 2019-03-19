@@ -18,18 +18,13 @@ namespace CodeGenerator
         {
             try
             {
-                //while (true)
-                //{
-                //    var key = Console.ReadKey(true).Key;
-                //    Console.WriteLine(key.ToString());
-                //}
-
                 var serviceProvider = InitApplication.InitApp();
                 bool isContinue = true;
                 bool isContinueForDatabase = true;
                 bool isContinueForMode = true;
                 bool isContinueForTable = true;
 
+                #region Select directory
                 //string dirPath = @"D:\My_Data\Projects\LiveAdmins\WGApi\wgapi\CodeGenerator\";
                 string dirPath = @"";
                 bool isContinueDirPath = true;
@@ -49,12 +44,14 @@ namespace CodeGenerator
                     else
                         Console.Clear();
                 } while (isContinueDirPath);
+                #endregion
 
                 while (isContinue)
                 {
                     Console.Clear();
                     Engine engine = new Engine(dirPath);
 
+                    #region Select Database
                     ConsoleKey selectedDatabase;
                     do
                     {
@@ -79,7 +76,9 @@ namespace CodeGenerator
 
                     string databaseCodeName =
                         databaseName == engine.WebApiDbDatabaseName ? engine.WebApiDbCodeName : databaseName == engine.NorthwindDatabaseName ? engine.NorthwindCodeName : databaseName;
+                    #endregion
 
+                    #region Select Mode
                     ConsoleKey selectedMode;
                     do
                     {
@@ -99,6 +98,7 @@ namespace CodeGenerator
                         else
                             Console.Clear();
                     } while (isContinueForMode);
+                    #endregion
 
                     if (selectedMode == ConsoleKey.D1 || selectedMode == ConsoleKey.NumPad1)
                     {
@@ -117,8 +117,8 @@ namespace CodeGenerator
                         } while (isContinueForTable);
 
                         string schemaName = fullTableName.Split('.')[0];
-                        string tableName, model, viewModel;
-                        tableName = model = fullTableName.Split('.')[1];
+                        string tableName, model, apiServiceName;
+                        tableName = model = apiServiceName = fullTableName.Split('.')[1];
 
                         Console.WriteLine("Generating Model Class Code");
                         string generatedModelClass = engine.GetGeneratedModelClass(databaseName,
@@ -126,6 +126,23 @@ namespace CodeGenerator
                         Console.WriteLine("Generating ViewModel Class Code");
                         string generatedViewModelClass = engine.GetGeneratedViewModelClass(databaseName,
                             $"{schemaName}.{tableName}", serviceProvider);
+
+                        string apiServiceFolderName = databaseName;
+                        string balInitTemp = "\t\tprivate readonly [SB] _[SBC];\n";
+                        string balInit = "";
+                        string balCtorTemp = ", [SB] [SBC]";
+                        string balCtor = "";
+                        string balLinkTemp = "\n\t\t\t_[SBC] = [SBC];";
+                        string balLink = "";
+
+                        string[] selectedBal = $"I{model}Bal".Split(",");
+                        foreach (var sBal in selectedBal)
+                        {
+                            var sbCamelCase = sBal.Substring(1).ToCamelCase();
+                            balInit += balInitTemp.Replace("[SB]", sBal).Replace("[SBC]", sbCamelCase);
+                            balCtor += balCtorTemp.Replace("[SB]", sBal).Replace("[SBC]", sbCamelCase);
+                            balLink += balLinkTemp.Replace("[SBC]", sbCamelCase).Replace("[SBC]", sbCamelCase);
+                        }
 
                         Console.WriteLine("Generating files");
                         //Create Model Class
@@ -163,6 +180,18 @@ namespace CodeGenerator
                                 generatedModelClass,
                                 generatedViewModelClass);
                             engine.WriteToFile(Constants.BalClassDirectory, balClassTem, model, databaseName);
+
+                            //Create Api Service Interface
+                            string serviceInterfaceTem = engine.ReadTemplate(TemplateType.IApiService);
+                            serviceInterfaceTem = engine.ProcessApiServiceTemplate(serviceInterfaceTem, apiServiceFolderName, apiServiceName,
+                                balInit, balCtor, balLink);
+                            engine.WriteToFile(Constants.ApiServiceInterfaceDirectory, serviceInterfaceTem, "", databaseName, apiServiceFolderName, apiServiceName);
+
+                            //Create Api Service Class
+                            string serviceTem = engine.ReadTemplate(TemplateType.ApiService);
+                            serviceTem = engine.ProcessApiServiceTemplate(serviceTem, apiServiceFolderName, apiServiceName,
+                                balInit, balCtor, balLink);
+                            engine.WriteToFile(Constants.ApiServiceDirectory, serviceTem, "", databaseName, apiServiceFolderName, apiServiceName);
 
                             //Update Context Files
                             string repoClassTemp = engine.ReadTemplate(TemplateType.Repository);
@@ -221,12 +250,134 @@ namespace CodeGenerator
                                 mapperKeyword, mapperSpaces);
                             engine.UpdateToFile(Constants.RegisterServiceClassDirectory, diCode, model, databaseName,
                                 diKeyword, mapperSpaces);
+
+                            //Update Mapper files of Service
+                            string mapperClassTempService = engine.ReadTemplate(TemplateType.Mapper);
+                            mapperClassTempService = engine.ProcessApiServiceTemplate(mapperClassTempService, apiServiceFolderName, apiServiceName,
+                                balInit, balCtor, balLink);
+
+                            string serviceCode = mapperClassTempService.Split('\n')[2]
+                                .Substring(0, mapperClassTempService.Split('\n')[2].Length - 1);
+
+                            string serviceKeyword = Constants.RegisterApiServiceKeyword;
+                            string mapperSpacesService = "\t\t\t";
+                            engine.UpdateToFile(Constants.RegisterServiceClassDirectory, serviceCode, "", databaseName,
+                                serviceKeyword, mapperSpacesService);
                         }
                     }
 
                     if (selectedMode == ConsoleKey.D2 || selectedMode == ConsoleKey.NumPad2)
                     {
-                        Console.WriteLine("Store Procedure Generator");
+                        string spName = "";
+                        string modelName = "";
+                        bool generateParam = true;
+                        do
+                        {
+                            Console.WriteLine(
+                                "Enter fully qualified Store Procedure name eg: Schema.procedure (dbo.sp_Users)");
+                            spName = Console.ReadLine();
+                            Console.WriteLine("======================================");
+                            if (spName != null && spName.Split('.').Length == 2)
+                            {
+                                Console.WriteLine(
+                                    "Enter C# Model name for the procedure eg: Users");
+                                modelName = Console.ReadLine();
+                                Console.WriteLine("======================================");
+
+                                Console.Write(
+                                    "Generate parameters model for the Store procedure Y/N: ");
+                                generateParam = Console.ReadKey(true).Key == ConsoleKey.Y;
+                                Console.WriteLine("\n======================================");
+
+                                isContinueForTable = false;
+                            }
+                        } while (isContinueForTable);
+
+                        string generatedSpParamModelClass = "";
+                        string generatedSpParamViewModelClass = "";
+                        if (generateParam)
+                        {
+                            Console.WriteLine("Generating Param Model Class Code");
+                            generatedSpParamModelClass = engine.GetGeneratedSpParamModelClass(databaseName,
+                                spName, modelName, serviceProvider);
+                            Console.WriteLine("Generating param ViewModel Class Code");
+                            generatedSpParamViewModelClass = engine.GetGeneratedSpParamViewModelClass(databaseName,
+                                spName, modelName, serviceProvider);
+                        }
+                        Console.WriteLine("Generating Return Model Class Code");
+                        string generatedSpReturnModelClass = engine.GetGeneratedSpReturnModelClass(databaseName,
+                            spName, modelName, serviceProvider);
+                        Console.WriteLine("Generating Return ViewModel Class Code");
+                        string generatedSpReturnViewModelClass = engine.GetGeneratedSpReturnViewModelClass(databaseName,
+                            spName, modelName, serviceProvider);
+
+                        Console.WriteLine("\nGenerating files");
+
+                        if (generateParam)
+                        {
+                            //Create SP Param Model Class
+                            string paramModelTem = engine.ReadTemplate(TemplateType.SpParamModel);
+                            paramModelTem = engine.ProcessTemplate(paramModelTem, modelName, databaseCodeName, generatedSpParamModelClass,
+                                generatedSpParamViewModelClass);
+                            engine.WriteToFile(Constants.SpParamModelDirectory, paramModelTem, modelName, databaseName);
+
+                            //Create SP Param ViewModel Class
+                            string paramViewModelTem = engine.ReadTemplate(TemplateType.SpParamViewModel);
+                            paramViewModelTem = engine.ProcessTemplate(paramViewModelTem, modelName, databaseCodeName, generatedSpParamModelClass,
+                                generatedSpParamViewModelClass);
+                            engine.WriteToFile(Constants.SpParamViewModelDirectory, paramViewModelTem, modelName, databaseName);
+
+                            //Update StoreProceduresNames Class
+                            string spNameTem = $"public const string {modelName}SpName = \"{spName}\";";
+                            string spNameKeyword = Constants.SpProcNameKeyword.Replace("[DATABASENAME]", databaseName);
+                            string spNameMapperSpaces = "\t\t";
+                            engine.UpdateToFile(Constants.SpProcNameDirectory, spNameTem, modelName, databaseName,
+                                spNameKeyword, spNameMapperSpaces);
+                        }
+
+                        //Create SP Return Model Class
+                        string returnModelTem = engine.ReadTemplate(TemplateType.SpReturnModel);
+                        returnModelTem = engine.ProcessTemplate(returnModelTem, modelName, databaseCodeName, generatedSpReturnModelClass,
+                            generatedSpReturnViewModelClass);
+                        engine.WriteToFile(Constants.SpReturnModelDirectory, returnModelTem, modelName, databaseName);
+
+                        //Create SP Param ViewModel Class
+                        string returnViewModelTem = engine.ReadTemplate(TemplateType.SpReturnViewModel);
+                        returnViewModelTem = engine.ProcessTemplate(returnViewModelTem, modelName, databaseCodeName, generatedSpReturnModelClass,
+                            generatedSpReturnViewModelClass);
+                        engine.WriteToFile(Constants.SpReturnViewModelDirectory, returnViewModelTem, modelName, databaseName);
+
+                        //Update Mapper files For BAL
+                        string mapperClassTemp = engine.ReadTemplate(TemplateType.Mapper);
+                        mapperClassTemp = engine.ProcessTemplate(mapperClassTemp, modelName, databaseCodeName,
+                            "",
+                            "");
+
+                        string paramMapperCode = mapperClassTemp.Split('\n')[3]
+                            .Substring(0, mapperClassTemp.Split('\n')[3].Length - 1);
+                        string retrunMapperCode = mapperClassTemp.Split('\n')[4]
+                            .Substring(0, mapperClassTemp.Split('\n')[4].Length - 1);
+
+                        string paramMapperKeyword = Constants.SpParamMappingProfileKeyword.Replace("[DATABASENAME]", databaseName);
+                        string retrunMapperKeyword = Constants.SpReturnMappingProfileKeyword.Replace("[DATABASENAME]", databaseName);
+                        string mapperSpaces = "\t\t\t";
+                        if (generateParam)
+                            engine.UpdateToFile(Constants.MappingProfileClassDirectory, paramMapperCode, modelName,
+                                databaseName,
+                                paramMapperKeyword, mapperSpaces);
+
+                        engine.UpdateToFile(Constants.MappingProfileClassDirectory, retrunMapperCode, modelName, databaseName,
+                            retrunMapperKeyword, mapperSpaces);
+
+                        if (generateParam)
+                        {
+                            string spCode =
+                                $"ExecuteStoreProcedure<{modelName}Model, {modelName}Param, {modelName}ViewModel, {modelName}ParamViewModel>(new {modelName}ParamViewModel(){{ }});";
+                            Console.WriteLine("======================================");
+                            Console.WriteLine($"Use below code [Auto copied to clipboard]:");
+                            Console.WriteLine(spCode);
+                            TextCopy.Clipboard.SetText(spCode);
+                        }
                     }
 
                     if (selectedMode == ConsoleKey.D3 || selectedMode == ConsoleKey.NumPad3)

@@ -75,6 +75,11 @@ namespace CodeGenerator
             CreateMap<GetModelClassParam, GetModelClassParamViewModel>().ReverseMap();
             CreateMap<GetViewModelClassParam, GetModelClassParamViewModel>().ReverseMap();
             CreateMap<GeneratedModelClass, GeneratedModelClassViewModel>().ReverseMap();
+
+            CreateMap<GetSpParamModelClassParam, GetSpModelClassParamViewModel>().ReverseMap();
+            CreateMap<GetSpParamViewModelClassParam, GetSpModelClassParamViewModel>().ReverseMap();
+            CreateMap<GetSpReturnModelClassParam, GetSpModelClassParamViewModel>().ReverseMap();
+            CreateMap<GetSpReturnViewModelClassParam, GetSpModelClassParamViewModel>().ReverseMap();
         }
     }
 

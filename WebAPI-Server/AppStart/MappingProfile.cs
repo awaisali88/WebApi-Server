@@ -11,15 +11,13 @@ namespace WebAPI_Server.AppStart
     {
         internal MappingProfile()
         {
+            #region Identity
             CreateMap<RegisterUserViewModel, ApplicationUser>().ForMember(x => x.UserName, y => y.MapFrom(map => map.Email ?? string.Empty)).ReverseMap();
             CreateMap<AddNewUserViewModel, ApplicationUser>().ForMember(x => x.UserName, y => y.MapFrom(map => map.Email ?? string.Empty)).ReverseMap();
             CreateMap<LoginUserViewModel, ApplicationUser>().ForMember(x => x.UserName, y => y.MapFrom(map => map.Email ?? string.Empty)).ReverseMap();
             CreateMap<ApplicationRoleViewModel, ApplicationRole>().ReverseMap();
             CreateMap<TestRepo, TestRepoViewModel>().ReverseMap();
-
-            CreateMap<TestTicketCustomProcedureParam, TestTicketCustomProcedureParamViewModel>().ReverseMap();
-            CreateMap<PROC_Ticket_Custom_Search_Model, PROC_Ticket_Custom_Search_ViewModel>().ReverseMap();
-
+            #endregion
 
             #region Auto Generated Code. Don't Delete or Modify this section
             #region WebApiDb Mapper AG
@@ -34,7 +32,23 @@ namespace WebAPI_Server.AppStart
 			CreateMap<OrderDetailsModel, OrderDetailsViewModel>().ReverseMap();
 			CreateMap<ProductsModel, ProductsViewModel>().ReverseMap();
 			CreateMap<SuppliersModel, SuppliersViewModel>().ReverseMap();
-			//[AUTO_GENERATED_MAPPER_Northwind]
+            //[AUTO_GENERATED_MAPPER_Northwind]
+            #endregion
+            #region WebApi Store Procedures
+            #region Parameters Mapper
+            //[AUTO_GENERATED_SPPARAM_MAPPER_WebApiDb]
+            #endregion
+            #region Return Mappers
+            //[AUTO_GENERATED_SPRETURN_MAPPER_WebApiDb]
+            #endregion
+            #endregion
+            #region Northwind Store Procedures
+            #region Parameters Mapper
+            //[AUTO_GENERATED_SPPARAM_MAPPER_Northwind]
+            #endregion
+            #region Return Mappers
+            //[AUTO_GENERATED_SPRETURN_MAPPER_Northwind]
+            #endregion
             #endregion
             #endregion
         }

@@ -33,6 +33,16 @@ namespace CodeGenerator
         public const string ApiServiceInterfaceDirectory = @"WebAPI-Service\[SERVICEDIR]\Interfaces\I[SERVICENAME]Service.cs";
         public const string ApiServiceDirectory = @"WebAPI-Service\[SERVICEDIR]\[SERVICENAME]Service.cs";
 
+        public const string SpParamModelDirectory = @"WebAPI-Model\[DATABASENAME]_Proc\Parameters\[MODEL]Param.cs";
+        public const string SpParamViewModelDirectory = @"WebAPI-ViewModel\DTO\[DATABASENAME]_Proc\Parameters\[MODEL]ParamViewModel.cs";
+        public const string SpReturnModelDirectory = @"WebAPI-Model\[DATABASENAME]_Proc\[MODEL]Model.cs";
+        public const string SpReturnViewModelDirectory = @"WebAPI-ViewModel\DTO\[DATABASENAME]_Proc\[MODEL]ViewModel.cs";
+        public const string SpParamMappingProfileKeyword = @"//[AUTO_GENERATED_SPPARAM_MAPPER_[DATABASENAME]]";
+        public const string SpReturnMappingProfileKeyword = @"//[AUTO_GENERATED_SPRETURN_MAPPER_[DATABASENAME]]";
+
+        public const string SpProcNameDirectory = @"WebAPI-Model\StoreProcedureNames.cs";
+        public const string SpProcNameKeyword = @"//[AUTO_GENERATED_SPROCNAME_[DATABASENAME]]";
+
         #region Templates
         public const string ModelTemplate = @"CodeGenerator\Templates\Model";
         public const string ViewModelTemplate = @"CodeGenerator\Templates\ViewModel";
@@ -43,6 +53,11 @@ namespace CodeGenerator
         public const string ValidatorTemplate = @"CodeGenerator\Templates\Validator";
         public const string ApiServiceTemplate = @"CodeGenerator\Templates\ApiService";
         public const string IApiServiceTemplate = @"CodeGenerator\Templates\IApiService";
+
+        public const string SpParamModelTemplate = @"CodeGenerator\Templates\SpParamModel";
+        public const string SpParamViewModelTemplate = @"CodeGenerator\Templates\SpParamViewModel";
+        public const string SpReturnModelTemplate = @"CodeGenerator\Templates\SpReturnModel";
+        public const string SpReturnViewModelTemplate = @"CodeGenerator\Templates\SpReturnViewModel";
         #endregion
 
         #region TemplateKeywords
@@ -69,6 +84,11 @@ namespace CodeGenerator
         Repository,
         Validator,
         ApiService,
-        IApiService
+        IApiService,
+
+        SpParamModel,
+        SpParamViewModel,
+        SpReturnModel,
+        SpReturnViewModel
     }
 }

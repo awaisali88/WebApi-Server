@@ -1,0 +1,11 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Text;
+using Dapper.Repositories.Attributes;
+using Dapper.Repositories.Extensions;
+
+namespace WebAPI_Model
+{
+[MODELCLASS]
+}
