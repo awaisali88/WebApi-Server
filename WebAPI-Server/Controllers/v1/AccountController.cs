@@ -24,7 +24,7 @@ namespace WebAPI_Server.Controllers.v1
     /// <inheritdoc />
     //[Route("api/v{version:apiVersion}/auth")]
     [ApiVersion(ApiVersionNumber.V1)]
-    [Route("api/auth")]
+    [Route(ApiEndpoints.AccountControllerPrefix)]
     [ApiController]
     public class AccountController : BaseController
     {
@@ -60,7 +60,7 @@ namespace WebAPI_Server.Controllers.v1
         [SwaggerResponse(StatusCodes.Status409Conflict, type: typeof(ApiResponse))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, type: typeof(ApiResponse))]
         [RequireCallbackUrl]
-        [HttpPost("register")]
+        [HttpPost(ApiEndpoints.Register)]
         [AllowAnonymous]
         public async Task<ActionResult<ApiResponse>> RegisterUser([FromBody] RegisterUserViewModel data)
         {
@@ -81,7 +81,7 @@ namespace WebAPI_Server.Controllers.v1
         [SwaggerResponse(StatusCodes.Status409Conflict, type: typeof(ApiResponse))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, type: typeof(ApiResponse))]
         [RequireCallbackUrl]
-        [HttpPost("add-user")]
+        [HttpPost(ApiEndpoints.AddUser)]
         public async Task<ActionResult<ApiResponse<AddNewUserViewModel>>> AddUser([FromBody] AddNewUserViewModel data)
         {
             var result = await _auth.AddNewUserAsync(User, data);
@@ -101,7 +101,7 @@ namespace WebAPI_Server.Controllers.v1
         [SwaggerResponse(StatusCodes.Status404NotFound, type: typeof(ApiResponse))]
         [SwaggerResponse(StatusCodes.Status409Conflict, type: typeof(ApiResponse))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, type: typeof(ApiResponse))]
-        [HttpDelete("remove-user")]
+        [HttpDelete(ApiEndpoints.RemoveUser)]
         public async Task<ActionResult<ApiResponse>> RemoveUser([FromBody] string userId)
         {
             var result = await _auth.DeleteUserAsync(User, userId);
@@ -121,7 +121,7 @@ namespace WebAPI_Server.Controllers.v1
         [SwaggerResponse(StatusCodes.Status400BadRequest, type: typeof(ApiResponse))]
         [SwaggerResponse(StatusCodes.Status409Conflict, type: typeof(ApiResponse))]
         [RequireCallbackUrl]
-        [HttpPost("facebook")]
+        [HttpPost(ApiEndpoints.Facebook)]
         [AllowAnonymous]
         public async Task<ActionResult<ApiResponse<JwtToken>>> Facebook([FromBody]FacebookAuthViewModel model)
         {
@@ -166,7 +166,7 @@ namespace WebAPI_Server.Controllers.v1
         [SwaggerResponse(StatusCodes.Status401Unauthorized, type: typeof(ApiResponse))]
         [SwaggerResponse(StatusCodes.Status403Forbidden, type: typeof(ApiResponse))]
         [RequireCallbackUrl]
-        [HttpPost("authenticate")]
+        [HttpPost(ApiEndpoints.Authenticate)]
         [AllowAnonymous]
         public async Task<ActionResult<ApiResponse<JwtToken>>> Authenticate([FromBody] LoginUserViewModel data)
         {
@@ -187,7 +187,7 @@ namespace WebAPI_Server.Controllers.v1
         /// <returns></returns>
         [SwaggerResponse(StatusCodes.Status200OK, type: typeof(ApiResponse))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, type: typeof(ApiResponse))]
-        [HttpPost("set-password")]
+        [HttpPost(ApiEndpoints.SetPassword)]
         public async Task<ActionResult<ApiResponse>> SetPassword([FromBody] SetPasswordViewModel data)
         {
             var result = await _auth.SetPasswordAsync(User, data);
@@ -205,7 +205,7 @@ namespace WebAPI_Server.Controllers.v1
         /// <returns></returns>
         [SwaggerResponse(StatusCodes.Status200OK, type: typeof(ApiResponse))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, type: typeof(ApiResponse))]
-        [HttpPut("change-password")]
+        [HttpPut(ApiEndpoints.ChangePassword)]
         public async Task<ActionResult<ApiResponse>> ChangePassword([FromBody] ChangePasswordViewModel data)
         {
             var result = await _auth.ChangePasswordAsync(User, data);
@@ -225,7 +225,7 @@ namespace WebAPI_Server.Controllers.v1
         [SwaggerResponse(StatusCodes.Status400BadRequest, type: typeof(ApiResponse))]
         [SwaggerResponse(StatusCodes.Status403Forbidden, type: typeof(ApiResponse))]
         [RequireCallbackUrl]
-        [HttpPost("reset-password-token")]
+        [HttpPost(ApiEndpoints.ResetPasswordToken)]
         [AllowAnonymous]
         public async Task<ActionResult<ApiResponse>> GenerateResetPasswordToken([FromBody] PasswordResetTokenViewModel data)
         {
@@ -244,7 +244,7 @@ namespace WebAPI_Server.Controllers.v1
         /// <returns></returns>
         [SwaggerResponse(StatusCodes.Status200OK, type: typeof(ApiResponse))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, type: typeof(ApiResponse))]
-        [HttpPost("reset-password")]
+        [HttpPost(ApiEndpoints.ResetPassword)]
         [AllowAnonymous]
         public async Task<ActionResult<ApiResponse>> ResetPassword([FromBody] ResetPasswordWithTokenViewModel data)
         {
@@ -265,7 +265,7 @@ namespace WebAPI_Server.Controllers.v1
         [SwaggerResponse(StatusCodes.Status400BadRequest, type: typeof(ApiResponse))]
         [SwaggerResponse(StatusCodes.Status404NotFound, type: typeof(ApiResponse))]
         [SwaggerResponse(StatusCodes.Status409Conflict, type: typeof(ApiResponse))]
-        [HttpPost("verify-email")]
+        [HttpPost(ApiEndpoints.VerifyEmail)]
         [AllowAnonymous]
         public async Task<ActionResult<ApiResponse>> VerifyEmailToken([FromBody] VerifyTokenViewModel data)
         {
@@ -277,7 +277,7 @@ namespace WebAPI_Server.Controllers.v1
             return BadRequest(ErrorMessages.CommonErrorMessage);
         }
 
-        //[HttpPost("verify-reset-password")]
+        //[HttpPost(ApiEndpoints.VerifyResetPassword)]
         //[AllowAnonymous]
         //public async Task<ActionResult<ApiResponse>> VerifyResetPasswordToken([FromBody] VerifyTokenViewModel data)
         //{
@@ -298,7 +298,7 @@ namespace WebAPI_Server.Controllers.v1
         [SwaggerResponse(StatusCodes.Status401Unauthorized, type: typeof(ApiResponse))]
         [SwaggerResponse(StatusCodes.Status404NotFound, type: typeof(ApiResponse))]
         [RequireCallbackUrl]
-        [HttpPost("refresh-token")]
+        [HttpPost(ApiEndpoints.RefreshToken)]
         [AllowAnonymous]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenViewModel data)
         {
@@ -317,7 +317,7 @@ namespace WebAPI_Server.Controllers.v1
         [SwaggerResponse(StatusCodes.Status200OK, type: typeof(ApiResponse))]
         [SwaggerResponse(StatusCodes.Status404NotFound, type: typeof(ApiResponse))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, type: typeof(ApiResponse))]
-        [HttpPost("logoff")]
+        [HttpPost(ApiEndpoints.LogOff)]
         public async Task<ActionResult<ApiResponse>> Revoke()
         {
             var result = await _auth.RevokeToken(User);
@@ -338,7 +338,7 @@ namespace WebAPI_Server.Controllers.v1
         [SwaggerResponse(StatusCodes.Status201Created, type: typeof(ApiResponse))]
         [SwaggerResponse(StatusCodes.Status409Conflict, type: typeof(ApiResponse))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, type: typeof(ApiResponse))]
-        [HttpPost("add-role")]
+        [HttpPost(ApiEndpoints.AddRole)]
         public async Task<IActionResult> CreateRole([FromBody] ApplicationRoleViewModel data)
         {
             var result = await _authorize.CreateRole(User, data);
@@ -356,7 +356,7 @@ namespace WebAPI_Server.Controllers.v1
         /// <returns></returns>
         [SwaggerResponse(StatusCodes.Status200OK, type: typeof(ApiResponse))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, type: typeof(ApiResponse))]
-        [HttpPut("update-role")]
+        [HttpPut(ApiEndpoints.UpdateRole)]
         public async Task<IActionResult> UpdateRole([FromBody] ApplicationRoleViewModel data)
         {
             var result = await _authorize.UpdateRole(User, data);
@@ -374,7 +374,7 @@ namespace WebAPI_Server.Controllers.v1
         /// <returns></returns>
         [SwaggerResponse(StatusCodes.Status200OK, type: typeof(ApiResponse))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, type: typeof(ApiResponse))]
-        [HttpDelete("delete-role")]
+        [HttpDelete(ApiEndpoints.DeleteRole)]
         public async Task<IActionResult> RemoveRole([FromBody] ApplicationRoleViewModel data)
         {
             var result = await _authorize.RemoveRole(User, data);
@@ -391,7 +391,7 @@ namespace WebAPI_Server.Controllers.v1
         /// <param name="roleName">Role name to check for user</param>
         /// <returns></returns>
         [SwaggerResponse(StatusCodes.Status200OK, type: typeof(ApiResponse))]
-        [HttpGet("has-role")]
+        [HttpGet(ApiEndpoints.HasRole)]
         public async Task<IActionResult> UserIsInRole([FromQuery] string roleName)
         {
             var result = await _authorize.UserIsInRole(User, roleName);
@@ -412,7 +412,7 @@ namespace WebAPI_Server.Controllers.v1
         [SwaggerResponse(StatusCodes.Status200OK, type: typeof(ApiResponse))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, type: typeof(ApiResponse))]
         [SwaggerResponse(StatusCodes.Status404NotFound, type: typeof(ApiResponse))]
-        [HttpPost("assign-role")]
+        [HttpPost(ApiEndpoints.AssignRole)]
         public async Task<IActionResult> AssignRole([FromBody] AssignRoleViewModel data)
         {
             var result = await _authorize.AssignRole(User, data.UserId, data.RoleId);
@@ -431,7 +431,7 @@ namespace WebAPI_Server.Controllers.v1
         [SwaggerResponse(StatusCodes.Status200OK, type: typeof(ApiResponse))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, type: typeof(ApiResponse))]
         [SwaggerResponse(StatusCodes.Status404NotFound, type: typeof(ApiResponse))]
-        [HttpDelete("remove-role")]
+        [HttpDelete(ApiEndpoints.RemoveRole)]
         public async Task<IActionResult> RemoveFromRole([FromBody] AssignRoleViewModel data)
         {
             var result = await _authorize.RemoveFromRole(User, data.UserId, data.RoleId);
@@ -448,7 +448,7 @@ namespace WebAPI_Server.Controllers.v1
         /// <param name="data">role and user data</param>
         /// <returns></returns>
         [SwaggerResponse(StatusCodes.Status200OK, type: typeof(ApiResponse))]
-        [HttpPost("user-role")]
+        [HttpPost(ApiEndpoints.UserRole)]
         public async Task<IActionResult> SpecificUserIsInRole([FromBody] UserHasRoleViewModel data)
         {
             var result = await _authorize.UserIsInRole(data.UserId, data.RoleId);

@@ -18,6 +18,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using WebAPI_Server.AppStart;
 using WebAPI_Server.Middleware;
+using WebAPI_ViewModel.ConfigSettings;
 
 namespace WebAPI_Server
 {
@@ -64,6 +65,7 @@ namespace WebAPI_Server
             services.ConfigureDatabase(Configuration, CurrentEnvironment);
             services.ConfigureJwt(Configuration, CurrentEnvironment);
             services.ConfigureElmah(Configuration, CurrentEnvironment);
+            services.ConfigureMongoDatabase(Configuration, CurrentEnvironment);
 
             services.AddRouting(options => options.LowercaseUrls = true);
             services.AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV");
@@ -131,12 +133,15 @@ namespace WebAPI_Server
 
 
             #region Api Behavior Optons ([ApiController] Attribute)
+            var appSettingsSection = Configuration.GetSection(nameof(AppSettings));
+            var appSettings = appSettingsSection.Get<AppSettings>();
+
             services.Configure<ApiBehaviorOptions>(options =>
             {
                 options.SuppressModelStateInvalidFilter = false;
                 options.InvalidModelStateResponseFactory = actionContext =>
                 {
-                    if (!OpenUrls.WebUrls.Any(x => actionContext.HttpContext.Request.Path.StartsWithSegments(x)))
+                    if (!OpenUrls.WebUrls.Any(x => actionContext.HttpContext.Request.Path.StartsWithSegments($"{appSettings.WebAppName}{x}")))
                     {
                         var errors = actionContext.ModelState
                             .Where(e => e.Value.Errors.Count > 0)
@@ -220,11 +225,13 @@ namespace WebAPI_Server
 
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), 
             // specifying the Swagger JSON endpoint.
+            var appSettingsSection = Configuration.GetSection(nameof(AppSettings));
+            var appSettings = appSettingsSection.Get<AppSettings>();
             app.UseSwaggerUI(c =>
             {
                 foreach (var description in provider.ApiVersionDescriptions)
                 {
-                    c.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
+                    c.SwaggerEndpoint($"{appSettings.WebAppName}/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
                     c.RoutePrefix = "api-doc";
                     c.DocumentTitle = "Web API Doc";
                 }

@@ -54,10 +54,10 @@ Note: Please be aware of the followig columns. These columns need extra steps to
 	eg. CreateMap<CustomerModel, CustomerViewModel>().ReverseMap();
 
 6. Add Model repository in WebAPI-DataAccess(project) > "Database name"Context(folder) > "Database name class"
-	GreeterApp Database
-		IApplicationDbContext.cs, AppDbContext_Private.cs, AppDbContext_Public.cs
-	TicketSystem Database
-		ITicketSystemDbContext.cs, TS_DbContext_Private.cs, TS_DbContext_Public.cs
+	WebApiDb Database
+		IWebApiDbContext.cs, AppDbContext_Private.cs, AppDbContext_Public.cs
+	Northwind Database
+		INorthwindDbContext.cs, TS_DbContext_Private.cs, TS_DbContext_Public.cs
 
 	eg. (If Customer table is in GreeterApp Database)
 	1. Add this code in IApplicationDbContext ()

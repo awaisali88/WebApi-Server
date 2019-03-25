@@ -223,10 +223,10 @@ namespace CodeGenerator
                                 engine.UpdateToFile(Constants.NorthwindDbContextInterfaceDirectory, repoInterface,
                                     model,
                                     databaseName, repoKeyword, initialSpaces);
-                                engine.UpdateToFile(Constants.TicketSystemContextPublicClassDirectory, repoPublic,
+                                engine.UpdateToFile(Constants.NorthwindContextPublicClassDirectory, repoPublic,
                                     model,
                                     databaseName, repoKeyword, initialSpaces);
-                                engine.UpdateToFile(Constants.TicketSystemContextPrivateClassDirectory, repoPrivate,
+                                engine.UpdateToFile(Constants.NorthwindContextPrivateClassDirectory, repoPrivate,
                                     model,
                                     databaseName, repoKeyword, initialSpaces);
                             }

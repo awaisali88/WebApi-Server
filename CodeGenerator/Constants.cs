@@ -20,14 +20,14 @@ namespace CodeGenerator
         public const string RegisterServiceKeyword = @"//[AUTO_GENERATED_SCOPED_SERVICES_[DATABASENAME]]";
         public const string RegisterApiServiceKeyword = @"//[AUTO_GENERATED_SCOPED_ApiServices]";
 
-        //GreeterApp Context
+        //WebApiDb Context
         public const string WebApiDbDbContextInterfaceDirectory = @"WebAPI-DataAccess\WebApiContext\IWebApiDbContext.cs";
         public const string AppContextPublicClassDirectory = @"WebAPI-DataAccess\WebApiContext\WebApiDbContext_Public.cs";
         public const string AppContextPrivateClassDirectory = @"WebAPI-DataAccess\WebApiContext\WebApiDbContext_Private.cs";
-        //TicketSystem Context
+        //Northwind Context
         public const string NorthwindDbContextInterfaceDirectory = @"WebAPI-DataAccess\NorthwindContext\INorthwindDbContext.cs";
-        public const string TicketSystemContextPublicClassDirectory = @"WebAPI-DataAccess\NorthwindContext\NorthwindDbContext_Public.cs";
-        public const string TicketSystemContextPrivateClassDirectory = @"WebAPI-DataAccess\NorthwindContext\NorthwindDbContext_Private.cs";
+        public const string NorthwindContextPublicClassDirectory = @"WebAPI-DataAccess\NorthwindContext\NorthwindDbContext_Public.cs";
+        public const string NorthwindContextPrivateClassDirectory = @"WebAPI-DataAccess\NorthwindContext\NorthwindDbContext_Private.cs";
         public const string RepositoryKeyword = @"//[AUTO_GENERATED_REPO_[DATABASENAME]]";
 
         public const string ApiServiceInterfaceDirectory = @"WebAPI-Service\[SERVICEDIR]\Interfaces\I[SERVICENAME]Service.cs";

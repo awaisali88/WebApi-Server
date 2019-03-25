@@ -958,7 +958,10 @@ namespace Dapper.Repositories.SqlGenerator
 
                     bool nestedRightProperty = false;
                     object propertyValue = null;
-                    if (innerbody.Right.NodeType == ExpressionType.MemberAccess)
+                    if (innerbody.Right.NodeType == ExpressionType.MemberAccess &&
+                        innerbody.Left is MemberExpression leftExpression &&
+                        innerbody.Right is MemberExpression rightExpression &&
+                        leftExpression.Expression == rightExpression.Expression)
                         propertyValue = ExpressionHelper.GetPropertyNamePath(innerbody.Right, out nestedRightProperty) + "_[COLUMN]";
                     else
                         propertyValue = ExpressionHelper.GetValue(innerbody.Right);

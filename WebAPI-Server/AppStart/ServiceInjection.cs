@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using MongoDB.Driver;
 using WebAPI_BAL.IdentityManager;
 using WebAPI_BAL.JwtGenerator;
 using WebAPI_DataAccess;
@@ -42,6 +43,21 @@ namespace WebAPI_Server.AppStart
                 options.SqlProvider = SqlProvider.MSSQL;
                 options.UseQuotationMarks = true;
             });
+        }
+
+        internal static void ConfigureMongoDatabase(this IServiceCollection services, IConfiguration configuration, IHostingEnvironment env)
+        {
+
+            services.Configure<MongoDbOptions>(
+                options =>
+                {
+                    options.ConnectionString =
+                        configuration.GetSection("MongoDb:ConnectionString").Value;
+                    options.Database = configuration.GetSection("MongoDb:Database").Value;
+                });
+
+            services.AddSingleton<IMongoClient, MongoClient>(
+                _ => new MongoClient(configuration.GetSection("MongoDb:ConnectionString").Value));
         }
 
         internal static void ConfigureJwt(this IServiceCollection services, IConfiguration configuration, IHostingEnvironment env)
@@ -107,11 +123,16 @@ namespace WebAPI_Server.AppStart
         {
             string connString = configuration.GetConnectionString("WebApiConnection");
 
-            if (configuration.GetSection(nameof(FacebookAuthSettings)).Value != null)
+            try
+            {
                 services.Configure<FacebookAuthSettings>(configuration.GetSection(nameof(FacebookAuthSettings)));
 
-            if (configuration.GetSection(nameof(SmtpConfig)).Value != null)
                 services.Configure<SmtpConfig>(configuration.GetSection(nameof(SmtpConfig)));
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
 
             SingletonServices(services);
 

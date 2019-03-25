@@ -7,8 +7,10 @@ using Common.Messages;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
+using WebAPI_ViewModel.ConfigSettings;
 using WebAPI_ViewModel.Response;
 
 namespace WebAPI_Server.Middleware
@@ -20,15 +22,17 @@ namespace WebAPI_Server.Middleware
     {
         private readonly RequestDelegate _next;
         private readonly ILogger<ExceptionMiddleware> _logger;
+        private readonly AppSettings _appSettings;
         /// <summary>
         /// 
         /// </summary>
         /// <param name="next"></param>
         /// <param name="logger"></param>
-        public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
+        public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger, IOptions<AppSettings> appSettingConfig)
         {
             _next = next;
             _logger = logger;
+            _appSettings = appSettingConfig.Value;
         }
 
         /// <summary>
@@ -42,7 +46,10 @@ namespace WebAPI_Server.Middleware
             try
             {
                 _logger.LogInformation("{@Path}", httpContext.Request.Path);
-                if (OpenUrls.Urls.Any(x => httpContext.Request.Path.StartsWithSegments(x)) && !OpenUrls.WebUrls.Any(x => httpContext.Request.Path.StartsWithSegments(x)))
+                if (OpenUrls.Urls.Any(x =>
+                        httpContext.Request.Path.StartsWithSegments($"{_appSettings.WebAppName}{x}")) &&
+                    !OpenUrls.WebUrls.Any(x =>
+                        httpContext.Request.Path.StartsWithSegments($"{_appSettings.WebAppName}{x}")))
                 {
                     AuthenticateResult result = await httpContext.AuthenticateAsync("Identity.Application");
                     if (!result.Succeeded)
@@ -65,7 +72,7 @@ namespace WebAPI_Server.Middleware
 
                 await _next(httpContext);
 
-                if (!OpenUrls.WebUrls.Any(x => httpContext.Request.Path.StartsWithSegments(x)))
+                if (!OpenUrls.WebUrls.Any(x => httpContext.Request.Path.StartsWithSegments($"{_appSettings.WebAppName}{x}")))
                 {
                     switch (httpContext.Response.StatusCode)
                     {

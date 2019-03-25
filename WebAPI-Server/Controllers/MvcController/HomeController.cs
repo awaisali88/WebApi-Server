@@ -6,9 +6,11 @@ using Common.Exception;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using WebAPI_BAL.IdentityManager;
 using WebAPI_BAL.JwtGenerator;
 using WebAPI_Server.Controllers.v1;
+using WebAPI_ViewModel.ConfigSettings;
 using WebAPI_ViewModel.Identity;
 using IAuthenticationService = WebAPI_Service.Service.IAuthenticationService;
 
@@ -24,9 +26,11 @@ namespace WebAPI_Server.Controllers.MvcController
         private readonly ILogger<AccountController> _logger;
         private readonly IJwtFactory _jwtFactory;
         private readonly IAuthenticationService _authService;
+        private readonly AppSettings _appSettings;
 
         public HomeController(ApplicationUserManager userManager, IMapper mapper,
-            ApplicationSignInManager signInManager, ILogger<AccountController> logger, IJwtFactory jwtFactory, IAuthenticationService authService)
+            ApplicationSignInManager signInManager, ILogger<AccountController> logger, IJwtFactory jwtFactory, IAuthenticationService authService,
+            IOptions<AppSettings> _appSettingsConfig)
         {
             _userManager = userManager;
             _mapper = mapper;
@@ -34,6 +38,7 @@ namespace WebAPI_Server.Controllers.MvcController
             _logger = logger;
             _jwtFactory = jwtFactory;
             _authService = authService;
+            _appSettings = _appSettingsConfig.Value;
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]
@@ -43,6 +48,7 @@ namespace WebAPI_Server.Controllers.MvcController
         [HttpGet]
         public ActionResult Login()
         {
+            ViewBag.ApplicationName = _appSettings.WebAppName;
             return View();
         }
 
@@ -52,6 +58,7 @@ namespace WebAPI_Server.Controllers.MvcController
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Login(LoginUserViewModel loginUser)
         {
+            ViewBag.ApplicationName = _appSettings.WebAppName;
             List<ErrorsModelException> errors = _authService.ValidateLoginForWeb(loginUser);
             if (!errors.Any())
             {
@@ -59,7 +66,7 @@ namespace WebAPI_Server.Controllers.MvcController
                     await _signInManager.PasswordSignInAsync(loginUser.Email, loginUser.Password, true, false);
                 if (signInResult.Succeeded)
                 {
-                    return Redirect("/api-doc");
+                    return Redirect($"{_appSettings.WebAppName}/api-doc");
                 }
 
                 if (signInResult.IsLockedOut)

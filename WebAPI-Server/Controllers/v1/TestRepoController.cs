@@ -53,6 +53,10 @@ namespace WebAPI_Server.Controllers.v1
             _ordersBal = ordersBal;
             _orderDetailsBal = orderDetailsBal;
             _customersBal = customersBal;
+
+            //Get Service Object from DI
+            //private readonly IServiceProvider _serviceProvider; //get from Constructor
+            //var serviceName = _serviceProvider.GetService<IService>();
         }
 
         /// <summary>
