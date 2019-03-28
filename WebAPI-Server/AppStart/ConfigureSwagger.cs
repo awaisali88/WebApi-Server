@@ -137,7 +137,7 @@ namespace WebAPI_Server.AppStart
                     return;
                 }
 
-                var accessTokenPolicies = _accessTokenPolicySelector(atAttributes) ?? Enumerable.Empty<string>();
+                var accessTokenPolicies = _accessTokenPolicySelector(atAttributes) ?? System.Linq.Enumerable.Empty<string>();
                 var tokenPolicies = accessTokenPolicies as string[] ?? accessTokenPolicies.ToArray();
                 if (tokenPolicies.Any())
                 {
@@ -179,7 +179,7 @@ namespace WebAPI_Server.AppStart
                         });
                 //operation.Responses.Add("401", new Response { Description = JsonConvert.SerializeObject(new ApiResponse(false, ErrorMessages.UnAuthorized, null)) });
                 
-                var authorizePolicies = _authorizePolicySelector(attributes) ?? Enumerable.Empty<string>();
+                var authorizePolicies = _authorizePolicySelector(attributes) ?? System.Linq.Enumerable.Empty<string>();
 
                 policy.Add($"oauth2_{_groupName}", authorizePolicies);
 

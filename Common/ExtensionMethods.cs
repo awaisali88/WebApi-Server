@@ -308,5 +308,75 @@ namespace Common
             }
             return default(TValue);
         }
+        
+        public static string ToMillis(this DateTime currentTime)
+        {
+            DateTime dt1970 = new DateTime(1970, 1, 1);
+            TimeSpan span = currentTime - dt1970;
+            string[] split = span.TotalMilliseconds.ToString().Split('.');
+            return zeroPadString(split[0], 15);
+        }
+        private static string zeroPadString(string str, int length)
+        {
+            if (str == null || str.Length > length)
+            {
+                return str;
+            }
+            return str.ToString().PadLeft(length, '0').ToString();
+        }
+
+        public static string ReplaceSpecialCharacters(this string stringValue)
+        {
+            var updatedString = "";
+            updatedString = stringValue.Replace("%23", "#");
+            updatedString = updatedString.Replace("%22", "\"");
+            updatedString = updatedString.Replace("%20", " ");
+            updatedString = updatedString.Replace("%24", "$");
+            updatedString = updatedString.Replace("%24", "$");
+            updatedString = updatedString.Replace("%26", "&");
+            updatedString = updatedString.Replace("%2B", "+");
+            updatedString = updatedString.Replace("%2C", ",");
+            updatedString = updatedString.Replace("%2F", "/");
+            updatedString = updatedString.Replace("%3A", ":");
+            updatedString = updatedString.Replace("%3B", ";");
+            updatedString = updatedString.Replace("%3D", "=");
+            updatedString = updatedString.Replace("%3F", "?");
+            updatedString = updatedString.Replace("%40", "@");
+            return updatedString;
+        }
+
+    }
+
+    public static class Enumerable
+    {
+        public static bool NotContains<TSource>(this IEnumerable<TSource> source, TSource value)
+        {
+            ICollection<TSource> collection = source as ICollection<TSource>;
+            if (collection != null) return collection.NotContains(value);
+            return NotContains<TSource>(source, value, null);
+        }
+        public static bool NotContains<TSource>(this IEnumerable<TSource> source, TSource value, IEqualityComparer<TSource> comparer)
+        {
+            if (comparer == null) comparer = EqualityComparer<TSource>.Default;
+            if (source == null) throw new ArgumentNullException("source");
+            foreach (TSource element in source)
+                if (!comparer.Equals(element, value)) return true;
+            return false;
+        }
+
+        public static T PickRandom<T>(this IEnumerable<T> source)
+        {
+            return source.PickRandom(1).Single();
+        }
+
+        public static IEnumerable<T> PickRandom<T>(this IEnumerable<T> source, int count)
+        {
+            return source.Shuffle().Take(count);
+        }
+
+        public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> source)
+        {
+            return source.OrderBy(x => Guid.NewGuid());
+        }
     }
 }

@@ -16,6 +16,7 @@ namespace WebAPI_BAL
         where TDbContext : IDapperDbContext
     {
         IDbConnection Conn { get; }
+        void UseMultipleActiveResultSet(bool val);
 
         #region Handle Transaction
         TReturn HandleTransaction<TReturn>(Func<IDbTransaction, TReturn> repoFunc);
@@ -663,6 +664,7 @@ namespace WebAPI_BAL
         where TDbContext : IDapperDbContext
     {
         IDbConnection Conn { get; }
+        void UseMultipleActiveResultSet(bool val);
 
         #region Store Procedure
 

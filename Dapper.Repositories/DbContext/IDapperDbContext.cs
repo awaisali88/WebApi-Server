@@ -8,6 +8,9 @@ namespace Dapper.Repositories.DbContext
     /// </summary>
     public interface IDapperDbContext : IDisposable
     {
+        IDapperRepository<TModel> GetRepository<TModel>(bool defaultConnection = true) where TModel : class;
+        IDapperSProcRepository GetSpRepository(bool defaultConnection = true);
+
         /// <summary>
         ///     Get opened DB Connection
         /// </summary>

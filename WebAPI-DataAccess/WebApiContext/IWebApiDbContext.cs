@@ -6,10 +6,8 @@ namespace WebAPI_DataAccess.WebApiContext
 {
     public interface IWebApiDbContext : IDapperDbContext
     {
-        IDapperSProcRepository StoreProcedureRepo { get; }
-        IDapperRepository<TestRepo> TestRepo { get; }
-
         #region Auto Generated Code. Don't Delete or Modify this section
+        IDapperRepository<TestRepo> TestRepo { get; }
         //[AUTO_GENERATED_REPO_WebApiDb]
         #endregion
     }

@@ -7,8 +7,11 @@ using Serilog;
 namespace Dapper.Repositories.DbContext
 {
     /// <inheritdoc />
-    public class DapperDbContext : IDapperDbContext
+    public abstract class DapperDbContext : IDapperDbContext
     {
+        public abstract IDapperRepository<TModel> GetRepository<TModel>(bool defaultConnection = true) where TModel : class;
+        public abstract IDapperSProcRepository GetSpRepository(bool defaultConnection = true);
+
         private bool _closeConnection = true;
         /// <summary>
         ///     DB Connection for internal use

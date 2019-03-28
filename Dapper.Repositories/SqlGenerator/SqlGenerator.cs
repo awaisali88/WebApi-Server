@@ -940,6 +940,20 @@ namespace Dapper.Repositories.SqlGenerator
                                 queryProperties.Add(new QueryParameter(link, propertyName + "_where", propertyValue, opr, isNested, false));
                                 break;
                             }
+                            case "NotContains":
+                            {
+                                var propertyName = ExpressionHelper.GetPropertyNamePath(innerBody, out var isNested, true);
+
+                                if (!SqlProperties.Select(x => x.PropertyName).Contains(propertyName) &&
+                                    !SqlJoinProperties.Select(x => x.PropertyName).Contains(propertyName))
+                                    throw new NotSupportedException("predicate can't parse");
+
+                                var propertyValue = ExpressionHelper.GetValue(innerBody.Arguments[0]);
+                                var opr = ExpressionHelper.GetMethodCallSqlOperator(methodName);
+                                var link = ExpressionHelper.GetSqlOperator(linkingType);
+                                queryProperties.Add(new QueryParameter(link, propertyName + "_where", propertyValue, opr, isNested, false));
+                                break;
+                            }
                             default:
                                 throw new NotSupportedException($"'{methodName}' method is not supported");
                         }

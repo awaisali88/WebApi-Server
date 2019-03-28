@@ -121,10 +121,12 @@ namespace WebAPI_Server.Controllers.v1
             //    new TestRepoViewModel() { FirstName = "Update With In Query 123", RowVersion = rowVersion });
 
             //Working
-            var data = _testRepoBal.Update(User, x => testId.Contains(x.Id), x => x.FirstName,
-                new TestRepoViewModel() { FirstName = "Update With In Query 456" });
+            //var data = _testRepoBal.Update(User, x => testId.Contains(x.Id), x => x.FirstName,
+            //    new TestRepoViewModel() { FirstName = "Update With In Query 456" });
+            var data1 = _testRepoBal.FindAll(x => testId.Contains(x.Id));
+            var data2 = _testRepoBal.FindAll(x => testId.NotContains(x.Id));
 
-            return Ok(data, InfoMessages.CommonInfoMessage);
+            return Ok(data2, InfoMessages.CommonInfoMessage);
 
             //return StatusCodeResult(StatusCodes.Status400BadRequest, result.Item2, ErrorMessages.RecordNotFoundUpdate);
 

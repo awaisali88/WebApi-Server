@@ -88,6 +88,9 @@ namespace Dapper.Repositories.SqlGenerator
                 case "Contains":
                     return "IN";
 
+                case "NotContains":
+                    return "NOT IN";
+
                 case "Any":
                 case "All":
                     return methodName.ToUpperInvariant();
@@ -123,12 +126,13 @@ namespace Dapper.Repositories.SqlGenerator
         }
 
 
-        public static MemberExpression GetMemberExpression(Expression expression)
+        public static MemberExpression GetMemberExpression(Expression expression, bool secondArgument = false)
         {
             switch (expression)
             {
                 case MethodCallExpression expr:
-                    return (MemberExpression)expr.Arguments[0];
+                    return secondArgument ? (MemberExpression)expr.Arguments[expr.Arguments.Count - 1] :
+                        (MemberExpression)expr.Arguments[0];
                     
                 case MemberExpression memberExpression:
                     return memberExpression;
@@ -166,11 +170,12 @@ namespace Dapper.Repositories.SqlGenerator
         /// </summary>
         /// <param name="expr">The Expression.</param>
         /// <param name="nested">Out. Is nested property.</param>
+        /// <param name="secondArgument">Has second Argument.</param>
         /// <returns>The property name for the property expression.</returns>
-        public static string GetPropertyNamePath(Expression expr, out bool nested)
+        public static string GetPropertyNamePath(Expression expr, out bool nested, bool secondArgument = false)
         {
             var path = new StringBuilder();
-            var memberExpression = GetMemberExpression(expr);
+            var memberExpression = GetMemberExpression(expr, secondArgument);
             var count = 0;
             do
             {

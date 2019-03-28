@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using Dapper.Repositories;
+using Dapper.Repositories.Attributes;
 using Dapper.Repositories.DbContext;
 using Dapper.Repositories.Extensions;
 using Microsoft.AspNetCore.Hosting;
@@ -26,8 +27,8 @@ namespace WebAPI_BAL
         protected readonly IHttpContextAccessor _httpContextAccessor;
         protected readonly ILogger<CommonBusinessLogic<TDbContext, TEntity, TEntityViewModel>> _logger;
 
-        protected readonly IDapperRepository<TEntity> _repo;
-        protected readonly IDapperSProcRepository _spRepo;
+        protected IDapperRepository<TEntity> _repo;
+        protected IDapperSProcRepository _spRepo;
 
         protected readonly IDbConnection _dbConn;
         public IDbConnection Conn => _dbConn;
@@ -40,17 +41,30 @@ namespace WebAPI_BAL
             _env = env;
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
-            
-            var repoProperty = _db.GetType().GetProperties().FirstOrDefault(x => x.PropertyType == typeof(IDapperRepository<TEntity>));
-            var spRepoProperty = _db.GetType().GetProperties().FirstOrDefault(x => x.PropertyType == typeof(IDapperSProcRepository));
 
-            if (repoProperty != null)
-                _repo = (IDapperRepository<TEntity>)repoProperty.GetValue(_db);
-            else
-                throw new ArgumentNullException($"Repository for {typeof(TEntity).Name} is not defined in Database Context.");
+            bool isInMemoryTable = typeof(TEntity).GetCustomAttributes(false)
+                .Any(x => x is InMemoryTableAttribute);
+            _repo = isInMemoryTable ? db.GetRepository<TEntity>(false) : db.GetRepository<TEntity>();
 
-            if (spRepoProperty != null)
-                _spRepo = (IDapperSProcRepository)spRepoProperty.GetValue(_db);
+            _spRepo = _db.GetSpRepository();
+
+            //var spRepoProperty = _db.GetType().GetProperties()
+            //    .FirstOrDefault(x => x.PropertyType == typeof(IDapperSProcRepository));
+            //if (spRepoProperty != null)
+            //    _spRepo = (IDapperSProcRepository)spRepoProperty.GetValue(_db);
+            //var repoProperty = _db.GetType().GetProperties()
+            //    .FirstOrDefault(x => x.PropertyType == typeof(IDapperRepository<TEntity>));
+            //if (repoProperty != null)
+            //    _repo = (IDapperRepository<TEntity>) repoProperty.GetValue(_db);
+            //else
+            //    throw new ArgumentNullException(
+            //        $"Repository for {typeof(TEntity).Name} is not defined in Database Context.");
+        }
+
+        public void UseMultipleActiveResultSet(bool val)
+        {
+            _repo = val ? _db.GetRepository<TEntity>() : _db.GetRepository<TEntity>(false);
+            _spRepo = val ? _db.GetSpRepository() : _db.GetSpRepository(false);
         }
 
         #region Manage Or Handle Transaction
@@ -1321,7 +1335,7 @@ namespace WebAPI_BAL
         private readonly TDbContext _db;
         private readonly IMapper _mapper;
         private readonly ILogger<CommonStoreProcBusinessLogic<TDbContext>> _logger;
-        private readonly IDapperSProcRepository _spRepo;
+        private IDapperSProcRepository _spRepo;
 
         protected readonly IDbConnection _dbConn;
         public IDbConnection Conn => _dbConn;
@@ -1335,13 +1349,13 @@ namespace WebAPI_BAL
             _mapper = mapper;
             _logger = logger;
 
-            var spRepoProperty = _db.GetType().GetProperties()
-                .FirstOrDefault(x => x.PropertyType == typeof(IDapperSProcRepository));
-
-            if (spRepoProperty != null)
-                _spRepo = (IDapperSProcRepository)spRepoProperty.GetValue(_db);
+            _spRepo = _db.GetSpRepository();
         }
 
+        public void UseMultipleActiveResultSet(bool val)
+        {
+            _spRepo = val ? _db.GetSpRepository() : _db.GetSpRepository(false);
+        }
 
         private TReturn ManageOrHandleTransaction<TReturn, TData1>(Func<TData1, IDbTransaction, TReturn> func,
             TData1 data1, IDbTransaction transaction, bool manageTransaction)
