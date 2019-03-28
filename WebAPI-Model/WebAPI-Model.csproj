@@ -14,4 +14,8 @@
     <ProjectReference Include="..\Dapper.Repositories\Dapper.Repositories.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="WebApiDb\" />
+  </ItemGroup>
+
 </Project>

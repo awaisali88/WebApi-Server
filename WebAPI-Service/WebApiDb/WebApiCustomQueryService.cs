@@ -5,7 +5,7 @@ using WebAPI_BAL.BLL;
 using WebAPI_Model;
 using WebAPI_ViewModel.DTO;
 
-namespace WebAPI_Service.WebApi
+namespace WebAPI_Service.WebApiDb
 {
     public class WebApiCustomQueryService : IWebApiCustomQueryService
     {
