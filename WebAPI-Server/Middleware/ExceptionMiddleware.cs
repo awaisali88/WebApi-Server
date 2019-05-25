@@ -12,6 +12,7 @@ using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 using WebAPI_ViewModel.ConfigSettings;
 using WebAPI_ViewModel.Response;
+using Refit;
 
 namespace WebAPI_Server.Middleware
 {
@@ -96,6 +97,11 @@ namespace WebAPI_Server.Middleware
             {
                 _logger.LogError("{@Exception}", ex);
                 await HandleApiAppExceptionAsync(httpContext, ex);
+            }
+            catch (ApiException ex)
+            {
+                _logger.LogError("{@Exception}", ex);
+                await HandleExceptionAsync(httpContext, ex);
             }
             catch (Exception ex)
                 {

@@ -12,7 +12,7 @@ using WebAPI_BAL.JwtGenerator;
 using WebAPI_Server.Controllers.v1;
 using WebAPI_ViewModel.ConfigSettings;
 using WebAPI_ViewModel.Identity;
-using IAuthenticationService = WebAPI_Service.Service.IAuthenticationService;
+using IAuthenticationService = WebAPI_Service.Identity.IAuthenticationService;
 
 namespace WebAPI_Server.Controllers.MvcController
 {

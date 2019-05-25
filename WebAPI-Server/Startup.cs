@@ -66,6 +66,7 @@ namespace WebAPI_Server
             services.ConfigureJwt(Configuration, CurrentEnvironment);
             services.ConfigureElmah(Configuration, CurrentEnvironment);
             services.ConfigureMongoDatabase(Configuration, CurrentEnvironment);
+            services.ConfigureThirdPartyApiClient(Configuration);
 
             services.AddRouting(options => options.LowercaseUrls = true);
             services.AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV");

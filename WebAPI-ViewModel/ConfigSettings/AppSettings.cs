@@ -4,5 +4,6 @@
     {
         public string WebAppName { get; set; }
         public string SecretKey { get; set; }
+        public string ThirdPartyApiUrl { get; set; }
     }
 }

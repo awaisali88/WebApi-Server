@@ -179,6 +179,16 @@ namespace WebAPI_BAL
         ///     Delete objects from DB
         /// </summary>
         Task<bool> DeleteAsync(ClaimsPrincipal claim, Expression<Func<TEntityViewModel, bool>> where, TEntityViewModel viewModelData, IDbTransaction transaction = null, bool manageTransaction = true);
+
+        /// <summary>
+        ///     Delete objects from DB
+        /// </summary>
+        bool Delete(ClaimsPrincipal claim, Expression<Func<TEntityViewModel, bool>> where, IDbTransaction transaction = null, bool manageTransaction = true);
+
+        /// <summary>
+        ///     Delete objects from DB
+        /// </summary>
+        Task<bool> DeleteAsync(ClaimsPrincipal claim, Expression<Func<TEntityViewModel, bool>> where, IDbTransaction transaction = null, bool manageTransaction = true);
         #endregion 
 
         #region Count
@@ -668,6 +678,8 @@ namespace WebAPI_BAL
 
         #region Store Procedure
 
+        TReturn HandleTransaction<TReturn>(Func<IDbTransaction, TReturn> repoFunc);
+
         /// <summary>
         /// Execute Store Procedure
         /// </summary>
@@ -680,7 +692,7 @@ namespace WebAPI_BAL
         /// <param name="manageTransaction"></param>
         /// <returns></returns>
         IEnumerable<TDataViewModel> ExecuteStoreProcedure<TData, TParams, TDataViewModel, TParamsViewModel>(
-            TParamsViewModel spParam, IDbTransaction transaction = null, bool manageTransaction = true)
+            TParamsViewModel spParam, IDbTransaction transaction = null, bool manageTransaction = true, bool useMultipleActiveResultSet = true)
             where TParams : class, ISProcParam;
 
         /// <summary>
@@ -695,7 +707,7 @@ namespace WebAPI_BAL
         /// <param name="manageTransaction"></param>
         /// <returns></returns>
         Task<IEnumerable<TDataViewModel>> ExecuteStoreProcedureAsync<TData, TParams, TDataViewModel, TParamsViewModel>(
-            TParamsViewModel spParam, IDbTransaction transaction = null, bool manageTransaction = true)
+            TParamsViewModel spParam, IDbTransaction transaction = null, bool manageTransaction = true, bool useMultipleActiveResultSet = true)
             where TParams : class, ISProcParam;
 
         #endregion

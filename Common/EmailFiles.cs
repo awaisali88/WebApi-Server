@@ -12,6 +12,9 @@ namespace Common
         public const string ApiKey = "access-token";
         public const string Authorization = "Authorization";
         public const string AntiForgeryTokenHeader = "X-XSRF-TOKEN";
+        public const string Origin = "Origin";
+        public const string UserAgent = "User-Agent";
+        public const string Referer = "Referer";
     }
 
 

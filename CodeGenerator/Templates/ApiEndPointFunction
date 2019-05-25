@@ -1,0 +1,21 @@
+﻿
+		/// <summary>
+		/// [APIDESCRIPTION]
+		/// </summary>[PARAMETERSSUMMARY]
+		/// <returns></returns>
+		[SwaggerResponse(StatusCodes.Status200OK, type: typeof(ApiResponse<[RETURNTYPE]>))]
+		[SwaggerResponse(StatusCodes.Status400BadRequest, type: typeof(ApiResponse))]
+		[SwaggerResponse(StatusCodes.Status401Unauthorized, type: typeof(ApiResponse))]
+		[Http[METHODTYPE](ApiEndpoints.[APIENDPOINTNAMEVARIABLE])]
+		public IActionResult [APIFUNCTIONNAME]([APIFUNCTIONPARAMETERS])
+		{
+			_logger.LogInformation($"[APIFUNCTIONNAME] Call started at {DateTime.UtcNow}");
+			
+			[APISERVICEINTERFACE] [APISERVICEVARIABLE] =
+			    _serviceProvider.GetService<[APISERVICEINTERFACE]>();
+			var data = [APISERVICEVARIABLE].[APISERVICEFUNCTION](User[APIFUNCTIONSERVICEPARAMETERS]);
+			
+			return Ok(data, InfoMessages.CommonInfoMessage);
+		}
+	}
+}

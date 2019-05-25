@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Claims;
@@ -10,12 +11,14 @@ using Dapper.Repositories;
 using Dapper.Repositories.Attributes;
 using Dapper.Repositories.DbContext;
 using Dapper.Repositories.Extensions;
+using Dapper.Repositories.SqlGenerator;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 namespace WebAPI_BAL
 {
+
     public abstract class CommonBusinessLogic<TDbContext, TEntity, TEntityViewModel> : ICommonBusinessLogic<TDbContext, TEntity, TEntityViewModel>
         where TEntity : class, IDefaultColumns
         where TEntityViewModel : class
@@ -33,7 +36,9 @@ namespace WebAPI_BAL
         protected readonly IDbConnection _dbConn;
         public IDbConnection Conn => _dbConn;
 
-        protected CommonBusinessLogic(TDbContext db, IMapper mapper, IHostingEnvironment env, IHttpContextAccessor httpContextAccessor, ILogger<CommonBusinessLogic<TDbContext, TEntity, TEntityViewModel>> logger)
+        protected CommonBusinessLogic(TDbContext db, IMapper mapper, IHostingEnvironment env,
+            IHttpContextAccessor httpContextAccessor,
+            ILogger<CommonBusinessLogic<TDbContext, TEntity, TEntityViewModel>> logger)
         {
             _db = db;
             _dbConn = _db.Connection;
@@ -650,8 +655,8 @@ namespace WebAPI_BAL
         {
             TEntity entityData = _mapper.Map<TEntity>(viewModelData);
             Expression<Func<TEntity, bool>> entityPredicate = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
-            entityData = ExtBusinessLogic.GetDeleteEntity(entityData, ExtBusinessLogic.UserValue(claim));
-            return ManageOrHandleTransaction(_repo.Delete, entityPredicate, entityData, transaction, manageTransaction);
+            //entityData = ExtBusinessLogic.GetDeleteEntity(entityData, ExtBusinessLogic.UserValue(claim));
+            return ManageOrHandleTransaction(_repo.Delete, entityPredicate, transaction, manageTransaction);
             //return ManageOrHandleTransaction(_repo.Delete, entityPredicate, transaction, manageTransaction);
         }
 
@@ -660,8 +665,28 @@ namespace WebAPI_BAL
         {
             TEntity entityData = _mapper.Map<TEntity>(viewModelData);
             Expression<Func<TEntity, bool>> entityPredicate = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
-            entityData = ExtBusinessLogic.GetDeleteEntity(entityData, ExtBusinessLogic.UserValue(claim));
-            return ManageOrHandleTransaction(_repo.DeleteAsync, entityPredicate, entityData, transaction, manageTransaction);
+            //entityData = ExtBusinessLogic.GetDeleteEntity(entityData, ExtBusinessLogic.UserValue(claim));
+            return ManageOrHandleTransaction(_repo.DeleteAsync, entityPredicate, transaction, manageTransaction);
+            //return ManageOrHandleTransaction(_repo.DeleteAsync, entityPredicate, transaction, manageTransaction);
+        }
+
+        public virtual bool Delete(ClaimsPrincipal claim, Expression<Func<TEntityViewModel, bool>> where,
+            IDbTransaction transaction = null, bool manageTransaction = true)
+        {
+            Expression<Func<TEntity, bool>> entityPredicate = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
+            //var entityData = ManageOrHandleTransaction(_repo.Find, entityPredicate, false, transaction, manageTransaction);
+            //entityData = ExtBusinessLogic.GetDeleteEntity(entityData, ExtBusinessLogic.UserValue(claim));
+            return ManageOrHandleTransaction(_repo.Delete, entityPredicate, transaction, manageTransaction);
+            //return ManageOrHandleTransaction(_repo.Delete, entityPredicate, transaction, manageTransaction);
+        }
+
+        public virtual Task<bool> DeleteAsync(ClaimsPrincipal claim, Expression<Func<TEntityViewModel, bool>> where,
+            IDbTransaction transaction = null, bool manageTransaction = true)
+        {
+            Expression<Func<TEntity, bool>> entityPredicate = _mapper.Map<Expression<Func<TEntity, bool>>>(where);
+            //var entityData = ManageOrHandleTransaction(_repo.Find, entityPredicate, false, transaction, manageTransaction);
+            //entityData = ExtBusinessLogic.GetDeleteEntity(entityData, ExtBusinessLogic.UserValue(claim));
+            return ManageOrHandleTransaction(_repo.DeleteAsync, entityPredicate, transaction, manageTransaction);
             //return ManageOrHandleTransaction(_repo.DeleteAsync, entityPredicate, transaction, manageTransaction);
         }
 
@@ -1333,7 +1358,7 @@ namespace WebAPI_BAL
         where TDbContext : IDapperDbContext
     {
         private readonly TDbContext _db;
-        private readonly IMapper _mapper;
+        protected readonly IMapper _mapper;
         private readonly ILogger<CommonStoreProcBusinessLogic<TDbContext>> _logger;
         private IDapperSProcRepository _spRepo;
 
@@ -1355,6 +1380,31 @@ namespace WebAPI_BAL
         public void UseMultipleActiveResultSet(bool val)
         {
             _spRepo = val ? _db.GetSpRepository() : _db.GetSpRepository(false);
+        }
+
+        public TReturn HandleTransaction<TReturn>(Func<IDbTransaction, TReturn> repoFunc)
+        {
+            TReturn result;
+            using (var transaction = _db.BeginTransaction(false))
+            {
+                try
+                {
+                    result = repoFunc(transaction);
+                    transaction.Commit();
+                }
+                catch (Exception)
+                {
+                    transaction.Rollback();
+                    throw;
+                }
+                finally
+                {
+                    transaction.Dispose();
+                    _db.CloseConnection();
+                }
+            }
+
+            return result;
         }
 
         private TReturn ManageOrHandleTransaction<TReturn, TData1>(Func<TData1, IDbTransaction, TReturn> func,
@@ -1394,8 +1444,9 @@ namespace WebAPI_BAL
         #region Store Procedure
 
         public virtual IEnumerable<TDataViewModel> ExecuteStoreProcedure<TData, TParams, TDataViewModel, TParamsViewModel>(
-            TParamsViewModel spParam, IDbTransaction transaction = null, bool manageTransaction = true) where TParams : class, ISProcParam
+            TParamsViewModel spParam, IDbTransaction transaction = null, bool manageTransaction = true, bool useMultipleActiveResultSet = true) where TParams : class, ISProcParam
         {
+            UseMultipleActiveResultSet(useMultipleActiveResultSet);
             if (_spRepo != null)
             {
                 TParams paramsData = _mapper.Map<TParams>(spParam);
@@ -1408,8 +1459,9 @@ namespace WebAPI_BAL
         }
 
         public virtual async Task<IEnumerable<TDataViewModel>> ExecuteStoreProcedureAsync<TData, TParams, TDataViewModel, TParamsViewModel>(
-            TParamsViewModel spParam, IDbTransaction transaction = null, bool manageTransaction = true) where TParams : class, ISProcParam
+            TParamsViewModel spParam, IDbTransaction transaction = null, bool manageTransaction = true, bool useMultipleActiveResultSet = true) where TParams : class, ISProcParam
         {
+            UseMultipleActiveResultSet(useMultipleActiveResultSet);
             if (_spRepo != null)
             {
                 TParams paramsData = _mapper.Map<TParams>(spParam);

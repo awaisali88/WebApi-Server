@@ -245,7 +245,7 @@ namespace WebAPI_Server.AppStart
             if (operation.Parameters == null)
                 operation.Parameters = new List<IParameter>();
 
-            if (context.GetControllerAndActionAttributes<RequireCallbackUrl>().Any())
+            if (context.GetControllerAndActionAttributes<RequireCallbackUrlFilter>().Any())
             {
                 operation.Parameters.Add(new NonBodyParameter
                 {

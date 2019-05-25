@@ -7,25 +7,43 @@ using Dapper.Repositories.Extensions;
 
 namespace CodeGenerator
 {
+    public static class ProcedureNames
+    {
+        public const string CreateModelFromTable = "dbo.CreateC#ModelFromTable";
+        public const string CreateViewModelFromTable = "dbo.CreateC#ViewModelFromTable";
+        public const string CreateSpParamModel = "dbo.CreateC#SpParamModel";
+        public const string CreateSpParamViewModel = "dbo.CreateC#SpParamViewModel";
+        public const string CreateSpReturnModel = "dbo.CreateC#SpReturnModel";
+        public const string CreateSpReturnViewModel = "dbo.CreateC#SpReturnViewModel";
+    }
+
     public class GetModelClassParam : ISProcParam
     {
-        public string ProcedureName => "CreateC#ModelFromTable";
+        public string ProcedureName => ProcedureNames.CreateModelFromTable;
 
         [ProcedureParam("@TableName", typeof(string))]
         public string TableName { get; set; }
+
+        [ProcedureParam("@ModelName", typeof(string))]
+        public string ModelName { get; set; }
+    }
+
+    public class GetViewModelClassParam : ISProcParam
+    {
+        public string ProcedureName => ProcedureNames.CreateViewModelFromTable;
+
+        [ProcedureParam("@TableName", typeof(string))]
+        public string TableName { get; set; }
+
+        [ProcedureParam("@ModelName", typeof(string))]
+        public string ModelName { get; set; }
     }
 
     public class GetModelClassParamViewModel
     {
         public string TableName { get; set; }
-    }
 
-    public class GetViewModelClassParam : ISProcParam
-    {
-        public string ProcedureName => "CreateC#ViewModelFromTable";
-
-        [ProcedureParam("@TableName", typeof(string))]
-        public string TableName { get; set; }
+        public string ModelName { get; set; }
     }
 
     public class GeneratedModelClass
@@ -38,7 +56,6 @@ namespace CodeGenerator
         public string ModelClass { get; set; }
     }
 
-
     ////////////////////////////////////////////////////////
     // ReSharper disable once InvalidXmlDocComment
     /// Generate Store procedure Classes
@@ -46,7 +63,7 @@ namespace CodeGenerator
 
     public class GetSpParamModelClassParam : ISProcParam
     {
-        public string ProcedureName => "dbo.CreateC#SpParamModel";
+        public string ProcedureName => ProcedureNames.CreateSpParamModel;
 
         [ProcedureParam("@spFullName", typeof(string))]
         public string SpName { get; set; }
@@ -57,7 +74,7 @@ namespace CodeGenerator
 
     public class GetSpParamViewModelClassParam : ISProcParam
     {
-        public string ProcedureName => "dbo.CreateC#SpParamViewModel";
+        public string ProcedureName => ProcedureNames.CreateSpParamViewModel;
 
         [ProcedureParam("@spFullName", typeof(string))]
         public string SpName { get; set; }
@@ -68,7 +85,7 @@ namespace CodeGenerator
 
     public class GetSpReturnModelClassParam : ISProcParam
     {
-        public string ProcedureName => "dbo.CreateC#SpReturnModel";
+        public string ProcedureName => ProcedureNames.CreateSpReturnModel;
 
         [ProcedureParam("@spFullName", typeof(string))]
         public string SpName { get; set; }
@@ -79,7 +96,7 @@ namespace CodeGenerator
 
     public class GetSpReturnViewModelClassParam : ISProcParam
     {
-        public string ProcedureName => "dbo.CreateC#SpReturnViewModel";
+        public string ProcedureName => ProcedureNames.CreateSpReturnViewModel;
 
         [ProcedureParam("@spFullName", typeof(string))]
         public string SpName { get; set; }

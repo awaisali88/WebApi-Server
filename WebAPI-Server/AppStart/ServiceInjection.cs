@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using Common;
+using Common.Exception;
 using Dapper.Identity;
 using Dapper.Identity.Stores;
 using ElmahCore.Mvc;
@@ -12,10 +13,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
+using Refit;
 using WebAPI_BAL.IdentityManager;
 using WebAPI_BAL.JwtGenerator;
 using WebAPI_DataAccess;
 using WebAPI_Server.Middleware;
+using WebAPI_Service.ThirdPartyService;
 using WebAPI_ViewModel.ConfigSettings;
 
 namespace WebAPI_Server.AppStart
@@ -226,5 +229,21 @@ namespace WebAPI_Server.AppStart
                     });
             });
         }
+
+        internal static void ConfigureThirdPartyApiClient(this IServiceCollection services, IConfiguration configuration)
+        {
+            var appSettingsSection = configuration.GetSection(nameof(AppSettings));
+            var appSettings = appSettingsSection.Get<AppSettings>();
+
+            var settings = new RefitSettings();
+
+            services.AddRefitClient<IThirdPartyApi>(settings).ConfigureHttpClient(c =>
+            {
+                c.BaseAddress = new Uri(appSettings.ThirdPartyApiUrl);
+            }).SetHandlerLifetime(TimeSpan.FromMinutes(2));
+
+            //services.AddHttpClient<CwgApiService>().AddTypedClient(Refit.RestService.For<ICwgApi>);
+        }
+
     }
 }

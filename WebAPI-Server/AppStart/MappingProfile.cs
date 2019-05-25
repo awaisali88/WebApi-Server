@@ -1,7 +1,6 @@
 using AutoMapper;
 using Dapper.Identity.Stores;
 using WebAPI_Model;
-using WebAPI_Model.Test;
 using WebAPI_ViewModel.DTO;
 using WebAPI_ViewModel.Identity;
 
@@ -16,12 +15,12 @@ namespace WebAPI_Server.AppStart
             CreateMap<AddNewUserViewModel, ApplicationUser>().ForMember(x => x.UserName, y => y.MapFrom(map => map.Email ?? string.Empty)).ReverseMap();
             CreateMap<LoginUserViewModel, ApplicationUser>().ForMember(x => x.UserName, y => y.MapFrom(map => map.Email ?? string.Empty)).ReverseMap();
             CreateMap<ApplicationRoleViewModel, ApplicationRole>().ReverseMap();
-            CreateMap<TestRepo, TestRepoViewModel>().ReverseMap();
             #endregion
 
             #region Auto Generated Code. Don't Delete or Modify this section
             #region WebApiDb Mapper AG
-            //[AUTO_GENERATED_MAPPER_WebApiDb]
+            CreateMap<TestRepoModel, TestRepoViewModel>().ReverseMap();
+			//[AUTO_GENERATED_MAPPER_WebApiDb]
             #endregion
             #region Northwind Mapper AG
             CreateMap<CategoriesModel, CategoriesViewModel>().ReverseMap();

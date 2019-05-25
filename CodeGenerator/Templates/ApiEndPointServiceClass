@@ -1,0 +1,7 @@
+﻿
+		public [RETURNTYPE] [APISERVICEFUNCTION](ClaimsPrincipal claims[APISERVICEFUNCTIONPARAMETERS])
+		{
+			return default([RETURNTYPE]);
+		}
+	}
+}

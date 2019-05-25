@@ -28,7 +28,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
-    <ProjectReference Include="..\Dapper.Repositories\Dapper.Repositories.csproj" />
+    <ProjectReference Include="..\Dapper.Repositories.110\Dapper.Repositories.110.csproj" />
     <ProjectReference Include="..\WebAPI-Model\WebAPI-Model.csproj" />
   </ItemGroup>
 

@@ -83,6 +83,8 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="8.0.0" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="ElmahCore" Version="1.2.5" />
+    <PackageReference Include="ElmahCore.Sql" Version="1.2.5" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="8.1.3" />
     <PackageReference Include="MicroElements.Swashbuckle.FluentValidation" Version="2.0.0-beta.3" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
@@ -98,18 +100,17 @@
     <PackageReference Include="Serilog.Enrichers.AspnetcoreHttpcontext" Version="1.1.0" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="3.0.1" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+    <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="7.1.0" />
     <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
     <PackageReference Include="Serilog.Sinks.Seq" Version="4.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="4.5.3" />
+    <PackageReference Include="UAParser.FormFactor" Version="2.0.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\Dapper.Identity\Dapper.Identity.csproj" />
-    <ProjectReference Include="..\ElmahCore.MsSql\ElmahCore.Sql.csproj" />
-    <ProjectReference Include="..\ElmahCore.Mvc\ElmahCore.Mvc.csproj" />
-    <ProjectReference Include="..\ElmahCore\ElmahCore.csproj" />
     <ProjectReference Include="..\Encryptor\Encryptor.csproj" />
     <ProjectReference Include="..\WebAPI-BAL\WebAPI-BAL.csproj" />
     <ProjectReference Include="..\WebAPI-Model\WebAPI-Model.csproj" />

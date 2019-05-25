@@ -7,9 +7,9 @@ using WebAPI_BAL.BLL;
 using WebAPI_BAL.NotificationManager;
 using WebAPI_DataAccess.NorthwindContext;
 using WebAPI_DataAccess.WebApiContext;
+using WebAPI_Service.Identity;
 using WebAPI_Service.Northwind;
-using WebAPI_Service.Service;
-using WebAPI_Service.WebApi;
+using WebAPI_Service.WebApiDb;
 
 namespace WebAPI_Server.AppStart
 {
@@ -36,14 +36,15 @@ namespace WebAPI_Server.AppStart
             services.TryAddScoped<IAuthenticationService, AuthenticationService>();
 			services.TryAddScoped<IWebApiCustomQueryService, WebApiCustomQueryService>();
 			services.TryAddScoped<INorthwindCustomQueryService, NorthwindCustomQueryService>();
+			services.TryAddScoped<ITestRepoService, TestRepoService>();
 			//[AUTO_GENERATED_SCOPED_ApiServices]
             #endregion
 
             #region Auto Generated Code. Don't Delete or Modify this section
             #region WebApiDb Bal AG
-            services.TryAddScoped<ITestRepoBal, TestRepoBal>();
             services.TryAddScoped<IWebApiCustomQueryBal, WebApiCustomQueryBal>();
-            //[AUTO_GENERATED_SCOPED_SERVICES_WebApiDb]
+            services.TryAddScoped<ITestRepoBal, TestRepoBal>();
+			//[AUTO_GENERATED_SCOPED_SERVICES_WebApiDb]
             #endregion
             #region Northwind Bal AG
             services.TryAddScoped<INorthwindCustomQueryBal, NorthwindCustomQueryBal>();

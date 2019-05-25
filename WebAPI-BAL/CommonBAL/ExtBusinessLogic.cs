@@ -14,7 +14,7 @@ namespace WebAPI_BAL
     {
         public static string UserValue(ClaimsPrincipal claim, string value = nameof(ApplicationUser.Id))
         {
-            return claim != null && claim.Claims.Any() ? claim.Claims.Single(c => c.Type == value.ToLower()).Value : "";
+            return claim != null && claim.Claims.Any() ? claim.Claims.Single(c => c.Type.ToLower() == value.ToLower()).Value : "";
         }
 
         internal static void CheckRecordForNull<TDefaultColumns>(TDefaultColumns data) where TDefaultColumns : IDefaultColumns

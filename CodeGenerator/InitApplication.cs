@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using AutoMapper;
 using Common;
@@ -32,6 +33,8 @@ namespace CodeGenerator
             string webApiDbConnString = configuration.GetConnectionString("WebApiConnection");
             string northWindConnString = configuration.GetConnectionString("NorthWindConnection");
 
+            var databaseSection = configuration.GetSection(nameof(Databases));
+
             var serviceProvider = new ServiceCollection()
                 .AddLogging()
                 //.AddTransient(typeof(ICommonBusinessLogic<,,>), typeof(CommonBusinessLogic<,,>))
@@ -55,7 +58,7 @@ namespace CodeGenerator
                     options.SqlProvider = SqlProvider.MSSQL;
                     options.UseQuotationMarks = true;
                 })
-                //.AddSingleton<IBarService, BarService>()
+                .Configure<Databases>(databaseSection)
                 .BuildServiceProvider();
 
             var logger = serviceProvider.GetService<ILoggerFactory>()
@@ -91,5 +94,14 @@ namespace CodeGenerator
         public IFileProvider WebRootFileProvider { get; set; }
         public string ContentRootPath { get; set; }
         public IFileProvider ContentRootFileProvider { get; set; }
+    }
+
+    public class Databases
+    {
+        public string DatabaseName { get; set; }
+        public string DatabaseCodeName { get; set; }
+
+        public List<string> DatabaseNames => !string.IsNullOrEmpty(DatabaseName) ? DatabaseName.Split(",").ToList() : null;
+        public List<string> DatabaseCodeNames => !string.IsNullOrEmpty(DatabaseCodeName) ? DatabaseCodeName.Split(",").ToList() : null;
     }
 }

@@ -580,195 +580,156 @@ GO
 -----Create Procedure for code creation
 ----------------------------------------------------------------------------------------------------
 
-CREATE PROC CreateC#ModelFromTable   
-@TableName sysname  
-AS  
-  
-  DECLARE @schema VARCHAR(30), @table VARCHAR(100);
-  SELECT TOP 1 @schema =  value FROM dbo.SplitByCommas(@TableName,'.')
-  SELECT @table = value FROM(SELECT TOP 2 * FROM dbo.SplitByCommas(@TableName,'.') EXCEPT SELECT TOP 1 * FROM dbo.SplitByCommas(@TableName,'.')) tn
-
-
-DECLARE @Result varchar(max) = '    [Table("'+ @table +'", Schema = "'+@schema+'")]'+CHAR(10)+'    public class ' + @table + 'Model : CommonColumns  
-    {'  
-  
---SELECT @Result = @Result + '  
--- [Column("'+ ColumnName +'")]  
---    public ' + ColumnType + NullableSign + ' ' + ColumnName + ' { get; set; }  
---'  
-SELECT @Result =  
- CASE   
- WHEN t.IsPrimaryKey = 1 THEN   
+CREATE PROC CreateC#ModelFromTable
+@TableName sysname,
+@ModelName varchar(500)
+AS      
+      
+  DECLARE @schema VARCHAR(30), @table VARCHAR(100);    
+  SELECT TOP 1 @schema =  value FROM dbo.SplitByCommas(@TableName,'.')    
+  SELECT @table = value FROM(SELECT TOP 2 * FROM dbo.SplitByCommas(@TableName,'.') EXCEPT SELECT TOP 1 * FROM dbo.SplitByCommas(@TableName,'.')) tn    
+    
+    
+DECLARE @Result varchar(max) = '    [Table("'+ @table +'", Schema = "'+@schema+'")]'+CHAR(10)+'    public class ' + @ModelName + 'Model : DefaultColumns
+	{'
+      
+--SELECT @Result = @Result + '      
+-- [Column("'+ ColumnName +'")]      
+--    public ' + ColumnType + NullableSign + ' ' + ColumnName + ' { get; set; }      
+--'      
+SELECT @Result =      
+ CASE       
+ WHEN t.IsPrimaryKey = 1 THEN       
   @Result + '
-        [Identity, Key]  
-        public ' + ColumnType + NullableSign + ' ' + ColumnName + ' { get; set; }  
-'  
- WHEN t.ColumnName = 'Status' THEN   
-  @Result + '  
-        public new ' + ColumnType + NullableSign + ' ' + ColumnName + ' { get; set; }  
-'  
- ELSE   
-  @Result + '  
-        public ' + ColumnType + NullableSign + ' ' + ColumnName + ' { get; set; }  
-'  
-end  
-from  
-(  
-    select   
-        replace(col.name, ' ', '_') ColumnName,  
-        column_id ColumnId,  
-        case typ.name   
-            when 'bigint' then 'long'  
-            when 'binary' then 'byte[]'  
-            when 'bit' then 'bool'  
-            when 'char' then 'string'  
-            when 'date' then 'DateTime'  
-            when 'datetime' then 'DateTime'  
-            when 'datetime2' then 'DateTime'  
-            when 'datetimeoffset' then 'DateTimeOffset'  
-            when 'decimal' then 'decimal'  
-            when 'float' then 'float'  
-            when 'image' then 'byte[]'  
-            when 'int' then 'int'  
-            when 'money' then 'decimal'  
-            when 'nchar' then 'char'  
-            when 'ntext' then 'string'  
-            when 'numeric' then 'decimal'  
-            when 'nvarchar' then 'string'  
-            when 'real' then 'double'  
-            when 'smalldatetime' then 'DateTime'  
-            when 'smallint' then 'short'  
-            when 'smallmoney' then 'decimal'  
-            when 'text' then 'string'  
-            when 'time' then 'TimeSpan'  
-            when 'timestamp' then 'DateTime'  
-            when 'tinyint' then 'byte'  
-            when 'uniqueidentifier' then 'Guid'  
-            when 'varbinary' then 'byte[]'  
-            when 'varchar' then 'string'  
-            else 'UNKNOWN_' + typ.name  
-        end ColumnType,  
-        case   
-            when col.is_nullable = 1 and typ.name in ('bigint', 'bit', 'date', 'datetime', 'datetime2', 'datetimeoffset', 'decimal', 'float', 'int', 'money', 'numeric', 'real', 'smalldatetime', 'smallint', 'smallmoney', 'time', 'tinyint', 'uniqueidentifie
-r')   
-            then '?'   
-            else ''   
-        end NullableSign,  
-CASE   
-    WHEN EXISTS (  
- SELECT *  
- FROM  
-  sys.indexes AS I   
-  INNER JOIN   
-  sys.index_columns AS IC   
-  ON IC.object_id = I.object_id   
-  AND IC.index_id = I.index_id  
- WHERE    
-  I.object_id = col.object_id  
-  AND IC.object_id = col.object_id  
-  AND I.is_primary_key = 1  
-  AND IC.index_id = I.index_id   
-  AND IC.column_id = col.column_id  
- )    
- THEN 1   
-    ELSE 0   
-    END AS IsPrimaryKey  
-    from sys.columns col  
-        join sys.types typ on  
-            col.system_type_id = typ.system_type_id AND col.user_type_id = typ.user_type_id  
-    where object_id = object_id(@TableName)  
-) t  
-order by ColumnId  
-  
-set @Result = @Result  + '  
-    }'  
-  
-PRINT @Result  
-select @Result  AS ModelClass
-  
-
+        [Identity, Key]
+        public ' + ColumnType + NullableSign + ' ' + ColumnName + ' { get; set; }
+'      
+ WHEN t.ColumnName = 'Status' THEN       
+  @Result + '
+        public new ' + ColumnType + NullableSign + ' ' + ColumnName + ' { get; set; }
+'      
+ ELSE       
+  @Result + '
+        public ' + ColumnType + NullableSign + ' ' + ColumnName + ' { get; set; }
+'      
+end      
+from      
+(      
+    select       
+        replace(col.name, ' ', '_') ColumnName,      
+        column_id ColumnId,      
+        dbo.GetC#ValueType(typ.name) ColumnType,  
+  dbo.GetC#NullType(typ.name, col.is_nullable) NullableSign,      
+CASE       
+    WHEN EXISTS (      
+ SELECT *      
+ FROM      
+  sys.indexes AS I       
+  INNER JOIN       
+  sys.index_columns AS IC       
+  ON IC.object_id = I.object_id       
+  AND IC.index_id = I.index_id      
+ WHERE        
+  I.object_id = col.object_id      
+  AND IC.object_id = col.object_id      
+  AND I.is_primary_key = 1      
+  AND IC.index_id = I.index_id       
+  AND IC.column_id = col.column_id      
+ )        
+ THEN 1       
+    ELSE 0       
+    END AS IsPrimaryKey      
+    from sys.columns col      
+        join sys.types typ on      
+            col.system_type_id = typ.system_type_id AND col.user_type_id = typ.user_type_id      
+    where object_id = object_id(@TableName)      
+) t      
+order by ColumnId      
+      
+set @Result = @Result  + '    }'      
+      
+PRINT @Result      
+select @Result  AS ModelClass      
 GO
 
-
-CREATE PROC CreateC#ViewModelFromTable   
-@TableName sysname  
-AS  
-
-  DECLARE @schema VARCHAR(30), @table VARCHAR(100);
-  SELECT TOP 1 @schema =  value FROM dbo.SplitByCommas(@TableName,'.')
-  SELECT @table = value FROM(SELECT TOP 2 * FROM dbo.SplitByCommas(@TableName,'.') EXCEPT SELECT TOP 1 * FROM dbo.SplitByCommas(@TableName,'.')) tn
+CREATE PROC CreateC#ViewModelFromTable
+@TableName sysname,
+@ModelName sysname
+AS    
   
-DECLARE @Result varchar(max) = '    public class ' + @table + 'ViewModel : DefaultViewModel  
-    {'  
-SELECT @Result =   
- CASE   
- WHEN t.ColumnName = 'Status' THEN   
-  @Result + '  
-        public new ' + ColumnType + NullableSign + ' ' + ColumnName + ' { get; set; }  
-'  
- ELSE   
-  @Result + '  
-        public ' + ColumnType + NullableSign + ' ' + ColumnName + ' { get; set; }  
-'  
-end  
-  
-from  
-(  
-    select   
-        replace(col.name, ' ', '_') ColumnName,  
-        column_id ColumnId,  
-        case typ.name   
-            when 'bigint' then 'long'  
-            when 'binary' then 'byte[]'  
-            when 'bit' then 'bool'  
-            when 'char' then 'string'  
-            when 'date' then 'DateTime'  
-            when 'datetime' then 'DateTime'  
-            when 'datetime2' then 'DateTime'  
-            when 'datetimeoffset' then 'DateTimeOffset'  
-            when 'decimal' then 'decimal'  
-            when 'float' then 'float'  
-            when 'image' then 'byte[]'  
-            when 'int' then 'int'  
-            when 'money' then 'decimal'  
-            when 'nchar' then 'char'  
-            when 'ntext' then 'string'  
-            when 'numeric' then 'decimal'  
-            when 'nvarchar' then 'string'  
-            when 'real' then 'double'  
-            when 'smalldatetime' then 'DateTime'  
-            when 'smallint' then 'short'  
-            when 'smallmoney' then 'decimal'  
-            when 'text' then 'string'  
-            when 'time' then 'TimeSpan'  
-            when 'timestamp' then 'DateTime'  
-            when 'tinyint' then 'byte'  
-            when 'uniqueidentifier' then 'Guid'  
-            when 'varbinary' then 'byte[]'  
-            when 'varchar' then 'string'  
-            else 'UNKNOWN_' + typ.name  
-        end ColumnType,  
-        case   
+  DECLARE @schema VARCHAR(30), @table VARCHAR(100);  
+  SELECT TOP 1 @schema =  value FROM dbo.SplitByCommas(@TableName,'.')  
+  SELECT @table = value FROM(SELECT TOP 2 * FROM dbo.SplitByCommas(@TableName,'.') EXCEPT SELECT TOP 1 * FROM dbo.SplitByCommas(@TableName,'.')) tn  
+    
+DECLARE @Result varchar(max) = '    public class ' + @ModelName + 'ViewModel : DefaultViewModel
+	{'
+SELECT @Result =     
+ CASE     
+ WHEN t.ColumnName = 'Status' THEN     
+  @Result + '
+        public new ' + ColumnType + NullableSign + ' ' + ColumnName + ' { get; set; }
+'    
+ ELSE     
+  @Result + '
+        public ' + ColumnType + NullableSign + ' ' + ColumnName + ' { get; set; }
+'    
+end    
+    
+from    
+(    
+    select     
+        replace(col.name, ' ', '_') ColumnName,    
+        column_id ColumnId,    
+        case typ.name     
+            when 'bigint' then 'long'    
+            when 'binary' then 'byte[]'    
+            when 'bit' then 'bool'    
+            when 'char' then 'string'    
+            when 'date' then 'DateTime'    
+            when 'datetime' then 'DateTime'    
+            when 'datetime2' then 'DateTime'    
+            when 'datetimeoffset' then 'DateTimeOffset'    
+            when 'decimal' then 'decimal'    
+            when 'float' then 'float'    
+            when 'image' then 'byte[]'    
+            when 'int' then 'int'    
+            when 'money' then 'decimal'    
+            when 'nchar' then 'char'    
+            when 'ntext' then 'string'    
+            when 'numeric' then 'decimal'    
+            when 'nvarchar' then 'string'    
+            when 'real' then 'double'    
+            when 'smalldatetime' then 'DateTime'    
+            when 'smallint' then 'short'    
+            when 'smallmoney' then 'decimal'    
+            when 'text' then 'string'    
+            when 'time' then 'TimeSpan'    
+            when 'timestamp' then 'DateTime'    
+            when 'tinyint' then 'byte'    
+            when 'uniqueidentifier' then 'Guid'    
+            when 'varbinary' then 'byte[]'    
+            when 'varchar' then 'string'    
+            else 'UNKNOWN_' + typ.name    
+        end ColumnType,    
+        case     
             when col.is_nullable = 1 and typ.name in ('bigint', 'bit', 'date', 'datetime', 'datetime2', 'datetimeoffset', 'decimal', 'float', 'int', 'money', 'numeric', 'real', 'smalldatetime', 'smallint', 'smallmoney', 'time', 'tinyint', 'uniqueidentifie
-r')   
-            then '?'   
-            else ''   
-        end NullableSign  
-    from sys.columns col  
-        join sys.types typ on  
-            col.system_type_id = typ.system_type_id AND col.user_type_id = typ.user_type_id  
-    where object_id = object_id(@TableName)  
-) t  
-order by ColumnId  
   
-set @Result = @Result  + '  
-    }'  
-  
-print @Result  
-  SELECT @Result AS ModelClass
-  
+r')     
+            then '?'     
+            else ''     
+        end NullableSign    
+    from sys.columns col    
+        join sys.types typ on    
+            col.system_type_id = typ.system_type_id AND col.user_type_id = typ.user_type_id    
+    where object_id = object_id(@TableName)    
+) t    
+order by ColumnId    
+    
+set @Result = @Result  + '    }'    
+    
+print @Result    
+  SELECT @Result AS ModelClass    
 GO
-
 
 Create FUNCTION [dbo].[SplitByCommas](@MYSTR VARCHAR(MAX), @DELIMITER CHAR(1))
 RETURNS @MYTBL  TABLE (value varchar(MAX))
@@ -807,8 +768,6 @@ BEGIN
  END 
  RETURN   
 END
- 
- 
 GO
 
 ALTER PROCEDURE AddDefaultColumns
@@ -847,15 +806,11 @@ ALTER TABLE '+@tableName+'
 ADD [RecordStatus] [int] NOT NULL DEFAULT (2)
 ';
 EXEC (@sqlCommand)
-
 GO
 
 ----------------------------------------------------------------------------------------------------
 -----Create Procedure for Store procedure code creation
 ----------------------------------------------------------------------------------------------------
-
-
-
 
 CREATE FUNCTION dbo.GetC#ValueType(@sqlDataType varchar(15))
 RETURNS varchar(15)
@@ -897,7 +852,6 @@ SELECT @returnData = CASE typeName
 		FROM (VALUES (@sqlDataType)) t(typeName)
 		RETURN @returnData;
 END
-
 GO
 
 CREATE FUNCTION dbo.GetC#NullType(@sqlDataType varchar(15), @isNullable bit)
@@ -914,7 +868,6 @@ SELECT @returnData = CASE
 		FROM (VALUES (@sqlDataType, @isNullable)) t(typeName, nullable)
 RETURN @returnData;
 END
-
 GO
 
 CREATE PROC CreateC#SpParamModel
@@ -928,15 +881,15 @@ AS
   
   
 DECLARE @Result varchar(max) = '    public class ' + @modelName + 'Param : ISProcParam
-    {'    
+    {'
 
 SET @Result = @Result + '
 		public string ProcedureName => StoreProcedureNames.'+@modelName+'SpName;'
 
 SELECT @Result =    
-  @Result + '    
+  @Result + '
 
-        [ProcedureParam("'+Parameter_name+'", typeof('+dbo.GetC#ValueType([Type])+dbo.GetC#NullType([Type],isNullable)+'))]
+		[ProcedureParam("'+Parameter_name+'", typeof('+dbo.GetC#ValueType([Type])+dbo.GetC#NullType([Type],isNullable)+'))]
         public ' + dbo.GetC#ValueType([Type]) + dbo.GetC#NullType([Type],isNullable) + ' ' + REPLACE(Parameter_name , '@', '')+ ' { get; set; }'
 from    
 (    
@@ -958,12 +911,11 @@ select
 ) t   
 ORDER BY param_order 
     
-set @Result = @Result  + '    
+set @Result = @Result  + '
     }'    
     
 PRINT @Result    
 select @Result  AS ModelClass  
-
 GO
 
 CREATE PROC CreateC#SpParamViewModel
@@ -977,7 +929,7 @@ AS
   
   
 DECLARE @Result varchar(max) = '    public class ' + @modelName + 'ParamViewModel
-    {'    
+    {'
 
 SELECT @Result =    
   @Result + '
@@ -1007,7 +959,6 @@ set @Result = @Result  + '	}'
     
 PRINT @Result    
 select @Result  AS ModelClass  
-
 GO
 
 CREATE PROC CreateC#SpReturnViewModel
@@ -1028,7 +979,7 @@ INSERT INTO @temptable
 EXEC sp_describe_first_result_set @spFullName
 
 DECLARE @Result varchar(max) = '    public class ' + @modelName + 'ViewModel
-    {'    
+    {'
 
 SELECT @Result =    
   @Result + '
@@ -1040,11 +991,10 @@ SELECT * FROM @temptable
 ) t   
 ORDER BY t.column_ordinal
     
-set @Result = @Result  + '	}'    
+set @Result = @Result  + '	}'
     
 PRINT @Result    
 select @Result  AS ModelClass  
-
 GO
 
 CREATE PROC CreateC#SpReturnModel
@@ -1065,7 +1015,7 @@ INSERT INTO @temptable
 EXEC sp_describe_first_result_set @spFullName
 
 DECLARE @Result varchar(max) = '    public class ' + @modelName + 'Model
-    {'    
+    {'
 
 SELECT @Result =    
   @Result + '
@@ -1077,10 +1027,8 @@ SELECT * FROM @temptable
 ) t   
 ORDER BY t.column_ordinal
     
-set @Result = @Result  + '	}'    
+set @Result = @Result  + '	}'
     
 PRINT @Result    
 select @Result  AS ModelClass  
-
 GO
-

@@ -14,7 +14,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using WebAPI_BAL.AuthLogic;
 using WebAPI_BAL.JwtGenerator;
 using WebAPI_Server.AppStart;
-using WebAPI_Service.Service;
+using WebAPI_Service.Identity;
 using WebAPI_ViewModel.ConfigSettings;
 using WebAPI_ViewModel.Identity;
 using WebAPI_ViewModel.Response;
@@ -59,7 +59,7 @@ namespace WebAPI_Server.Controllers.v1
         [SwaggerResponse(StatusCodes.Status201Created, type: typeof(ApiResponse))]
         [SwaggerResponse(StatusCodes.Status409Conflict, type: typeof(ApiResponse))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, type: typeof(ApiResponse))]
-        [RequireCallbackUrl]
+        [RequireCallbackUrlFilter]
         [HttpPost(ApiEndpoints.Register)]
         [AllowAnonymous]
         public async Task<ActionResult<ApiResponse>> RegisterUser([FromBody] RegisterUserViewModel data)
@@ -80,7 +80,7 @@ namespace WebAPI_Server.Controllers.v1
         [SwaggerResponse(StatusCodes.Status201Created, type: typeof(ApiResponse<AddNewUserViewModel>))]
         [SwaggerResponse(StatusCodes.Status409Conflict, type: typeof(ApiResponse))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, type: typeof(ApiResponse))]
-        [RequireCallbackUrl]
+        [RequireCallbackUrlFilter]
         [HttpPost(ApiEndpoints.AddUser)]
         public async Task<ActionResult<ApiResponse<AddNewUserViewModel>>> AddUser([FromBody] AddNewUserViewModel data)
         {
@@ -120,7 +120,7 @@ namespace WebAPI_Server.Controllers.v1
         [SwaggerResponse(StatusCodes.Status200OK, type: typeof(ApiResponse<JwtToken>))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, type: typeof(ApiResponse))]
         [SwaggerResponse(StatusCodes.Status409Conflict, type: typeof(ApiResponse))]
-        [RequireCallbackUrl]
+        [RequireCallbackUrlFilter]
         [HttpPost(ApiEndpoints.Facebook)]
         [AllowAnonymous]
         public async Task<ActionResult<ApiResponse<JwtToken>>> Facebook([FromBody]FacebookAuthViewModel model)
@@ -165,7 +165,7 @@ namespace WebAPI_Server.Controllers.v1
         [SwaggerResponse(StatusCodes.Status200OK, type: typeof(ApiResponse<JwtToken>))]
         [SwaggerResponse(StatusCodes.Status401Unauthorized, type: typeof(ApiResponse))]
         [SwaggerResponse(StatusCodes.Status403Forbidden, type: typeof(ApiResponse))]
-        [RequireCallbackUrl]
+        [RequireCallbackUrlFilter]
         [HttpPost(ApiEndpoints.Authenticate)]
         [AllowAnonymous]
         public async Task<ActionResult<ApiResponse<JwtToken>>> Authenticate([FromBody] LoginUserViewModel data)
@@ -224,7 +224,7 @@ namespace WebAPI_Server.Controllers.v1
         [SwaggerResponse(StatusCodes.Status200OK, type: typeof(ApiResponse))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, type: typeof(ApiResponse))]
         [SwaggerResponse(StatusCodes.Status403Forbidden, type: typeof(ApiResponse))]
-        [RequireCallbackUrl]
+        [RequireCallbackUrlFilter]
         [HttpPost(ApiEndpoints.ResetPasswordToken)]
         [AllowAnonymous]
         public async Task<ActionResult<ApiResponse>> GenerateResetPasswordToken([FromBody] PasswordResetTokenViewModel data)
@@ -297,7 +297,7 @@ namespace WebAPI_Server.Controllers.v1
         [SwaggerResponse(StatusCodes.Status200OK, type: typeof(ApiResponse))]
         [SwaggerResponse(StatusCodes.Status401Unauthorized, type: typeof(ApiResponse))]
         [SwaggerResponse(StatusCodes.Status404NotFound, type: typeof(ApiResponse))]
-        [RequireCallbackUrl]
+        [RequireCallbackUrlFilter]
         [HttpPost(ApiEndpoints.RefreshToken)]
         [AllowAnonymous]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenViewModel data)
