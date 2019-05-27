@@ -174,17 +174,17 @@ namespace Dapper.Repositories.SqlGenerator
         /// <summary>
         ///     Get SQL for SELECT Query
         /// </summary>
-        SqlQuery GetSelectAll(Expression<Func<TEntity, bool>> predicate, bool includeLogicalDeleted, params Expression<Func<TEntity, object>>[] includes);
+        SqlQuery GetSelectAll(Expression<Func<TEntity, bool>> predicate, int pageNo, int pageSize, bool includeLogicalDeleted, object from = null, object to = null, string columnName = "", bool betweenQuery = false, params Expression<Func<TEntity, object>>[] includes);
 
         /// <summary>
         ///     Get SQL for SELECT Query with BETWEEN
         /// </summary>
-        SqlQuery GetSelectBetween(object from, object to, Expression<Func<TEntity, object>> btwField, bool includeLogicalDeleted);
-        
+        SqlQuery GetSelectBetween(object from, object to, Expression<Func<TEntity, object>> btwField, int pageNo, int pageSize, bool includeLogicalDeleted);
+
         /// <summary>
         ///     Get SQL for SELECT Query with BETWEEN
         /// </summary>
-        SqlQuery GetSelectBetween(object from, object to, Expression<Func<TEntity, object>> btwField, bool includeLogicalDeleted, Expression<Func<TEntity, bool>> predicate);
+        SqlQuery GetSelectBetween(object from, object to, Expression<Func<TEntity, object>> btwField, int pageNo, int pageSize, bool includeLogicalDeleted, Expression<Func<TEntity, bool>> predicate);
 
         /// <summary>
         ///     Get SQL for DELETE Query

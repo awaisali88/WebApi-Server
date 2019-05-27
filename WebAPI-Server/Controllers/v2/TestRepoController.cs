@@ -112,7 +112,7 @@ namespace WebAPI_Server.Controllers.v2
         [AllowAnonymous]
         public IActionResult SelectAll()
         {
-            var result = _cBal.FindAll(true);
+            var result = _cBal.FindAll(includeLogicalDeleted: true);
             return Ok(result, InfoMessages.CommonInfoMessage);
         }
     }

@@ -16,7 +16,7 @@ namespace Dapper.Repositories
         public virtual TEntity Find<TChild1>(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, object>> tChild1, bool includeLogicalDeleted, IDbTransaction transaction = null)
         {
             var queryResult = SqlGenerator.GetSelectFirst(predicate, includeLogicalDeleted, tChild1);
-            return ExecuteJoinQuery<TChild1, DontMap, DontMap, DontMap, DontMap, DontMap>(queryResult, transaction, tChild1).FirstOrDefault();
+            return ExecuteJoinQuery<TChild1, DontMap, DontMap, DontMap, DontMap, DontMap>(queryResult, transaction, tChild1).Item1.FirstOrDefault();
         }
 
         /// <inheritdoc />
@@ -26,7 +26,7 @@ namespace Dapper.Repositories
             bool includeLogicalDeleted, IDbTransaction transaction = null)
         {
             var queryResult = SqlGenerator.GetSelectFirst(predicate, includeLogicalDeleted, tChild1, tChild2);
-            return ExecuteJoinQuery<TChild1, TChild2, DontMap, DontMap, DontMap, DontMap>(queryResult, transaction, tChild1, tChild2).FirstOrDefault();
+            return ExecuteJoinQuery<TChild1, TChild2, DontMap, DontMap, DontMap, DontMap>(queryResult, transaction, tChild1, tChild2).Item1.FirstOrDefault();
         }
 
         /// <inheritdoc />
@@ -37,7 +37,7 @@ namespace Dapper.Repositories
             bool includeLogicalDeleted, IDbTransaction transaction = null)
         {
             var queryResult = SqlGenerator.GetSelectFirst(predicate, includeLogicalDeleted, tChild1, tChild2, tChild3);
-            return ExecuteJoinQuery<TChild1, TChild2, TChild3, DontMap, DontMap, DontMap>(queryResult, transaction, tChild1, tChild2, tChild3).FirstOrDefault();
+            return ExecuteJoinQuery<TChild1, TChild2, TChild3, DontMap, DontMap, DontMap>(queryResult, transaction, tChild1, tChild2, tChild3).Item1.FirstOrDefault();
         }
 
 
@@ -50,7 +50,7 @@ namespace Dapper.Repositories
             bool includeLogicalDeleted, IDbTransaction transaction = null)
         {
             var queryResult = SqlGenerator.GetSelectFirst(predicate, includeLogicalDeleted, tChild1, tChild2, tChild3, tChild4);
-            return ExecuteJoinQuery<TChild1, TChild2, TChild3, TChild4, DontMap, DontMap>(queryResult, transaction, tChild1, tChild2, tChild3, tChild4).FirstOrDefault();
+            return ExecuteJoinQuery<TChild1, TChild2, TChild3, TChild4, DontMap, DontMap>(queryResult, transaction, tChild1, tChild2, tChild3, tChild4).Item1.FirstOrDefault();
         }
 
         /// <inheritdoc />
@@ -63,7 +63,7 @@ namespace Dapper.Repositories
             bool includeLogicalDeleted, IDbTransaction transaction = null)
         {
             var queryResult = SqlGenerator.GetSelectFirst(predicate, includeLogicalDeleted, tChild1, tChild2, tChild3, tChild4, tChild5);
-            return ExecuteJoinQuery<TChild1, TChild2, TChild3, TChild4, TChild5, DontMap>(queryResult, transaction, tChild1, tChild2, tChild3, tChild4, tChild5).FirstOrDefault();
+            return ExecuteJoinQuery<TChild1, TChild2, TChild3, TChild4, TChild5, DontMap>(queryResult, transaction, tChild1, tChild2, tChild3, tChild4, tChild5).Item1.FirstOrDefault();
         }
 
         /// <inheritdoc />
@@ -77,14 +77,14 @@ namespace Dapper.Repositories
             bool includeLogicalDeleted, IDbTransaction transaction = null)
         {
             var queryResult = SqlGenerator.GetSelectFirst(predicate, includeLogicalDeleted, tChild1, tChild2, tChild3, tChild4, tChild5, tChild6);
-            return ExecuteJoinQuery<TChild1, TChild2, TChild3, TChild4, TChild5, TChild6>(queryResult, transaction, tChild1, tChild2, tChild3, tChild4, tChild5, tChild6).FirstOrDefault();
+            return ExecuteJoinQuery<TChild1, TChild2, TChild3, TChild4, TChild5, TChild6>(queryResult, transaction, tChild1, tChild2, tChild3, tChild4, tChild5, tChild6).Item1.FirstOrDefault();
         }
 
         /// <inheritdoc />
         public virtual async Task<TEntity> FindAsync<TChild1>(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, object>> tChild1, bool includeLogicalDeleted, IDbTransaction transaction = null)
         {
             var queryResult = SqlGenerator.GetSelectFirst(predicate, includeLogicalDeleted, tChild1);
-            return (await ExecuteJoinQueryAsync<TChild1, DontMap, DontMap, DontMap, DontMap, DontMap>(queryResult, transaction, tChild1)).FirstOrDefault();
+            return (await ExecuteJoinQueryAsync<TChild1, DontMap, DontMap, DontMap, DontMap, DontMap>(queryResult, transaction, tChild1)).Item1.FirstOrDefault();
         }
 
         /// <inheritdoc />
@@ -94,7 +94,7 @@ namespace Dapper.Repositories
             bool includeLogicalDeleted, IDbTransaction transaction = null)
         {
             var queryResult = SqlGenerator.GetSelectFirst(predicate, includeLogicalDeleted, tChild1, tChild2);
-            return (await ExecuteJoinQueryAsync<TChild1, TChild2, DontMap, DontMap, DontMap, DontMap>(queryResult, transaction, tChild1, tChild2)).FirstOrDefault();
+            return (await ExecuteJoinQueryAsync<TChild1, TChild2, DontMap, DontMap, DontMap, DontMap>(queryResult, transaction, tChild1, tChild2)).Item1.FirstOrDefault();
         }
 
         /// <inheritdoc />
@@ -105,7 +105,7 @@ namespace Dapper.Repositories
             bool includeLogicalDeleted, IDbTransaction transaction = null)
         {
             var queryResult = SqlGenerator.GetSelectFirst(predicate, includeLogicalDeleted, tChild1, tChild2, tChild3);
-            return (await ExecuteJoinQueryAsync<TChild1, TChild2, TChild3, DontMap, DontMap, DontMap>(queryResult, transaction, tChild1, tChild2, tChild3)).FirstOrDefault();
+            return (await ExecuteJoinQueryAsync<TChild1, TChild2, TChild3, DontMap, DontMap, DontMap>(queryResult, transaction, tChild1, tChild2, tChild3)).Item1.FirstOrDefault();
         }
 
         /// <inheritdoc />
@@ -117,7 +117,7 @@ namespace Dapper.Repositories
             bool includeLogicalDeleted, IDbTransaction transaction = null)
         {
             var queryResult = SqlGenerator.GetSelectFirst(predicate, includeLogicalDeleted, tChild1, tChild2, tChild3, tChild4);
-            return (await ExecuteJoinQueryAsync<TChild1, TChild2, TChild3, TChild4, DontMap, DontMap>(queryResult, transaction, tChild1, tChild2, tChild3, tChild4)).FirstOrDefault();
+            return (await ExecuteJoinQueryAsync<TChild1, TChild2, TChild3, TChild4, DontMap, DontMap>(queryResult, transaction, tChild1, tChild2, tChild3, tChild4)).Item1.FirstOrDefault();
         }
 
         /// <inheritdoc />
@@ -130,7 +130,7 @@ namespace Dapper.Repositories
             bool includeLogicalDeleted, IDbTransaction transaction = null)
         {
             var queryResult = SqlGenerator.GetSelectFirst(predicate, includeLogicalDeleted, tChild1, tChild2, tChild3, tChild4, tChild5);
-            return (await ExecuteJoinQueryAsync<TChild1, TChild2, TChild3, TChild4, TChild5, DontMap>(queryResult, transaction, tChild1, tChild2, tChild3, tChild4, tChild5)).FirstOrDefault();
+            return (await ExecuteJoinQueryAsync<TChild1, TChild2, TChild3, TChild4, TChild5, DontMap>(queryResult, transaction, tChild1, tChild2, tChild3, tChild4, tChild5)).Item1.FirstOrDefault();
         }
 
         /// <inheritdoc />
@@ -144,7 +144,7 @@ namespace Dapper.Repositories
             bool includeLogicalDeleted, IDbTransaction transaction = null)
         {
             var queryResult = SqlGenerator.GetSelectFirst(predicate, includeLogicalDeleted, tChild1, tChild2, tChild3, tChild4, tChild5, tChild6);
-            return (await ExecuteJoinQueryAsync<TChild1, TChild2, TChild3, TChild4, TChild5, TChild6>(queryResult, transaction, tChild1, tChild2, tChild3, tChild4, tChild5, tChild6)).FirstOrDefault();
+            return (await ExecuteJoinQueryAsync<TChild1, TChild2, TChild3, TChild4, TChild5, TChild6>(queryResult, transaction, tChild1, tChild2, tChild3, tChild4, tChild5, tChild6)).Item1.FirstOrDefault();
         }
     }
 }

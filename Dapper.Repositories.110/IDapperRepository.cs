@@ -393,64 +393,64 @@ namespace Dapper.Repositories
         /// <summary>
         ///     Get all objects
         /// </summary>
-        IEnumerable<TEntity> FindAll(bool includeLogicalDeleted, IDbTransaction transaction = null);
+        (IEnumerable<TEntity>, int) FindAll(int pageNo, int pageSize, bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get all objects
         /// </summary>
-        IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> predicate, bool includeLogicalDeleted, IDbTransaction transaction = null);
+        (IEnumerable<TEntity>, int) FindAll(Expression<Func<TEntity, bool>> predicate, int pageNo, int pageSize, bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get all objects with join objects
         /// </summary>
-        IEnumerable<TEntity> FindAll<TChild1>(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, object>> tChild1, bool includeLogicalDeleted, IDbTransaction transaction = null);
+        (IEnumerable<TEntity>, int) FindAll<TChild1>(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, object>> tChild1, int pageNo, int pageSize, bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get all objects with join objects
         /// </summary>
-        IEnumerable<TEntity> FindAll<TChild1, TChild2>(
+        (IEnumerable<TEntity>, int) FindAll<TChild1, TChild2>(
             Expression<Func<TEntity, bool>> predicate,
             Expression<Func<TEntity, object>> tChild1,
             Expression<Func<TEntity, object>> tChild2,
-            bool includeLogicalDeleted, IDbTransaction transaction = null);
+            int pageNo, int pageSize, bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get all objects with join objects
         /// </summary>
-        IEnumerable<TEntity> FindAll<TChild1, TChild2, TChild3>(
+        (IEnumerable<TEntity>, int) FindAll<TChild1, TChild2, TChild3>(
             Expression<Func<TEntity, bool>> predicate,
             Expression<Func<TEntity, object>> tChild1,
             Expression<Func<TEntity, object>> tChild2,
             Expression<Func<TEntity, object>> tChild3,
-            bool includeLogicalDeleted, IDbTransaction transaction = null);
+            int pageNo, int pageSize, bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get all objects with join objects
         /// </summary>
-        IEnumerable<TEntity> FindAll<TChild1, TChild2, TChild3, TChild4>(
+        (IEnumerable<TEntity>, int) FindAll<TChild1, TChild2, TChild3, TChild4>(
             Expression<Func<TEntity, bool>> predicate,
             Expression<Func<TEntity, object>> tChild1,
             Expression<Func<TEntity, object>> tChild2,
             Expression<Func<TEntity, object>> tChild3,
             Expression<Func<TEntity, object>> tChild4,
-            bool includeLogicalDeleted, IDbTransaction transaction = null);
+            int pageNo, int pageSize, bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get all objects with join objects
         /// </summary>
-        IEnumerable<TEntity> FindAll<TChild1, TChild2, TChild3, TChild4, TChild5>(
+        (IEnumerable<TEntity>, int) FindAll<TChild1, TChild2, TChild3, TChild4, TChild5>(
             Expression<Func<TEntity, bool>> predicate,
             Expression<Func<TEntity, object>> tChild1,
             Expression<Func<TEntity, object>> tChild2,
             Expression<Func<TEntity, object>> tChild3,
             Expression<Func<TEntity, object>> tChild4,
             Expression<Func<TEntity, object>> tChild5,
-            bool includeLogicalDeleted, IDbTransaction transaction = null);
+            int pageNo, int pageSize, bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get all objects with join objects
         /// </summary>
-        IEnumerable<TEntity> FindAll<TChild1, TChild2, TChild3, TChild4, TChild5, TChild6>(
+        (IEnumerable<TEntity>, int) FindAll<TChild1, TChild2, TChild3, TChild4, TChild5, TChild6>(
             Expression<Func<TEntity, bool>> predicate,
             Expression<Func<TEntity, object>> tChild1,
             Expression<Func<TEntity, object>> tChild2,
@@ -458,71 +458,71 @@ namespace Dapper.Repositories
             Expression<Func<TEntity, object>> tChild4,
             Expression<Func<TEntity, object>> tChild5,
             Expression<Func<TEntity, object>> tChild6,
-            bool includeLogicalDeleted, IDbTransaction transaction = null);
+            int pageNo, int pageSize, bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get all objects
         /// </summary>
-        Task<IEnumerable<TEntity>> FindAllAsync(bool includeLogicalDeleted, IDbTransaction transaction = null);
+        Task<(IEnumerable<TEntity>, int)> FindAllAsync(int pageNo, int pageSize, bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get all objects
         /// </summary>
-        Task<IEnumerable<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> predicate, bool includeLogicalDeleted, IDbTransaction transaction = null);
+        Task<(IEnumerable<TEntity>, int)> FindAllAsync(Expression<Func<TEntity, bool>> predicate, int pageNo, int pageSize, bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get all objects with join objects
         /// </summary>
-        Task<IEnumerable<TEntity>> FindAllAsync<TChild1>(Expression<Func<TEntity, bool>> predicate,
+        Task<(IEnumerable<TEntity>, int)> FindAllAsync<TChild1>(Expression<Func<TEntity, bool>> predicate,
             Expression<Func<TEntity, object>> tChild1,
-            bool includeLogicalDeleted, IDbTransaction transaction = null);
+            int pageNo, int pageSize, bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get all objects with join objects
         /// </summary>
-        Task<IEnumerable<TEntity>> FindAllAsync<TChild1, TChild2>(
+        Task<(IEnumerable<TEntity>, int)> FindAllAsync<TChild1, TChild2>(
             Expression<Func<TEntity, bool>> predicate,
             Expression<Func<TEntity, object>> tChild1,
             Expression<Func<TEntity, object>> tChild2,
-            bool includeLogicalDeleted, IDbTransaction transaction = null);
+            int pageNo, int pageSize, bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get all objects with join objects
         /// </summary>
-        Task<IEnumerable<TEntity>> FindAllAsync<TChild1, TChild2, TChild3>(
+        Task<(IEnumerable<TEntity>, int)> FindAllAsync<TChild1, TChild2, TChild3>(
             Expression<Func<TEntity, bool>> predicate,
             Expression<Func<TEntity, object>> tChild1,
             Expression<Func<TEntity, object>> tChild2,
             Expression<Func<TEntity, object>> tChild3,
-            bool includeLogicalDeleted, IDbTransaction transaction = null);
+            int pageNo, int pageSize, bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get all objects with join objects
         /// </summary>
-        Task<IEnumerable<TEntity>> FindAllAsync<TChild1, TChild2, TChild3, TChild4>(
+        Task<(IEnumerable<TEntity>, int)> FindAllAsync<TChild1, TChild2, TChild3, TChild4>(
             Expression<Func<TEntity, bool>> predicate,
             Expression<Func<TEntity, object>> tChild1,
             Expression<Func<TEntity, object>> tChild2,
             Expression<Func<TEntity, object>> tChild3,
             Expression<Func<TEntity, object>> tChild4,
-            bool includeLogicalDeleted, IDbTransaction transaction = null);
+            int pageNo, int pageSize, bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get all objects with join objects
         /// </summary>
-        Task<IEnumerable<TEntity>> FindAllAsync<TChild1, TChild2, TChild3, TChild4, TChild5>(
+        Task<(IEnumerable<TEntity>, int)> FindAllAsync<TChild1, TChild2, TChild3, TChild4, TChild5>(
             Expression<Func<TEntity, bool>> predicate,
             Expression<Func<TEntity, object>> tChild1,
             Expression<Func<TEntity, object>> tChild2,
             Expression<Func<TEntity, object>> tChild3,
             Expression<Func<TEntity, object>> tChild4,
             Expression<Func<TEntity, object>> tChild5,
-            bool includeLogicalDeleted, IDbTransaction transaction = null);
+            int pageNo, int pageSize, bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Get all objects with join objects
         /// </summary>
-        Task<IEnumerable<TEntity>> FindAllAsync<TChild1, TChild2, TChild3, TChild4, TChild5, TChild6>(
+        Task<(IEnumerable<TEntity>, int)> FindAllAsync<TChild1, TChild2, TChild3, TChild4, TChild5, TChild6>(
             Expression<Func<TEntity, bool>> predicate,
             Expression<Func<TEntity, object>> tChild1,
             Expression<Func<TEntity, object>> tChild2,
@@ -530,7 +530,7 @@ namespace Dapper.Repositories
             Expression<Func<TEntity, object>> tChild4,
             Expression<Func<TEntity, object>> tChild5,
             Expression<Func<TEntity, object>> tChild6,
-            bool includeLogicalDeleted, IDbTransaction transaction = null);
+            int pageNo, int pageSize, bool includeLogicalDeleted, IDbTransaction transaction = null);
 
         /// <summary>
         ///     Insert object to DB
@@ -645,125 +645,125 @@ namespace Dapper.Repositories
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
-        IEnumerable<TEntity> FindAllBetween(object from, object to, Expression<Func<TEntity, object>> btwField, bool includeLogicalDeleted);
-        
-        /// <summary>
-        ///     Get all objects with BETWEEN query
-        /// </summary>
-        IEnumerable<TEntity> FindAllBetween(object from, object to, Expression<Func<TEntity, object>> btwField, bool includeLogicalDeleted, IDbTransaction transaction);
+        (IEnumerable<TEntity>, int) FindAllBetween(object from, object to, Expression<Func<TEntity, object>> btwField, int pageNo, int pageSize, bool includeLogicalDeleted);
 
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
-        IEnumerable<TEntity> FindAllBetween(
-            object from,
-            object to,
-            Expression<Func<TEntity, object>> btwField,
-            Expression<Func<TEntity, bool>> predicate,
-            bool includeLogicalDeleted);
-        
+        (IEnumerable<TEntity>, int) FindAllBetween(object from, object to, Expression<Func<TEntity, object>> btwField, int pageNo, int pageSize, bool includeLogicalDeleted, IDbTransaction transaction);
+
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
-        IEnumerable<TEntity> FindAllBetween(
+        (IEnumerable<TEntity>, int) FindAllBetween(
             object from,
             object to,
             Expression<Func<TEntity, object>> btwField,
             Expression<Func<TEntity, bool>> predicate,
-            bool includeLogicalDeleted,
+            int pageNo, int pageSize, bool includeLogicalDeleted);
+
+        /// <summary>
+        ///     Get all objects with BETWEEN query
+        /// </summary>
+        (IEnumerable<TEntity>, int) FindAllBetween(
+            object from,
+            object to,
+            Expression<Func<TEntity, object>> btwField,
+            Expression<Func<TEntity, bool>> predicate,
+            int pageNo, int pageSize, bool includeLogicalDeleted,
             IDbTransaction transaction);
 
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
-        IEnumerable<TEntity> FindAllBetween(DateTime from, DateTime to, Expression<Func<TEntity, object>> btwField, bool includeLogicalDeleted);
+        (IEnumerable<TEntity>, int) FindAllBetween(DateTime from, DateTime to, Expression<Func<TEntity, object>> btwField, int pageNo, int pageSize, bool includeLogicalDeleted);
 
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
-        IEnumerable<TEntity> FindAllBetween(DateTime from, DateTime to, Expression<Func<TEntity, object>> btwField, bool includeLogicalDeleted, IDbTransaction transaction);
+        (IEnumerable<TEntity>, int) FindAllBetween(DateTime from, DateTime to, Expression<Func<TEntity, object>> btwField, int pageNo, int pageSize, bool includeLogicalDeleted, IDbTransaction transaction);
 
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
-        IEnumerable<TEntity> FindAllBetween(
+        (IEnumerable<TEntity>, int) FindAllBetween(
             DateTime from,
             DateTime to,
             Expression<Func<TEntity, object>> btwField,
             Expression<Func<TEntity, bool>> predicate,
-            bool includeLogicalDeleted);
+            int pageNo, int pageSize, bool includeLogicalDeleted);
 
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
-        IEnumerable<TEntity> FindAllBetween(
+        (IEnumerable<TEntity>, int) FindAllBetween(
             DateTime from,
             DateTime to,
             Expression<Func<TEntity, object>> btwField,
             Expression<Func<TEntity, bool>> predicate,
-            bool includeLogicalDeleted,
+            int pageNo, int pageSize, bool includeLogicalDeleted,
             IDbTransaction transaction);
 
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
-        Task<IEnumerable<TEntity>> FindAllBetweenAsync(object from, object to, Expression<Func<TEntity, object>> btwField, bool includeLogicalDeleted);
+        Task<(IEnumerable<TEntity>, int)> FindAllBetweenAsync(object from, object to, Expression<Func<TEntity, object>> btwField, int pageNo, int pageSize, bool includeLogicalDeleted);
 
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
-        Task<IEnumerable<TEntity>> FindAllBetweenAsync(object from, object to, Expression<Func<TEntity, object>> btwField, bool includeLogicalDeleted, IDbTransaction transaction);
+        Task<(IEnumerable<TEntity>, int)> FindAllBetweenAsync(object from, object to, Expression<Func<TEntity, object>> btwField, int pageNo, int pageSize, bool includeLogicalDeleted, IDbTransaction transaction);
 
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
-        Task<IEnumerable<TEntity>> FindAllBetweenAsync(
+        Task<(IEnumerable<TEntity>, int)> FindAllBetweenAsync(
             object from,
             object to,
             Expression<Func<TEntity, object>> btwField,
             Expression<Func<TEntity, bool>> predicate,
-            bool includeLogicalDeleted);
+            int pageNo, int pageSize, bool includeLogicalDeleted);
 
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
-        Task<IEnumerable<TEntity>> FindAllBetweenAsync(
+        Task<(IEnumerable<TEntity>, int)> FindAllBetweenAsync(
             object from,
             object to,
             Expression<Func<TEntity, object>> btwField,
             Expression<Func<TEntity, bool>> predicate,
-            bool includeLogicalDeleted,
+            int pageNo, int pageSize, bool includeLogicalDeleted,
             IDbTransaction transaction);
 
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
-        Task<IEnumerable<TEntity>> FindAllBetweenAsync(DateTime from, DateTime to, Expression<Func<TEntity, object>> btwField, bool includeLogicalDeleted);
+        Task<(IEnumerable<TEntity>, int)> FindAllBetweenAsync(DateTime from, DateTime to, Expression<Func<TEntity, object>> btwField, int pageNo, int pageSize, bool includeLogicalDeleted);
 
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
-        Task<IEnumerable<TEntity>> FindAllBetweenAsync(DateTime from, DateTime to, Expression<Func<TEntity, object>> btwField, bool includeLogicalDeleted, IDbTransaction transaction);
+        Task<(IEnumerable<TEntity>, int)> FindAllBetweenAsync(DateTime from, DateTime to, Expression<Func<TEntity, object>> btwField, int pageNo, int pageSize, bool includeLogicalDeleted, IDbTransaction transaction);
 
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
-        Task<IEnumerable<TEntity>> FindAllBetweenAsync(
+        Task<(IEnumerable<TEntity>, int)> FindAllBetweenAsync(
             DateTime from,
             DateTime to,
             Expression<Func<TEntity, object>> btwField,
             Expression<Func<TEntity, bool>> predicate,
-            bool includeLogicalDeleted);
+            int pageNo, int pageSize, bool includeLogicalDeleted);
 
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
-        Task<IEnumerable<TEntity>> FindAllBetweenAsync(
+        Task<(IEnumerable<TEntity>, int)> FindAllBetweenAsync(
             DateTime from,
             DateTime to,
             Expression<Func<TEntity, object>> btwField,
             Expression<Func<TEntity, bool>> predicate,
-            bool includeLogicalDeleted,
+            int pageNo, int pageSize, bool includeLogicalDeleted,
             IDbTransaction transaction);
     }
 }

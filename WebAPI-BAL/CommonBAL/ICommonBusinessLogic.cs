@@ -51,6 +51,16 @@ namespace WebAPI_BAL
             Func<TData1, TData2, TData3, TData4, TData5, TData6, TData7, TData8, IDbTransaction, TReturn> repoFunc,
             TData1 data1, TData2 data2,
             TData3 data3, TData4 data4, TData5 data5, TData6 data6, TData7 data7, TData8 data8);
+
+        TReturn HandleTransaction<TReturn, TData1, TData2, TData3, TData4, TData5, TData6, TData7, TData8, TData9>(
+            Func<TData1, TData2, TData3, TData4, TData5, TData6, TData7, TData8, TData9, IDbTransaction, TReturn> repoFunc,
+            TData1 data1, TData2 data2,
+            TData3 data3, TData4 data4, TData5 data5, TData6 data6, TData7 data7, TData8 data8, TData9 data9);
+
+        TReturn HandleTransaction<TReturn, TData1, TData2, TData3, TData4, TData5, TData6, TData7, TData8, TData9, TData10>(
+            Func<TData1, TData2, TData3, TData4, TData5, TData6, TData7, TData8, TData9, TData10, IDbTransaction, TReturn> repoFunc,
+            TData1 data1, TData2 data2,
+            TData3 data3, TData4 data4, TData5 data5, TData6 data6, TData7 data7, TData8 data8, TData9 data9, TData10 data10);
         #endregion
 
         #region Store Procedure
@@ -231,6 +241,48 @@ namespace WebAPI_BAL
         ///     Get number of rows with DISTINCT and WHERE clause
         /// </summary>
         Task<int> CountAsync(Expression<Func<TEntityViewModel, bool>> where, Expression<Func<TEntityViewModel, object>> distinct, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
+        #endregion
+
+        #region Count Pages
+        /// <summary>
+        ///     Get number of rows
+        /// </summary>
+        int CountPages(int pageSize, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
+
+        /// <summary>
+        ///     Get number of rows with WHERE clause
+        /// </summary>
+        int CountPages(int pageSize, Expression<Func<TEntityViewModel, bool>> where, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
+
+        /// <summary>
+        ///     Get number of rows with DISTINCT clause
+        /// </summary>
+        int CountPages(int pageSize, Expression<Func<TEntityViewModel, object>> distinct, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
+
+        /// <summary>
+        ///     Get number of rows with DISTINCT and WHERE clause
+        /// </summary>
+        int CountPages(int pageSize, Expression<Func<TEntityViewModel, bool>> where, Expression<Func<TEntityViewModel, object>> distinct, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
+
+        /// <summary>
+        ///     Get number of rows
+        /// </summary>
+        Task<int> CountPagesAsync(int pageSize, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
+
+        /// <summary>
+        ///     Get number of rows with WHERE clause
+        /// </summary>
+        Task<int> CountPagesAsync(int pageSize, Expression<Func<TEntityViewModel, bool>> where, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
+
+        /// <summary>
+        ///     Get number of rows with DISTINCT clause
+        /// </summary>
+        Task<int> CountPagesAsync(int pageSize, Expression<Func<TEntityViewModel, object>> distinct, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
+
+        /// <summary>
+        ///     Get number of rows with DISTINCT and WHERE clause
+        /// </summary>
+        Task<int> CountPagesAsync(int pageSize, Expression<Func<TEntityViewModel, bool>> where, Expression<Func<TEntityViewModel, object>> distinct, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
         #endregion
 
         #region Select
@@ -477,193 +529,193 @@ namespace WebAPI_BAL
         /// <summary>
         ///     Get all objects
         /// </summary>
-        IEnumerable<TEntityViewModel> FindAll(bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
+        (IEnumerable<TEntityViewModel> Data, int TotalPages) FindAll(int pageNo = 0, int pageSize = 0, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get all objects
         /// </summary>
-        IEnumerable<TEntityViewModel> FindAll(Expression<Func<TEntityViewModel, bool>> where, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
+        (IEnumerable<TEntityViewModel> Data, int TotalPages) FindAll(Expression<Func<TEntityViewModel, bool>> where, int pageNo = 0, int pageSize = 0, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
 
         /// <summary>
         ///     Get all objects with join objects
         /// </summary>
-        IEnumerable<TEntityViewModel> FindAll<TChild1>(Expression<Func<TEntityViewModel, bool>> where, Expression<Func<TEntityViewModel, object>> tChild1, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
+        (IEnumerable<TEntityViewModel> Data, int TotalPages) FindAll<TChild1>(Expression<Func<TEntityViewModel, bool>> where, Expression<Func<TEntityViewModel, object>> tChild1, int pageNo = 0, int pageSize = 0, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
 
         /// <summary>
         ///     Get all objects with join objects
         /// </summary>
-        IEnumerable<TEntityViewModel> FindAll<TChild1, TChild2>(
+        (IEnumerable<TEntityViewModel> Data, int TotalPages) FindAll<TChild1, TChild2>(
             Expression<Func<TEntityViewModel, bool>> where,
             Expression<Func<TEntityViewModel, object>> tChild1,
-            Expression<Func<TEntityViewModel, object>> tChild2, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild2, int pageNo = 0, int pageSize = 0, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get all objects with join objects
         /// </summary>
-        IEnumerable<TEntityViewModel> FindAll<TChild1, TChild2, TChild3>(
+        (IEnumerable<TEntityViewModel> Data, int TotalPages) FindAll<TChild1, TChild2, TChild3>(
             Expression<Func<TEntityViewModel, bool>> where,
             Expression<Func<TEntityViewModel, object>> tChild1,
             Expression<Func<TEntityViewModel, object>> tChild2,
-            Expression<Func<TEntityViewModel, object>> tChild3, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild3, int pageNo = 0, int pageSize = 0, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get all objects with join objects
         /// </summary>
-        IEnumerable<TEntityViewModel> FindAll<TChild1, TChild2, TChild3, TChild4>(
+        (IEnumerable<TEntityViewModel> Data, int TotalPages) FindAll<TChild1, TChild2, TChild3, TChild4>(
             Expression<Func<TEntityViewModel, bool>> where,
             Expression<Func<TEntityViewModel, object>> tChild1,
             Expression<Func<TEntityViewModel, object>> tChild2,
             Expression<Func<TEntityViewModel, object>> tChild3,
-            Expression<Func<TEntityViewModel, object>> tChild4, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild4, int pageNo = 0, int pageSize = 0, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get all objects with join objects
         /// </summary>
-        IEnumerable<TEntityViewModel> FindAll<TChild1, TChild2, TChild3, TChild4, TChild5>(
+        (IEnumerable<TEntityViewModel> Data, int TotalPages) FindAll<TChild1, TChild2, TChild3, TChild4, TChild5>(
             Expression<Func<TEntityViewModel, bool>> where,
             Expression<Func<TEntityViewModel, object>> tChild1,
             Expression<Func<TEntityViewModel, object>> tChild2,
             Expression<Func<TEntityViewModel, object>> tChild3,
             Expression<Func<TEntityViewModel, object>> tChild4,
-            Expression<Func<TEntityViewModel, object>> tChild5, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild5, int pageNo = 0, int pageSize = 0, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get all objects with join objects
         /// </summary>
-        IEnumerable<TEntityViewModel> FindAll<TChild1, TChild2, TChild3, TChild4, TChild5, TChild6>(
+        (IEnumerable<TEntityViewModel> Data, int TotalPages) FindAll<TChild1, TChild2, TChild3, TChild4, TChild5, TChild6>(
             Expression<Func<TEntityViewModel, bool>> where,
             Expression<Func<TEntityViewModel, object>> tChild1,
             Expression<Func<TEntityViewModel, object>> tChild2,
             Expression<Func<TEntityViewModel, object>> tChild3,
             Expression<Func<TEntityViewModel, object>> tChild4,
             Expression<Func<TEntityViewModel, object>> tChild5,
-            Expression<Func<TEntityViewModel, object>> tChild6, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild6, int pageNo = 0, int pageSize = 0, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get all objects
         /// </summary>
-        Task<IEnumerable<TEntityViewModel>> FindAllAsync(bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
+        Task<(IEnumerable<TEntityViewModel> Data, int TotalPages)> FindAllAsync(int pageNo = 0, int pageSize = 0, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get all objects
         /// </summary>
-        Task<IEnumerable<TEntityViewModel>> FindAllAsync(Expression<Func<TEntityViewModel, bool>> where, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
+        Task<(IEnumerable<TEntityViewModel> Data, int TotalPages)> FindAllAsync(Expression<Func<TEntityViewModel, bool>> where, int pageNo = 0, int pageSize = 0, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
 
         /// <summary>
         ///     Get all objects with join objects
         /// </summary>
-        Task<IEnumerable<TEntityViewModel>> FindAllAsync<TChild1>(Expression<Func<TEntityViewModel, bool>> where,
-            Expression<Func<TEntityViewModel, object>> tChild1, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
+        Task<(IEnumerable<TEntityViewModel> Data, int TotalPages)> FindAllAsync<TChild1>(Expression<Func<TEntityViewModel, bool>> where,
+            Expression<Func<TEntityViewModel, object>> tChild1, int pageNo = 0, int pageSize = 0, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get all objects with join objects
         /// </summary>
-        Task<IEnumerable<TEntityViewModel>> FindAllAsync<TChild1, TChild2>(
+        Task<(IEnumerable<TEntityViewModel> Data, int TotalPages)> FindAllAsync<TChild1, TChild2>(
             Expression<Func<TEntityViewModel, bool>> where,
             Expression<Func<TEntityViewModel, object>> tChild1,
-            Expression<Func<TEntityViewModel, object>> tChild2, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild2, int pageNo = 0, int pageSize = 0, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
 
         /// <summary>
         ///     Get all objects with join objects
         /// </summary>
-        Task<IEnumerable<TEntityViewModel>> FindAllAsync<TChild1, TChild2, TChild3>(
+        Task<(IEnumerable<TEntityViewModel> Data, int TotalPages)> FindAllAsync<TChild1, TChild2, TChild3>(
             Expression<Func<TEntityViewModel, bool>> where,
             Expression<Func<TEntityViewModel, object>> tChild1,
             Expression<Func<TEntityViewModel, object>> tChild2,
-            Expression<Func<TEntityViewModel, object>> tChild3, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild3, int pageNo = 0, int pageSize = 0, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get all objects with join objects
         /// </summary>
-        Task<IEnumerable<TEntityViewModel>> FindAllAsync<TChild1, TChild2, TChild3, TChild4>(
+        Task<(IEnumerable<TEntityViewModel> Data, int TotalPages)> FindAllAsync<TChild1, TChild2, TChild3, TChild4>(
             Expression<Func<TEntityViewModel, bool>> where,
             Expression<Func<TEntityViewModel, object>> tChild1,
             Expression<Func<TEntityViewModel, object>> tChild2,
             Expression<Func<TEntityViewModel, object>> tChild3,
-            Expression<Func<TEntityViewModel, object>> tChild4, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild4, int pageNo = 0, int pageSize = 0, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get all objects with join objects
         /// </summary>
-        Task<IEnumerable<TEntityViewModel>> FindAllAsync<TChild1, TChild2, TChild3, TChild4, TChild5>(
+        Task<(IEnumerable<TEntityViewModel> Data, int TotalPages)> FindAllAsync<TChild1, TChild2, TChild3, TChild4, TChild5>(
             Expression<Func<TEntityViewModel, bool>> where,
             Expression<Func<TEntityViewModel, object>> tChild1,
             Expression<Func<TEntityViewModel, object>> tChild2,
             Expression<Func<TEntityViewModel, object>> tChild3,
             Expression<Func<TEntityViewModel, object>> tChild4,
-            Expression<Func<TEntityViewModel, object>> tChild5, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild5, int pageNo = 0, int pageSize = 0, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get all objects with join objects
         /// </summary>
-        Task<IEnumerable<TEntityViewModel>> FindAllAsync<TChild1, TChild2, TChild3, TChild4, TChild5, TChild6>(
+        Task<(IEnumerable<TEntityViewModel> Data, int TotalPages)> FindAllAsync<TChild1, TChild2, TChild3, TChild4, TChild5, TChild6>(
             Expression<Func<TEntityViewModel, bool>> where,
             Expression<Func<TEntityViewModel, object>> tChild1,
             Expression<Func<TEntityViewModel, object>> tChild2,
             Expression<Func<TEntityViewModel, object>> tChild3,
             Expression<Func<TEntityViewModel, object>> tChild4,
             Expression<Func<TEntityViewModel, object>> tChild5,
-            Expression<Func<TEntityViewModel, object>> tChild6, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
+            Expression<Func<TEntityViewModel, object>> tChild6, int pageNo = 0, int pageSize = 0, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
         #endregion
 
         #region Find All Between
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
-        IEnumerable<TEntityViewModel> FindAllBetween(object from, object to, Expression<Func<TEntityViewModel, object>> btwField, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
+        (IEnumerable<TEntityViewModel> Data, int TotalPages) FindAllBetween(object from, object to, Expression<Func<TEntityViewModel, object>> btwField, int pageNo = 0, int pageSize = 0, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
-        IEnumerable<TEntityViewModel> FindAllBetween(object from, object to, Expression<Func<TEntityViewModel, object>> btwField,
-            Expression<Func<TEntityViewModel, bool>> where = null, bool includeLogicalDeleted = false, IDbTransaction transaction = null,
+        (IEnumerable<TEntityViewModel> Data, int TotalPages) FindAllBetween(object from, object to, Expression<Func<TEntityViewModel, object>> btwField,
+            Expression<Func<TEntityViewModel, bool>> where = null, int pageNo = 0, int pageSize = 0, bool includeLogicalDeleted = false, IDbTransaction transaction = null,
             bool manageTransaction = true);
 
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
-        IEnumerable<TEntityViewModel> FindAllBetween(DateTime from, DateTime to,
-            Expression<Func<TEntityViewModel, object>> btwField, bool includeLogicalDeleted = false, IDbTransaction transaction = null,
+        (IEnumerable<TEntityViewModel> Data, int TotalPages) FindAllBetween(DateTime from, DateTime to,
+            Expression<Func<TEntityViewModel, object>> btwField, int pageNo = 0, int pageSize = 0, bool includeLogicalDeleted = false, IDbTransaction transaction = null,
             bool manageTransaction = true);
 
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
-        IEnumerable<TEntityViewModel> FindAllBetween(DateTime from, DateTime to,
+        (IEnumerable<TEntityViewModel> Data, int TotalPages) FindAllBetween(DateTime from, DateTime to,
             Expression<Func<TEntityViewModel, object>> btwField, Expression<Func<TEntityViewModel, bool>> where,
-            bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
+            int pageNo = 0, int pageSize = 0, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
-        Task<IEnumerable<TEntityViewModel>> FindAllBetweenAsync(object from, object to,
-            Expression<Func<TEntityViewModel, object>> btwField, bool includeLogicalDeleted = false, IDbTransaction transaction = null,
+        Task<(IEnumerable<TEntityViewModel> Data, int TotalPages)> FindAllBetweenAsync(object from, object to,
+            Expression<Func<TEntityViewModel, object>> btwField, int pageNo = 0, int pageSize = 0, bool includeLogicalDeleted = false, IDbTransaction transaction = null,
             bool manageTransaction = true);
 
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
-        Task<IEnumerable<TEntityViewModel>> FindAllBetweenAsync(object from, object to,
+        Task<(IEnumerable<TEntityViewModel> Data, int TotalPages)> FindAllBetweenAsync(object from, object to,
             Expression<Func<TEntityViewModel, object>> btwField, Expression<Func<TEntity, bool>> where,
-            bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
+            int pageNo = 0, int pageSize = 0, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
-        Task<IEnumerable<TEntityViewModel>> FindAllBetweenAsync(DateTime from, DateTime to,
-            Expression<Func<TEntityViewModel, object>> btwField, bool includeLogicalDeleted = false, IDbTransaction transaction = null,
+        Task<(IEnumerable<TEntityViewModel> Data, int TotalPages)> FindAllBetweenAsync(DateTime from, DateTime to,
+            Expression<Func<TEntityViewModel, object>> btwField, int pageNo = 0, int pageSize = 0, bool includeLogicalDeleted = false, IDbTransaction transaction = null,
             bool manageTransaction = true);
 
         /// <summary>
         ///     Get all objects with BETWEEN query
         /// </summary>
-        Task<IEnumerable<TEntityViewModel>> FindAllBetweenAsync(DateTime from, DateTime to,
+        Task<(IEnumerable<TEntityViewModel> Data, int TotalPages)> FindAllBetweenAsync(DateTime from, DateTime to,
             Expression<Func<TEntityViewModel, object>> btwField, Expression<Func<TEntity, bool>> where,
-            bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
+            int pageNo = 0, int pageSize = 0, bool includeLogicalDeleted = false, IDbTransaction transaction = null, bool manageTransaction = true);
 
         #endregion
 
