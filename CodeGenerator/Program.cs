@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
-using Common;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CodeGenerator
@@ -53,6 +50,9 @@ namespace CodeGenerator
 
                     //Generate code for Api End Point
                     CodeGeneratorForApiEndPoint(selectedMode, engine);
+
+                    //Generate API Request Param Class
+                    CodeGeneratorForApiRequestParamClass(selectedMode, engine, databaseCodeName);
 
                     Console.WriteLine();
                     Console.Write("Do you want to add another model? Y/N: ");
@@ -154,15 +154,16 @@ namespace CodeGenerator
             bool isContinueForMode = true;
             do
             {
-                Console.WriteLine("Available Generators:\n1. Table\n2. Store Procedure\n3. Api Service\n4. Api End Point");
+                Console.WriteLine("Available Generators:\n1. Table\n2. Store Procedure\n3. Api Service\n4. Api End Point\n5. Api Request Param Class");
                 Console.WriteLine();
                 Console.Write("Please select mode:\t");
 
                 selectedMode = Console.ReadKey(true).Key;
-                if (selectedMode == ConsoleKey.D1 || selectedMode == ConsoleKey.D2 ||
-                    selectedMode == ConsoleKey.NumPad1 || selectedMode == ConsoleKey.NumPad2 ||
+                if (selectedMode == ConsoleKey.D1 || selectedMode == ConsoleKey.NumPad1 ||
+                    selectedMode == ConsoleKey.D2 || selectedMode == ConsoleKey.NumPad2 ||
                     selectedMode == ConsoleKey.D3 || selectedMode == ConsoleKey.NumPad3 ||
-                    selectedMode == ConsoleKey.D4 || selectedMode == ConsoleKey.NumPad4)
+                    selectedMode == ConsoleKey.D4 || selectedMode == ConsoleKey.NumPad4 ||
+                    selectedMode == ConsoleKey.D5 || selectedMode == ConsoleKey.NumPad5)
                 {
                     isContinueForMode = false;
                     Console.WriteLine(SelectMode(selectedMode));
@@ -183,6 +184,8 @@ namespace CodeGenerator
                         ? "Api Service"
                         : pressedKey == ConsoleKey.D4 || pressedKey == ConsoleKey.NumPad4
                             ? "Api End Point"
+                            : pressedKey == ConsoleKey.D5 || pressedKey == ConsoleKey.NumPad5
+                                ? "Api Request Param Class"
                     : "";
         }
 
@@ -701,6 +704,34 @@ namespace CodeGenerator
                 }
 
                 Console.WriteLine("Controller or Service not Found. Please check your input.");
+            }
+        }
+
+        private static void CodeGeneratorForApiRequestParamClass(ConsoleKey selectedMode, Engine engine, string databaseCodeName)
+        {
+            if (selectedMode == ConsoleKey.D5 || selectedMode == ConsoleKey.NumPad5)
+            {
+                #region User Input
+                Console.WriteLine(
+                    "Enter request parameter folder name eg: WGLCS");
+                if (!CancelableReadLine(out var folderName)) return;
+
+                Console.WriteLine(
+                    "Enter parameter class name eg: ParamAddDepartment");
+                if (!CancelableReadLine(out var className)) return;
+
+                Console.WriteLine("======================================");
+                #endregion
+
+                //Create ViewModel Class
+                string viewModelTem = engine.ReadTemplate(TemplateType.ApiRequestParamClass);
+                viewModelTem = engine.ProcessTemplate(viewModelTem, className, databaseCodeName);
+                engine.WriteToFile(Constants.ApiRequestParamClassDirectory, viewModelTem, className, folderName);
+
+                //Create Validator Class
+                string validatorTem = engine.ReadTemplate(TemplateType.Validator);
+                validatorTem = engine.ProcessTemplate(validatorTem, className, databaseCodeName);
+                engine.WriteToFile(Constants.ValidatorClassDirectory, validatorTem, className, folderName);
             }
         }
 

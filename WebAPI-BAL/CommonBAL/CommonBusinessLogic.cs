@@ -508,10 +508,12 @@ namespace WebAPI_BAL
         #region Store Procedure
 
         public virtual IEnumerable<TDataViewModel> ExecuteStoreProcedure<TData, TParams, TDataViewModel, TParamsViewModel>(
-            TParamsViewModel spParam, IDbTransaction transaction = null, bool manageTransaction = true) where TParams : class, ISProcParam
+            TParamsViewModel spParam, IDbTransaction transaction = null, bool manageTransaction = true, bool useMultipleActiveResultSet = true) where TParams : class, ISProcParam
         {
             if (_spRepo != null)
             {
+                UseMultipleActiveResultSet(useMultipleActiveResultSet);
+
                 TParams paramsData = _mapper.Map<TParams>(spParam);
                 IEnumerable<TData> spData = ManageOrHandleTransaction(_spRepo.Execute<TData, TParams>, paramsData,
                     transaction, manageTransaction);
@@ -522,10 +524,12 @@ namespace WebAPI_BAL
         }
 
         public virtual async Task<IEnumerable<TDataViewModel>> ExecuteStoreProcedureAsync<TData, TParams, TDataViewModel, TParamsViewModel>(
-            TParamsViewModel spParam, IDbTransaction transaction = null, bool manageTransaction = true) where TParams : class, ISProcParam
+            TParamsViewModel spParam, IDbTransaction transaction = null, bool manageTransaction = true, bool useMultipleActiveResultSet = true) where TParams : class, ISProcParam
         {
             if (_spRepo != null)
             {
+                UseMultipleActiveResultSet(useMultipleActiveResultSet);
+
                 TParams paramsData = _mapper.Map<TParams>(spParam);
                 IEnumerable<TData> spData = await ManageOrHandleTransaction(_spRepo.ExecuteAsync<TData, TParams>,
                     paramsData, transaction, manageTransaction);

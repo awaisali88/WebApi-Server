@@ -12,6 +12,7 @@ namespace CodeGenerator
         public const string ModelClassDirectory = @"WebAPI-Model\[DATABASENAME]\[MODEL]Model.cs";
         public const string ViewModelClassDirectory = @"WebAPI-ViewModel\DTO\[DATABASENAME]\[MODEL]ViewModel.cs";
         public const string ValidatorClassDirectory = @"WebAPI-ViewModel\Validator\[DATABASENAME]\[MODEL]ViewModelValidator.cs";
+        public const string ApiRequestParamClassDirectory = @"WebAPI-ViewModel\DTO\[DATABASENAME]\Request\[MODEL]ViewModel.cs";
 
         public const string MappingProfileClassDirectory = @"WebAPI-Server\AppStart\MappingProfile.cs";
         public const string MappingProfileKeyword = @"//[AUTO_GENERATED_MAPPER_[DATABASENAME]]";
@@ -107,6 +108,8 @@ namespace CodeGenerator
         public const string ApiEndPointTemplate = @"CodeGenerator\Templates\ApiEndPoint";
         public const string ApiEndPointServiceClassTemplate = @"CodeGenerator\Templates\ApiEndPointServiceClass";
         public const string ApiEndPointServiceInterfaceTemplate = @"CodeGenerator\Templates\ApiEndPointServiceInterface";
+
+        public const string ApiRequestParamClassTemplate = @"CodeGenerator\Templates\RequestParamClass";
         #endregion
 
         #region TemplateKeywords
@@ -161,6 +164,8 @@ namespace CodeGenerator
         ApiEndPoint,
         ApiEndPointFunction,
         ApiEndPointServiceClass,
-        ApiEndPointServiceInterface
+        ApiEndPointServiceInterface,
+
+        ApiRequestParamClass
     }
 }

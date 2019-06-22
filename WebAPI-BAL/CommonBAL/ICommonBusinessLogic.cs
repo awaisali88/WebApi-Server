@@ -77,11 +77,11 @@ namespace WebAPI_BAL
         /// <param name="manageTransaction"></param>
         /// <returns></returns>
         IEnumerable<TDataViewModel> ExecuteStoreProcedure<TData, TParams, TDataViewModel, TParamsViewModel>(
-            TParamsViewModel spParam, IDbTransaction transaction = null, bool manageTransaction = true)
+            TParamsViewModel spParam, IDbTransaction transaction = null, bool manageTransaction = true, bool useMultipleActiveResultSet = true)
             where TParams : class, ISProcParam;
 
         Task<IEnumerable<TDataViewModel>> ExecuteStoreProcedureAsync<TData, TParams, TDataViewModel, TParamsViewModel>(
-            TParamsViewModel spParam, IDbTransaction transaction = null, bool manageTransaction = true)
+            TParamsViewModel spParam, IDbTransaction transaction = null, bool manageTransaction = true, bool useMultipleActiveResultSet = true)
             where TParams : class, ISProcParam;
         #endregion
 

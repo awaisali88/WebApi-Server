@@ -11,7 +11,6 @@ using Dapper.Identity.Stores;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using WebAPI_BAL.IdentityManager;
@@ -48,7 +47,7 @@ namespace WebAPI_BAL.AuthLogic
         private readonly ApplicationSignInManager _signInManager;
         //private readonly UserStore _userStore;
         private readonly ITokenManager _tokenManager;
-        private readonly IEmailSender _emailSender;
+        private readonly NotificationManager.IEmailSender _emailSender;
         private readonly ISmsSender _smsSender;
         private readonly IJwtFactory _jwtFactory;
         private readonly JwtIssuerOptions _jwtOptions;

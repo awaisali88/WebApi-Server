@@ -234,6 +234,9 @@ namespace CodeGenerator
                     return ReadFile(Constants.ApiEndPointServiceClassTemplate);
                 case TemplateType.ApiEndPointServiceInterface:
                     return ReadFile(Constants.ApiEndPointServiceInterfaceTemplate);
+
+                case TemplateType.ApiRequestParamClass:
+                    return ReadFile(Constants.ApiRequestParamClassTemplate);
                 default:
                     return "";
             }
